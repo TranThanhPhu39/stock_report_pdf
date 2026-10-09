@@ -1,4 +1,5 @@
 """Evidence-based links from macro conditions through industry to the company."""
+from __future__ import annotations
 import statistics
 
 SECTOR_SIGNALS={"21":["construction_growth","industrial_growth","investment_growth"],"24":["construction_growth","investment_growth"],

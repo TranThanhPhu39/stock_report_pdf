@@ -1,4 +1,5 @@
 """Verify automatic acquisition from an empty workspace and safe partial failures."""
+from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 import json

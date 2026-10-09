@@ -1,4 +1,5 @@
 """Financial calculations with matched periods/scopes and explicit missing values."""
+from __future__ import annotations
 import math
 
 

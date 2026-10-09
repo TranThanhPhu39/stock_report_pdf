@@ -1,4 +1,5 @@
 """Discover source classifications; compare a dated sample selected by assets."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, date
 import json

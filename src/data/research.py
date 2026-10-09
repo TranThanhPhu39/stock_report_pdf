@@ -1,4 +1,5 @@
 """Acquire financial tables, company profile, news and an independent price check."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta
 import json

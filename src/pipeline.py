@@ -1,4 +1,5 @@
 """Application pipeline: always acquire source data before displaying a new result."""
+from __future__ import annotations
 
 import csv
 from datetime import date

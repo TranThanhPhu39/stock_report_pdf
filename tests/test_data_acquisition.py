@@ -1,4 +1,5 @@
 """Offline regression tests for completed-session filtering and source parsing."""
+from __future__ import annotations
 
 from datetime import date, datetime, timezone
 import unittest

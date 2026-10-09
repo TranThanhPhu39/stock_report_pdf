@@ -1,4 +1,5 @@
 """Market statistics from one provider-defined adjusted-close series."""
+from __future__ import annotations
 import math
 import statistics
 

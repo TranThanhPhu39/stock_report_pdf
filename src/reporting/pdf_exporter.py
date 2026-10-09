@@ -1,4 +1,5 @@
 """Selectable Vietnamese PDF from the saved analysis result."""
+from __future__ import annotations
 from pathlib import Path
 import sys
 from xml.sax.saxutils import escape

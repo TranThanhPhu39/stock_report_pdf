@@ -1,4 +1,5 @@
 """Exercise the real SDK against a mock transport without a paid API call."""
+from __future__ import annotations
 import json
 from pathlib import Path
 import sys

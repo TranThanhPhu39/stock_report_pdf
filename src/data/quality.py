@@ -1,4 +1,5 @@
 """Compare selected provider figures with documented issuer baselines and OCR evidence."""
+from __future__ import annotations
 import json
 
 

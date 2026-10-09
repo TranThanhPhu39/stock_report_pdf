@@ -1,4 +1,5 @@
 """StockInsight: request → automatic acquisition → analysis → selected PDF."""
+from __future__ import annotations
 from datetime import date, datetime, timedelta
 from pathlib import Path
 import html

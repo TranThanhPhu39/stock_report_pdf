@@ -1,4 +1,5 @@
 """Explicit P/B scenarios, with dated equity and current share-count assumptions."""
+from __future__ import annotations
 from datetime import datetime
 from src.data.providers import VN_TIME
 

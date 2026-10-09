@@ -1,4 +1,5 @@
 """Financial period/unit guards, independent checks and selective PDF behavior."""
+from __future__ import annotations
 from copy import deepcopy
 from datetime import date
 import json

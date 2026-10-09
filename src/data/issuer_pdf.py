@@ -1,4 +1,5 @@
 """Extract the latest HPG reviewed interim statement; preserve OCR evidence and checks."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 import hashlib

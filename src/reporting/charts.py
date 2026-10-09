@@ -1,4 +1,5 @@
 """Charts use the same adjusted series as the analysis."""
+from __future__ import annotations
 from pathlib import Path
 
 def market_chart(result, folder: Path):

@@ -1,4 +1,5 @@
 """Create a transparent headline digest from sourced company news."""
+from __future__ import annotations
 
 from datetime import date
 

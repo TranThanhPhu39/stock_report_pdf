@@ -1,4 +1,5 @@
 """Compute peer P/B from dated financials and independently matched daily quotes."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 import json

@@ -1,4 +1,5 @@
 """Validated user request and stable report-section identifiers."""
+from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from datetime import date
 

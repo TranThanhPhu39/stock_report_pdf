@@ -1,4 +1,5 @@
 """Acquire and persist source data for application and CLI workflows."""
+from __future__ import annotations
 
 import csv
 from datetime import date, datetime, timedelta

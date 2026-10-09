@@ -1,4 +1,5 @@
 """Structural checks for acquired daily prices; not independent accuracy verification."""
+from __future__ import annotations
 
 from datetime import date
 import math

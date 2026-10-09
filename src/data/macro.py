@@ -1,4 +1,5 @@
 """Automatically discover dated NSO releases and retrieve World Bank annual context."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime
 import json, math, re

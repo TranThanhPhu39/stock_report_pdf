@@ -1,4 +1,5 @@
 """Optional Gemini narration using a finite evidence bundle, never new data."""
+from __future__ import annotations
 import json
 import os
 import re

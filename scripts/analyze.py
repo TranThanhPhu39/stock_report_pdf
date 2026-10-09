@@ -1,4 +1,5 @@
 """Automatically fetch, analyze and export without pre-existing data files."""
+from __future__ import annotations
 import argparse
 from datetime import date, datetime, timedelta
 from pathlib import Path

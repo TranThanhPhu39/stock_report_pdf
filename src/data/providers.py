@@ -1,7 +1,9 @@
 """Public-source acquisition. No promise of real-time or verified adjustment basis."""
+from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta, timezone
 import json
+from typing import Optional
 import re
 from urllib.parse import urlencode, urljoin, urlparse
 from urllib.request import Request, urlopen
@@ -25,7 +27,7 @@ def download(url: str, timeout: int = 30) -> bytes:
         raise DataSourceError(f"Unable to retrieve {url}: {exc}") from exc
 
 
-def completed_day_cutoff(as_of: date, now: datetime | None = None) -> date:
+def completed_day_cutoff(as_of: date, now: Optional[datetime] = None) -> date:
     """Conservative rule: use only dates strictly before today's local date.
 
     Does not assume the market is closed or a daily bar is finalized today.
@@ -65,7 +67,7 @@ def parse_yahoo_chart(payload: dict, ticker: str, start: date, end: date) -> tup
         raise DataSourceError(f"Unrecognized Yahoo response: {exc}") from exc
 
 
-def fetch_daily_prices(ticker: str, start: date, as_of: date, now: datetime | None = None) -> dict:
+def fetch_daily_prices(ticker: str, start: date, as_of: date, now: Optional[datetime] = None) -> dict:
     ticker = ticker.strip().upper()
     if not re.fullmatch(r"[A-Z][A-Z0-9]{1,9}", ticker):
         raise ValueError("Invalid ticker")

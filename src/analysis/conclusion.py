@@ -1,4 +1,5 @@
 """Rules produce observations, implications and follow-up conditions, not buy/sell labels."""
+from __future__ import annotations
 
 
 def build_conclusion(financial, market, valuation, quote_check, interim=None):
