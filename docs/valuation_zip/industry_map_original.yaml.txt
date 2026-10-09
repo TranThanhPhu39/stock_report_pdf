@@ -1,0 +1,97 @@
+# Ánh xạ nhóm ngành và chỉ số định giá chuẩn theo chuẩn ICB (Industry Classification Benchmark)
+sectors:
+  materials:
+    name: "Thép và Vật liệu xây dựng"
+    tickers: ["HPG", "HSG", "NKG", "TLH", "POM", "VGS"]
+    median_pb: 1.25
+    median_pe: 11.2
+    median_roe: 12.8
+    peers:
+      - ticker: "HPG"
+        name: "Tập đoàn Hòa Phát"
+        pb: 1.35
+        pe: 11.5
+        roe: 13.2
+      - ticker: "HSG"
+        name: "Tập đoàn Hoa Sen"
+        pb: 1.15
+        pe: 12.8
+        roe: 9.8
+      - ticker: "NKG"
+        name: "Thép Nam Kim"
+        pb: 1.10
+        pe: 10.6
+        roe: 11.0
+  technology:
+    name: "Công nghệ thông tin"
+    tickers: ["FPT", "CMG", "ELC", "ITD", "SAM"]
+    median_pb: 3.80
+    median_pe: 18.5
+    median_roe: 24.5
+    peers:
+      - ticker: "FPT"
+        name: "Tập đoàn FPT"
+        pb: 4.20
+        pe: 19.2
+        roe: 25.8
+      - ticker: "CMG"
+        name: "Tập đoàn Công nghệ CMC"
+        pb: 3.40
+        pe: 18.0
+        roe: 16.5
+      - ticker: "ELC"
+        name: "Công nghệ Elcom"
+        pb: 2.10
+        pe: 14.5
+        roe: 15.2
+  consumer_staples:
+    name: "Thực phẩm và Đồ uống"
+    tickers: ["VNM", "QNS", "MCH", "MSN", "SAB", "KDC"]
+    median_pb: 2.15
+    median_pe: 14.8
+    median_roe: 21.0
+    peers:
+      - ticker: "VNM"
+        name: "Vinamilk"
+        pb: 2.25
+        pe: 14.2
+        roe: 22.5
+      - ticker: "QNS"
+        name: "Đường Quảng Ngãi"
+        pb: 1.95
+        pe: 9.8
+        roe: 26.0
+      - ticker: "MCH"
+        name: "Masan Consumer"
+        pb: 3.10
+        pe: 16.5
+        roe: 28.0
+  banking:
+    name: "Ngân hàng thương mại"
+    tickers: ["VCB", "TCB", "MBB", "ACB", "VPB", "CTG", "BID"]
+    median_pb: 1.30
+    median_pe: 8.5
+    median_roe: 18.5
+    peers:
+      - ticker: "VCB"
+        name: "Vietcombank"
+        pb: 2.60
+        pe: 13.5
+        roe: 20.2
+      - ticker: "TCB"
+        name: "Techcombank"
+        pb: 1.15
+        pe: 7.2
+        roe: 17.5
+      - ticker: "MBB"
+        name: "Ngân hàng Quân Đội"
+        pb: 1.10
+        pe: 6.8
+        roe: 21.0
+  general:
+    name: "Toàn thị trường (VN-Index benchmark)"
+    tickers: []
+    median_pb: 1.55
+    median_pe: 13.5
+    median_roe: 14.0
+    peers: []

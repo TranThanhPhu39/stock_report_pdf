@@ -1,0 +1,177 @@
+{
+  "checked_at": "2026-10-09T15:49:15.760378+07:00",
+  "offline_tests": {
+    "command": "python -m unittest discover -s tests -q",
+    "passed": 76,
+    "failed": 0
+  },
+  "sdk_test": "google-genai 2.29.0 actual request/schema serialization via httpx.MockTransport; not a live API call",
+  "ui_test": {
+    "ticker": "ACB",
+    "run_id": "ACB_20261009_152949_776563",
+    "exceptions": 0,
+    "price_records": 2574,
+    "ai_status": "missing_key",
+    "pdf_generated": true
+  },
+  "runs": [
+    {
+      "ticker": "ACB",
+      "run_id": "ACB_20261009_154413_444233",
+      "status": "partial",
+      "provider": "KBS",
+      "price_records": 2574,
+      "coverage": {
+        "requested_start": "2016-03-20",
+        "actual_start": "2016-06-15",
+        "actual_end": "2026-10-08",
+        "start_gap_days": 87
+      },
+      "price_check": "matched",
+      "matched_price_days": 20,
+      "financial_check": "not_independently_checked",
+      "errors": [],
+      "ai_status": "missing_key",
+      "models": {
+        "gordon": {
+          "available": false,
+          "reason": "Thiếu vốn cổ đông mẹ: NCI đang null hoặc vốn mẹ không dương; không tự thay null bằng 0."
+        },
+        "industry": {
+          "available": false,
+          "reason": "Thiếu vốn cổ đông mẹ: NCI đang null hoặc vốn mẹ không dương; không tự thay null bằng 0."
+        },
+        "pe": {
+          "available": true,
+          "base_price_vnd": 32302.3359412876
+        },
+        "dcf": {
+          "available": false,
+          "reason": "Không áp DCF CFO/FCFF của doanh nghiệp sản xuất cho ngân hàng/chứng khoán; cần mô hình vốn hoặc cổ tức riêng."
+        },
+        "weighted_average": {
+          "available": false,
+          "reason": "Cần ít nhất hai phương pháp có trọng số dương; không gọi một phương pháp là bình quân đa phương pháp."
+        }
+      },
+      "pdf": {
+        "file": "outputs/pdf/ACB_report.pdf",
+        "pages": 10,
+        "images": 6,
+        "links": 23,
+        "sha256": "49697f2ae4aac4d833a748b4070258c59fb0115ba265c0ba8066e8c27d331381",
+        "visual_review": "All final rendered pages inspected; additional full-resolution finance/DCF inspection; no clipping/overlap/orphan headings observed."
+      },
+      "evidence": "submission/evidence/upgrade_ACB.json"
+    },
+    {
+      "ticker": "HPG",
+      "run_id": "HPG_20261009_152009_511905",
+      "status": "analyzed",
+      "provider": "Yahoo",
+      "price_records": 261,
+      "coverage": {
+        "requested_start": "2025-10-09",
+        "actual_start": "2025-10-09",
+        "actual_end": "2026-10-08",
+        "start_gap_days": 0
+      },
+      "price_check": "matched",
+      "matched_price_days": 20,
+      "financial_check": "matched_selected_fields",
+      "errors": [],
+      "ai_status": "disabled",
+      "models": {
+        "gordon": {
+          "available": true,
+          "target_price_vnd": 17577.504114420568
+        },
+        "industry": {
+          "available": true,
+          "reason": "Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot.",
+          "target_price_vnd": 14255.09646713919
+        },
+        "pe": {
+          "available": true,
+          "base_price_vnd": 21963.622804848645
+        },
+        "dcf": {
+          "available": false,
+          "reason": "FCFF năm gốc không dương; chưa có dự báo phục hồi được chứng minh."
+        },
+        "weighted_average": {
+          "available": true,
+          "target_price_vnd": 18939.961547814262
+        }
+      },
+      "pdf": {
+        "file": "outputs/pdf/HPG_report.pdf",
+        "pages": 13,
+        "images": 6,
+        "links": 35,
+        "sha256": "91fb5eb583e339b9c400739e5774631834da709f2c4126f04758bad5a466d735",
+        "visual_review": "All final rendered pages inspected; additional full-resolution finance/DCF inspection; no clipping/overlap/orphan headings observed."
+      },
+      "evidence": "submission/evidence/upgrade_HPG.json"
+    },
+    {
+      "ticker": "VNM",
+      "run_id": "VNM_20261009_152023_234377",
+      "status": "analyzed",
+      "provider": "Yahoo",
+      "price_records": 261,
+      "coverage": {
+        "requested_start": "2025-10-09",
+        "actual_start": "2025-10-09",
+        "actual_end": "2026-10-08",
+        "start_gap_days": 0
+      },
+      "price_check": "matched",
+      "matched_price_days": 20,
+      "financial_check": "matched_selected_fields",
+      "errors": [],
+      "ai_status": "disabled",
+      "models": {
+        "gordon": {
+          "available": true,
+          "target_price_vnd": 48434.45979916305
+        },
+        "industry": {
+          "available": true,
+          "reason": "Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot.",
+          "target_price_vnd": 28986.35260499551
+        },
+        "pe": {
+          "available": true,
+          "base_price_vnd": 54031.01775884988
+        },
+        "dcf": {
+          "available": true,
+          "reason": "",
+          "per_share_price_vnd": 54413.48175505778
+        },
+        "weighted_average": {
+          "available": true,
+          "target_price_vnd": 48783.54291284253
+        }
+      },
+      "pdf": {
+        "file": "outputs/pdf/VNM_report.pdf",
+        "pages": 12,
+        "images": 6,
+        "links": 38,
+        "sha256": "13754f9b819675fd0a2a3f8df4e09573d90f2d8c793ee9c2904a51e69804b6c4",
+        "visual_review": "All final rendered pages inspected; additional full-resolution finance/DCF inspection; no clipping/overlap/orphan headings observed."
+      },
+      "evidence": "submission/evidence/upgrade_VNM.json"
+    }
+  ],
+  "limits": [
+    "Only ACB/HPG/VNM rerun after this upgrade; not a whole-market certification.",
+    "ACB requested 2016-03-20, received prices from 2016-06-15; KBS adjustment history unverified.",
+    "ACB NCI null prevents P/B/Gordon; PE uses known annual parent profit and current shares as a disclosed scenario.",
+    "HPG nonpositive base FCFF prevents DCF.",
+    "Gemini live API and Streamlit Cloud deployment not tested without credentials.",
+    "Industry sample and selected-field financial checks do not certify every value in the financial statements."
+  ]
+}

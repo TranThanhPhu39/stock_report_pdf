@@ -56,11 +56,15 @@ def analyze_financials(records: list[dict]) -> dict:
         refs = [fields[k] for k in dependencies if k in fields]
         metrics.append({"key": key, "label": label, "value": value, "unit": unit, "period": str(latest["year"]),
                         "formula": formula, "inputs": refs, "reason": reason if value is None else None})
-    industry = "bank" if "net_interest_income" in fields else "securities" if "brokerage_revenue" in fields else "nonfinancial" if latest["business_type"] == 1 else "financial"
-    for key, label in [("revenue", "Doanh thu thuần"), ("net_profit", "LNST hợp nhất"), ("parent_profit", "LNST cổ đông công ty mẹ"),
-                       ("assets", "Tổng tài sản"), ("equity", "Vốn chủ sở hữu"), ("cfo", "Dòng tiền kinh doanh")]:
+    industry = "bank" if latest["business_type"]==3 or "net_interest_income" in fields else "securities" if latest["business_type"]==2 or "brokerage_revenue" in fields else "nonfinancial" if latest["business_type"] == 1 else "financial"
+    basic = [("net_profit", "LNST hợp nhất"), ("parent_profit", "LNST cổ đông công ty mẹ"),
+                       ("assets", "Tổng tài sản"), ("equity", "Vốn chủ sở hữu"), ("cfo", "Dòng tiền kinh doanh")]
+    for key, label in ([("revenue", "Doanh thu thuần")] if industry!="bank" else []) + basic:
         metric(key, label, get(latest, key), "VND", "Số liệu báo cáo năm", [key], "Nguồn thiếu chỉ tiêu phù hợp")
-    for key, label in [("revenue", "Tăng trưởng doanh thu"), ("net_profit", "Tăng trưởng LNST")]:
+    growth_fields = ([("revenue", "Tăng trưởng doanh thu")] if industry!="bank" else []) + [("net_profit", "Tăng trưởng LNST")]
+    if industry=="bank":
+        growth_fields += [("net_interest_income","Tăng trưởng thu nhập lãi thuần"), ("customer_loans","Tăng trưởng cho vay khách hàng"), ("customer_deposits","Tăng trưởng tiền gửi khách hàng")]
+    for key, label in growth_fields:
         value = growth(get(latest, key), get(previous, key))
         metric(key+"_growth", label, value, "%", "(Kỳ hiện tại / cùng kỳ năm trước - 1) × 100", [key], "Thiếu cùng kỳ hoặc kỳ gốc không phù hợp")
         if previous and key in previous["fields"]:
@@ -90,6 +94,7 @@ def analyze_financials(records: list[dict]) -> dict:
             v=ratio(get(latest,numerator),get(latest,denominator))
             metric(key,label,v*100 if v is not None else None,"%","Cho vay khách hàng gộp / tiền gửi khách hàng × 100; tỷ số phân tích, không phải LDR theo quy định",[numerator,denominator],"Thiếu cho vay/tiền gửi")
         cost,pp=get(latest,"operating_cost"),get(latest,"pre_provision_profit")
+        metric("total_operating_income","Tổng thu nhập hoạt động",pp+cost if pp is not None and cost is not None else None,"VND","Lợi nhuận trước dự phòng + chi phí hoạt động",["operating_cost","pre_provision_profit"],"Thiếu lợi nhuận trước dự phòng/chi phí")
         cir=ratio(cost,pp+cost) if pp is not None and cost is not None else None
         metric("cir","Chi phí / tổng thu nhập hoạt động",cir*100 if cir is not None else None,"%","Chi phí hoạt động / (lợi nhuận trước dự phòng + chi phí hoạt động) × 100",["operating_cost","pre_provision_profit"],"Thiếu thu nhập/chi phí")
         errors.append("Ngân hàng: không dùng biên gộp, CFO/LNST hoặc nợ vay/vốn của doanh nghiệp sản xuất; chưa đủ dữ liệu để tính NIM, NPL và CAR.")

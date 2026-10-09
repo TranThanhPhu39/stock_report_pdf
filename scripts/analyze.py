@@ -20,9 +20,18 @@ def main():
     parser.add_argument("--mode",choices=["summary","full"],default="full")
     parser.add_argument("--sections",nargs="+",choices=list(SECTION_LABELS),default=list(SECTION_LABELS))
     parser.add_argument("--target-pb",type=float,default=1.5)
+    parser.add_argument("--target-pe",type=float,default=12.)
+    parser.add_argument("--cost-of-equity",type=float,default=.115)
+    parser.add_argument("--wacc",type=float,default=.10)
+    parser.add_argument("--terminal-growth",type=float,default=.035)
+    parser.add_argument("--forecast-growth",type=float,default=.07)
+    parser.add_argument("--tax-rate",type=float,default=.20)
+    parser.add_argument("--use-ai",action="store_true")
     parser.add_argument("--output",type=Path)
     args=parser.parse_args()
-    result=run_analysis(args.ticker,args.start,args.as_of,mode=args.mode,sections=args.sections,target_pb=args.target_pb)
+    result=run_analysis(args.ticker,args.start,args.as_of,mode=args.mode,sections=args.sections,target_pb=args.target_pb,
+                        target_pe=args.target_pe,cost_of_equity=args.cost_of_equity,wacc=args.wacc,terminal_growth=args.terminal_growth,
+                        forecast_growth=args.forecast_growth,tax_rate=args.tax_rate,use_ai=args.use_ai)
     if not result["market"] and not result["financial"]["metrics"]:
         print("Không lấy được dữ liệu phân tích:",result["errors"]);return 1
     path=generate_report(result,args.output)

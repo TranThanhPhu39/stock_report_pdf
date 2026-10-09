@@ -1,0 +1,1282 @@
+{
+  "ticker": "HPG",
+  "request": {
+    "ticker": "HPG",
+    "start": "2025-10-09",
+    "as_of": "2026-10-09",
+    "mode": "full",
+    "sections": [
+      "overview",
+      "macro",
+      "industry",
+      "market",
+      "financial",
+      "reference",
+      "valuation",
+      "news",
+      "risks"
+    ],
+    "target_pb": 1.5,
+    "target_pe": 12.0,
+    "cost_of_equity": 0.115,
+    "terminal_growth": 0.035,
+    "forecast_growth": 0.07,
+    "wacc": 0.1,
+    "tax_rate": 0.2,
+    "use_ai": false
+  },
+  "run_id": "HPG_20261009_152009_511905",
+  "note": "Final analysis recalculated from the same retrieved snapshots to add source references; numerical valuation results unchanged.",
+  "coverage": {
+    "requested_start": "2025-10-09",
+    "actual_start": "2025-10-09",
+    "actual_end": "2026-10-08",
+    "start_gap_days": 0
+  },
+  "price_attempts": [
+    {
+      "provider": "Yahoo",
+      "validation": {
+        "valid": true,
+        "row_count": 261,
+        "errors": [],
+        "warnings": [
+          "Prices have not been cross-checked against an independent source.",
+          "Provider OHLC adjustment basis is not yet verified; do not describe it as raw/adjusted or total return.",
+          "All current-day observations are excluded conservatively, including after market close."
+        ]
+      },
+      "raw_file": "data/raw/prices/HPG_20261009_152009_511905_yahoo.json"
+    }
+  ],
+  "price_check": {
+    "status": "matched",
+    "checks": [
+      {
+        "date": "2026-09-11",
+        "yahoo_close": 21300.0,
+        "kbs_close": 21300,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 21300.0,
+        "reference_close": 21300
+      },
+      {
+        "date": "2026-09-14",
+        "yahoo_close": 20900.0,
+        "kbs_close": 20900,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20900.0,
+        "reference_close": 20900
+      },
+      {
+        "date": "2026-09-15",
+        "yahoo_close": 21200.0,
+        "kbs_close": 21200,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 21200.0,
+        "reference_close": 21200
+      },
+      {
+        "date": "2026-09-16",
+        "yahoo_close": 20950.0,
+        "kbs_close": 20950,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20950.0,
+        "reference_close": 20950
+      },
+      {
+        "date": "2026-09-17",
+        "yahoo_close": 21200.0,
+        "kbs_close": 21200,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 21200.0,
+        "reference_close": 21200
+      },
+      {
+        "date": "2026-09-18",
+        "yahoo_close": 21550.0,
+        "kbs_close": 21550,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 21550.0,
+        "reference_close": 21550
+      },
+      {
+        "date": "2026-09-21",
+        "yahoo_close": 21100.0,
+        "kbs_close": 21100,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 21100.0,
+        "reference_close": 21100
+      },
+      {
+        "date": "2026-09-22",
+        "yahoo_close": 21150.0,
+        "kbs_close": 21150,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 21150.0,
+        "reference_close": 21150
+      },
+      {
+        "date": "2026-09-23",
+        "yahoo_close": 21050.0,
+        "kbs_close": 21050,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 21050.0,
+        "reference_close": 21050
+      },
+      {
+        "date": "2026-09-24",
+        "yahoo_close": 20800.0,
+        "kbs_close": 20800,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20800.0,
+        "reference_close": 20800
+      },
+      {
+        "date": "2026-09-25",
+        "yahoo_close": 20650.0,
+        "kbs_close": 20650,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20650.0,
+        "reference_close": 20650
+      },
+      {
+        "date": "2026-09-28",
+        "yahoo_close": 20200.0,
+        "kbs_close": 20200,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20200.0,
+        "reference_close": 20200
+      },
+      {
+        "date": "2026-09-29",
+        "yahoo_close": 20300.0,
+        "kbs_close": 20300,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20300.0,
+        "reference_close": 20300
+      },
+      {
+        "date": "2026-09-30",
+        "yahoo_close": 20150.0,
+        "kbs_close": 20150,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20150.0,
+        "reference_close": 20150
+      },
+      {
+        "date": "2026-10-01",
+        "yahoo_close": 20050.0,
+        "kbs_close": 20050,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20050.0,
+        "reference_close": 20050
+      },
+      {
+        "date": "2026-10-02",
+        "yahoo_close": 20050.0,
+        "kbs_close": 20050,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20050.0,
+        "reference_close": 20050
+      },
+      {
+        "date": "2026-10-05",
+        "yahoo_close": 20500.0,
+        "kbs_close": 20500,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20500.0,
+        "reference_close": 20500
+      },
+      {
+        "date": "2026-10-06",
+        "yahoo_close": 20500.0,
+        "kbs_close": 20500,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20500.0,
+        "reference_close": 20500
+      },
+      {
+        "date": "2026-10-07",
+        "yahoo_close": 20350.0,
+        "kbs_close": 20350,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20350.0,
+        "reference_close": 20350
+      },
+      {
+        "date": "2026-10-08",
+        "yahoo_close": 20150.0,
+        "kbs_close": 20150,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 20150.0,
+        "reference_close": 20150
+      }
+    ],
+    "latest_match": true,
+    "note": "Đối chiếu giá đóng cửa tối đa 20 ngày gần nhất, sai lệch cho phép 0,1%; không xác nhận toàn bộ lịch sử điều chỉnh.",
+    "primary_provider": "Yahoo",
+    "reference_provider": "KBS",
+    "source_id": "KBS_price_check_HPG_20261009_152009_511905"
+  },
+  "financial_check": {
+    "status": "matched_selected_fields",
+    "checks": [
+      {
+        "metric": "revenue",
+        "period": "2025",
+        "actual_billion_vnd": 156116.094618,
+        "reference_billion_vnd": 156116,
+        "match": true,
+        "url": "https://file.hoaphat.com.vn/hoaphat-com-vn/2026/04/bao-cao-thuong-nien-2025-1.pdf",
+        "locator": "1.5 Tóm tắt các chỉ số tài chính"
+      },
+      {
+        "metric": "net_profit",
+        "period": "2025",
+        "actual_billion_vnd": 15514.931572,
+        "reference_billion_vnd": 15515,
+        "match": true,
+        "url": "https://file.hoaphat.com.vn/hoaphat-com-vn/2026/04/bao-cao-thuong-nien-2025-1.pdf",
+        "locator": "1.5 Tóm tắt các chỉ số tài chính"
+      },
+      {
+        "metric": "assets",
+        "period": "2025",
+        "actual_billion_vnd": 257899.200818,
+        "reference_billion_vnd": 257899.200817547,
+        "match": true,
+        "source_id": "HPG_9a2881a88ac8ca4c",
+        "locator": "BCTC bán niên, cột đầu kỳ, trang PDF 10"
+      },
+      {
+        "metric": "equity",
+        "period": "2025",
+        "actual_billion_vnd": 131220.010877,
+        "reference_billion_vnd": 131220.010876575,
+        "match": true,
+        "source_id": "HPG_9a2881a88ac8ca4c",
+        "locator": "BCTC bán niên, cột đầu kỳ, trang PDF 11"
+      },
+      {
+        "metric": "liabilities",
+        "period": "2025",
+        "actual_billion_vnd": 126679.189941,
+        "reference_billion_vnd": 126679.189940972,
+        "match": true,
+        "source_id": "HPG_9a2881a88ac8ca4c",
+        "locator": "BCTC bán niên, cột đầu kỳ, trang PDF 11"
+      }
+    ],
+    "note": "Chỉ đối chiếu các chỉ tiêu được liệt kê; không chứng nhận mọi số liệu hay toàn bộ lịch sử."
+  },
+  "latest_financial_period": {
+    "year": 2025,
+    "fields": {
+      "revenue": {
+        "value": 156116094618000.0,
+        "unit": "VND",
+        "source_id": "KBS_income_HPG_20261009_152009_511905",
+        "source_field": 2216,
+        "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+        "source_value": 156116094618.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "cost_of_sales": {
+        "value": 131618306435000.0,
+        "unit": "VND",
+        "source_id": "KBS_income_HPG_20261009_152009_511905",
+        "source_field": 2207,
+        "source_label": "4. Giá vốn hàng bán ",
+        "source_value": 131618306435.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "gross_profit": {
+        "value": 24497788183000.0,
+        "unit": "VND",
+        "source_id": "KBS_income_HPG_20261009_152009_511905",
+        "source_field": 2217,
+        "source_label": "5. Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
+        "source_value": 24497788183.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "interest_expense": {
+        "value": 3114855869000.0,
+        "unit": "VND",
+        "source_id": "KBS_income_HPG_20261009_152009_511905",
+        "source_field": 2223,
+        "source_label": "   Trong đó: Chi phí đi vay",
+        "source_value": 3114855869.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "net_profit": {
+        "value": 15514931572000.0,
+        "unit": "VND",
+        "source_id": "KBS_income_HPG_20261009_152009_511905",
+        "source_field": 2212,
+        "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+        "source_value": 15514931572.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "parent_profit": {
+        "value": 15453174006000.0,
+        "unit": "VND",
+        "source_id": "KBS_income_HPG_20261009_152009_511905",
+        "source_field": 2214,
+        "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+        "source_value": 15453174006.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "eps": {
+        "value": 1973.0,
+        "unit": "VND_per_share",
+        "source_id": "KBS_income_HPG_20261009_152009_511905",
+        "source_field": 2215,
+        "source_label": "19. Lãi cơ bản trên cổ phiếu (VNÐ)",
+        "source_value": 1973.0,
+        "unit_multiplier": 1,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "interest_paid": {
+        "value": -2884165977000.0,
+        "unit": "VND",
+        "source_id": "KBS_cashflow_HPG_20261009_152009_511905",
+        "source_field": 2250,
+        "source_label": "Chi phí đi vay đã trả",
+        "source_value": -2884165977.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "cfo": {
+        "value": 17365859057000.0,
+        "unit": "VND",
+        "source_id": "KBS_cashflow_HPG_20261009_152009_511905",
+        "source_field": 2234,
+        "source_label": "Lưu chuyển tiền thuần từ hoạt động kinh doanh",
+        "source_value": 17365859057.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "capex_cash": {
+        "value": -25748320477000.0,
+        "unit": "VND",
+        "source_id": "KBS_cashflow_HPG_20261009_152009_511905",
+        "source_field": 2254,
+        "source_label": "1. Tiền chi để mua sắm, xây dựng TSCĐ và các tài sản dài hạn khác",
+        "source_value": -25748320477.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "borrowings_received": {
+        "value": 149548990395000.0,
+        "unit": "VND",
+        "source_id": "KBS_cashflow_HPG_20261009_152009_511905",
+        "source_field": 2263,
+        "source_label": "3. Tiền thu từ đi vay",
+        "source_value": 149548990395.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "debt_repaid": {
+        "value": -140337963743000.0,
+        "unit": "VND",
+        "source_id": "KBS_cashflow_HPG_20261009_152009_511905",
+        "source_field": 2264,
+        "source_label": "4. Tiền trả nợ gốc vay",
+        "source_value": -140337963743.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "current_assets": {
+        "value": 103659402760000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 3000,
+        "source_label": "A. TÀI SẢN NGẮN HẠN",
+        "source_value": 103659402760.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "cash": {
+        "value": 8300890304000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 3003,
+        "source_label": "I. Tiền và các khoản tương đương tiền",
+        "source_value": 8300890304.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "current_liabilities": {
+        "value": 51513185000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 3012,
+        "source_label": "5. Lợi thế thương mại",
+        "source_value": 51513185.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "assets": {
+        "value": 257899200818000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 2996,
+        "source_label": "TỔNG CỘNG TÀI SẢN",
+        "source_value": 257899200818.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "liabilities": {
+        "value": 126679189941000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 2997,
+        "source_label": "C. NỢ PHẢI TRẢ",
+        "source_value": 126679189941.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "short_debt": {
+        "value": 64694957245000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 3077,
+        "source_label": "11. Vay và nợ thuê tài chính ngắn hạn",
+        "source_value": 64694957245.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "long_debt": {
+        "value": 27479194057000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 3078,
+        "source_label": "9. Vay và nợ thuê tài chính dài hạn",
+        "source_value": 27479194057.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "equity": {
+        "value": 131220010877000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 2998,
+        "source_label": "D. VỐN CHỦ SỞ HỮU",
+        "source_value": 131220010877.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      "non_controlling_equity": {
+        "value": 2039012776000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 5320,
+        "source_label": "13. Lợi ích cổ đông không kiểm soát",
+        "source_value": 2039012776.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      }
+    },
+    "business_type": 1,
+    "period_end": "2025-12-31",
+    "scope": "consolidated"
+  },
+  "valuation": {
+    "available": true,
+    "reason": "Đã tính phương pháp đủ đầu vào; xem giới hạn từng phương pháp.",
+    "blocked_reasons": [],
+    "scenarios": [
+      {
+        "label": "Thận trọng",
+        "target_pb": 1.2000000000000002,
+        "reference_price_vnd": 18360.517488139343,
+        "difference_pct": -8.880806510474725
+      },
+      {
+        "label": "Cơ sở",
+        "target_pb": 1.5,
+        "reference_price_vnd": 22950.64686017418,
+        "difference_pct": 13.898991861906595
+      },
+      {
+        "label": "Thuận lợi",
+        "target_pb": 1.7999999999999998,
+        "reference_price_vnd": 27540.776232209017,
+        "difference_pct": 36.67879023428793
+      }
+    ],
+    "pb_methods": [
+      {
+        "method": "P/B giả định người dùng",
+        "multiple": 1.5,
+        "target_price_vnd": 22950.64686017418,
+        "difference_pct": 13.898991861906595
+      },
+      {
+        "method": "P/B Gordon theo ROE mẹ",
+        "multiple": 1.1488240977374677,
+        "target_price_vnd": 17577.504114420568,
+        "difference_pct": -12.766728960691974
+      },
+      {
+        "method": "P/B trung vị mẫu ngành",
+        "multiple": 0.9316793914777923,
+        "target_price_vnd": 14255.09646713919,
+        "difference_pct": -29.25510438144322
+      }
+    ],
+    "book_value_per_share": 15300.43124011612,
+    "reference_pb": 1.316956344809996,
+    "inputs": [
+      {
+        "value": 131220010877000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 2998,
+        "source_label": "D. VỐN CHỦ SỞ HỮU",
+        "source_value": 131220010877.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      {
+        "value": 2039012776000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_HPG_20261009_152009_511905",
+        "source_field": 5320,
+        "source_label": "13. Lợi ích cổ đông không kiểm soát",
+        "source_value": 2039012776.0,
+        "unit_multiplier": 1000,
+        "period": "2025",
+        "published_at": "2026-03-27",
+        "statement_scope": "consolidated"
+      },
+      {
+        "source_id": "KBS_profile_HPG_20261009_152009_511905",
+        "value": 8442964520,
+        "unit": "shares",
+        "period": "2026-10-09"
+      },
+      {
+        "source_id": "YAHOO_HPG_20261009_152009_511905",
+        "value": 20150.0,
+        "unit": "VND/share",
+        "period": "2026-10-08"
+      },
+      {
+        "source_id": "KBS_price_check_HPG_20261009_152009_511905",
+        "value": 20150.0,
+        "unit": "VND/share",
+        "period": "2026-10-08",
+        "role": "independently matched closing price"
+      }
+    ],
+    "assumptions": {
+      "target_pb": 1.5,
+      "target_pe": 12.0,
+      "cost_of_equity": 0.115,
+      "terminal_growth": 0.035,
+      "forecast_growth": 0.07,
+      "wacc": 0.1,
+      "tax_rate": 0.2
+    },
+    "assumption": "Kịch bản giả định, không phải khuyến nghị mua/bán. Vốn/lợi nhuận cuối năm quy đổi trên CP snapshot; giả định không đổi vốn, cần xem phát hành/cổ tức sau cuối kỳ.",
+    "formula": "BVPS = vốn mẹ / CP; Gordon P/B = (ROE mẹ - g)/(Ke - g); EPS quy đổi = LNST mẹ năm / CP snapshot; FCFF = CFO + lãi đã trả × (1-thuế) - CAPEX; vốn = PV(FCFF) + tiền - nợ vay - NCI.",
+    "pe_status": "Lợi nhuận năm 2025 / CP tại 2026-10-09; không phải P/E TTM.",
+    "gordon": {
+      "available": true,
+      "roe_pct": 12.690592781899742,
+      "cost_of_equity_pct": 11.5,
+      "growth_rate_pct": 3.5000000000000004,
+      "justified_pb": 1.1488240977374677,
+      "target_price_vnd": 17577.504114420568,
+      "difference_pct": -12.766728960691974,
+      "formula": "P/B = (ROE cổ đông mẹ - g)/(Ke - g)",
+      "explanation": "Giả định ROE năm bền vững, g < ROE và g < Ke; không ép bội số vào khoảng tùy ý.",
+      "inputs": [
+        {
+          "value": 15453174006000.0,
+          "unit": "VND",
+          "source_id": "KBS_income_HPG_20261009_152009_511905",
+          "source_field": 2214,
+          "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+          "source_value": 15453174006.0,
+          "unit_multiplier": 1000,
+          "period": "2025",
+          "published_at": "2026-03-27",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 131220010877000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_HPG_20261009_152009_511905",
+          "source_field": 2998,
+          "source_label": "D. VỐN CHỦ SỞ HỮU",
+          "source_value": 131220010877.0,
+          "unit_multiplier": 1000,
+          "period": "2025",
+          "published_at": "2026-03-27",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 2039012776000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_HPG_20261009_152009_511905",
+          "source_field": 5320,
+          "source_label": "13. Lợi ích cổ đông không kiểm soát",
+          "source_value": 2039012776.0,
+          "unit_multiplier": 1000,
+          "period": "2025",
+          "published_at": "2026-03-27",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 114647457984000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_HPG_20261009_152009_511905",
+          "source_field": 2998,
+          "source_label": "D. VỐN CHỦ SỞ HỮU",
+          "source_value": 114647457984.0,
+          "unit_multiplier": 1000,
+          "period": "2024",
+          "published_at": "2025-03-28",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 290990632000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_HPG_20261009_152009_511905",
+          "source_field": 5320,
+          "source_label": "13. Lợi ích cổ đông không kiểm soát",
+          "source_value": 290990632.0,
+          "unit_multiplier": 1000,
+          "period": "2024",
+          "published_at": "2025-03-28",
+          "statement_scope": "consolidated"
+        }
+      ]
+    },
+    "industry": {
+      "available": true,
+      "peers": [
+        {
+          "ticker": "NKG",
+          "price_date": "2026-10-08",
+          "shares_snapshot": "2026-10-09",
+          "equity_period": "2025-12-31",
+          "pb": 0.5911438832173329,
+          "pe": 22.85263834505204,
+          "roe": 2.9184758963186357,
+          "inputs": [
+            {
+              "value": 7635393345000.0,
+              "unit": "VND",
+              "source_id": "PEER_NKG_balance_HPG_20261009_152009_511905",
+              "source_field": 2998,
+              "source_label": "D. VỐN CHỦ SỞ HỮU",
+              "source_value": 7635393345.0,
+              "unit_multiplier": 1000,
+              "period": "2025",
+              "published_at": "2026-03-26",
+              "statement_scope": "consolidated"
+            },
+            {
+              "value": 14974068000.0,
+              "unit": "VND",
+              "source_id": "PEER_NKG_balance_HPG_20261009_152009_511905",
+              "source_field": 5320,
+              "source_label": "13. Lợi ích cổ đông không kiểm soát",
+              "source_value": 14974068.0,
+              "unit_multiplier": 1000,
+              "period": "2025",
+              "published_at": "2026-03-26",
+              "statement_scope": "consolidated"
+            },
+            {
+              "value": 197122283000.0,
+              "unit": "VND",
+              "source_id": "PEER_NKG_income_HPG_20261009_152009_511905",
+              "source_field": 2214,
+              "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+              "source_value": 197122283.0,
+              "unit_multiplier": 1000,
+              "period": "2025",
+              "published_at": "2026-03-26",
+              "statement_scope": "consolidated"
+            },
+            {
+              "source_id": "VAL_PROFILE_NKG_HPG_20261009_152009_511905",
+              "value": 492323961,
+              "unit": "shares",
+              "period": "2026-10-09"
+            },
+            {
+              "source_id": "VAL_YAHOO_NKG_HPG_20261009_152009_511905",
+              "value": 9150.0,
+              "unit": "VND/share",
+              "period": "2026-10-08",
+              "provider": "YAHOO"
+            },
+            {
+              "source_id": "VAL_KBS_NKG_HPG_20261009_152009_511905",
+              "value": 9150,
+              "unit": "VND/share",
+              "period": "2026-10-08",
+              "provider": "KBS"
+            }
+          ]
+        },
+        {
+          "ticker": "SHI",
+          "price_date": "2026-10-08",
+          "shares_snapshot": "2026-10-09",
+          "equity_period": "2025-12-31",
+          "pb": 1.2722148997382519,
+          "pe": 47.22377034924068,
+          "roe": 3.8479944013329894,
+          "inputs": [
+            {
+              "value": 2175736387000.0,
+              "unit": "VND",
+              "source_id": "PEER_SHI_balance_HPG_20261009_152009_511905",
+              "source_field": 2998,
+              "source_label": "D. VỐN CHỦ SỞ HỮU",
+              "source_value": 2175736387.0,
+              "unit_multiplier": 1000,
+              "period": "2025",
+              "published_at": "2026-03-31",
+              "statement_scope": "consolidated"
+            },
+            {
+              "value": 305538446000.0,
+              "unit": "VND",
+              "source_id": "PEER_SHI_balance_HPG_20261009_152009_511905",
+              "source_field": 5320,
+              "source_label": "13. Lợi ích cổ đông không kiểm soát",
+              "source_value": 305538446.0,
+              "unit_multiplier": 1000,
+              "period": "2025",
+              "published_at": "2026-03-31",
+              "statement_scope": "consolidated"
+            },
+            {
+              "value": 50383391000.0,
+              "unit": "VND",
+              "source_id": "PEER_SHI_income_HPG_20261009_152009_511905",
+              "source_field": 2214,
+              "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+              "source_value": 50383391.0,
+              "unit_multiplier": 1000,
+              "period": "2025",
+              "published_at": "2026-03-31",
+              "statement_scope": "consolidated"
+            },
+            {
+              "source_id": "VAL_PROFILE_SHI_HPG_20261009_152009_511905",
+              "value": 169949549,
+              "unit": "shares",
+              "period": "2026-10-09"
+            },
+            {
+              "source_id": "VAL_YAHOO_SHI_HPG_20261009_152009_511905",
+              "value": 14000.0,
+              "unit": "VND/share",
+              "period": "2026-10-08",
+              "provider": "YAHOO"
+            },
+            {
+              "source_id": "VAL_KBS_SHI_HPG_20261009_152009_511905",
+              "value": 14000,
+              "unit": "VND/share",
+              "period": "2026-10-08",
+              "provider": "KBS"
+            }
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "ticker": "TVN",
+          "reason": "Unable to retrieve https://query1.finance.yahoo.com/v8/finance/chart/TVN.VN?period1=1787590800&period2=1791478800&interval=1d&events=div%2Csplits: HTTP Error 404: Not Found"
+        },
+        {
+          "ticker": "GDA",
+          "reason": "Unable to retrieve https://query1.finance.yahoo.com/v8/finance/chart/GDA.VN?period1=1787590800&period2=1791478800&interval=1d&events=div%2Csplits: HTTP Error 404: Not Found"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "VAL_PROFILE_NKG_HPG_20261009_152009_511905",
+          "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/profile/NKG?l=1",
+          "retrieved_at": "2026-10-09T15:20:19.545248+07:00",
+          "page_or_table": "profile.KLCPLH",
+          "notes": "Current shares; annual equity held constant as an explicit scenario assumption"
+        },
+        {
+          "source_id": "VAL_YAHOO_NKG_HPG_20261009_152009_511905",
+          "url_or_file": "https://query1.finance.yahoo.com/v8/finance/chart/NKG.VN?period1=1787590800&period2=1791478800&interval=1d&events=div%2Csplits",
+          "retrieved_at": "2026-10-09T15:20:20.316059+07:00",
+          "page_or_table": "2026-10-08",
+          "notes": "Only closing price on this date cross-checked; not full adjustment history"
+        },
+        {
+          "source_id": "VAL_KBS_NKG_HPG_20261009_152009_511905",
+          "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/NKG/data_day?sdate=25-08-2026&edate=08-10-2026",
+          "retrieved_at": "2026-10-09T15:20:20.524732+07:00",
+          "page_or_table": "2026-10-08",
+          "notes": "Only closing price on this date cross-checked; not full adjustment history"
+        },
+        {
+          "source_id": "VAL_PROFILE_SHI_HPG_20261009_152009_511905",
+          "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/profile/SHI?l=1",
+          "retrieved_at": "2026-10-09T15:20:20.658393+07:00",
+          "page_or_table": "profile.KLCPLH",
+          "notes": "Current shares; annual equity held constant as an explicit scenario assumption"
+        },
+        {
+          "source_id": "VAL_YAHOO_SHI_HPG_20261009_152009_511905",
+          "url_or_file": "https://query1.finance.yahoo.com/v8/finance/chart/SHI.VN?period1=1787590800&period2=1791478800&interval=1d&events=div%2Csplits",
+          "retrieved_at": "2026-10-09T15:20:21.399327+07:00",
+          "page_or_table": "2026-10-08",
+          "notes": "Only closing price on this date cross-checked; not full adjustment history"
+        },
+        {
+          "source_id": "VAL_KBS_SHI_HPG_20261009_152009_511905",
+          "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/SHI/data_day?sdate=25-08-2026&edate=08-10-2026",
+          "retrieved_at": "2026-10-09T15:20:21.587121+07:00",
+          "page_or_table": "2026-10-08",
+          "notes": "Only closing price on this date cross-checked; not full adjustment history"
+        }
+      ],
+      "median_pb": 0.9316793914777923,
+      "sector_name": "Thép và sản phẩm thép",
+      "reason": "Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot.",
+      "sample_size": 2,
+      "price_date": "2026-10-08",
+      "explanation": "Trung vị 2 mã khác trong mẫu Thép và sản phẩm thép, giá 2026-10-08; vốn năm quy đổi trên CP snapshot. Không phải chỉ số P/B toàn ngành.",
+      "industry_pb_median": 0.9316793914777923,
+      "target_price_vnd": 14255.09646713919,
+      "difference_pct": -29.25510438144322
+    },
+    "pe": {
+      "available": true,
+      "eps": 1830.3019004040539,
+      "eps_basis": "LNST mẹ năm / CP snapshot: EPS quy đổi giả định, không phải EPS công bố hoặc TTM",
+      "reference_pe": 11.00911275650849,
+      "target_pe": 12.0,
+      "base_price_vnd": 21963.622804848645,
+      "inputs": [
+        {
+          "value": 15453174006000.0,
+          "unit": "VND",
+          "source_id": "KBS_income_HPG_20261009_152009_511905",
+          "source_field": 2214,
+          "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+          "source_value": 15453174006.0,
+          "unit_multiplier": 1000,
+          "period": "2025",
+          "published_at": "2026-03-27",
+          "statement_scope": "consolidated"
+        }
+      ],
+      "formula": "EPS quy đổi năm = LNST mẹ năm / CP snapshot; giá kịch bản = EPS quy đổi × P/E giả định",
+      "scenarios": [
+        {
+          "label": "Thận trọng",
+          "target_pe": 9.600000000000001,
+          "reference_price_vnd": 17570.898243878917,
+          "difference_pct": -12.799512437325477
+        },
+        {
+          "label": "Cơ sở",
+          "target_pe": 12.0,
+          "reference_price_vnd": 21963.622804848645,
+          "difference_pct": 9.000609453343156
+        },
+        {
+          "label": "Thuận lợi",
+          "target_pe": 14.399999999999999,
+          "reference_price_vnd": 26356.347365818372,
+          "difference_pct": 30.80073134401178
+        }
+      ]
+    },
+    "dcf": {
+      "available": false,
+      "reason": "FCFF năm gốc không dương; chưa có dự báo phục hồi được chứng minh."
+    },
+    "weighted_average": {
+      "available": true,
+      "target_price_vnd": 18939.961547814262,
+      "difference_pct": -6.005153608862224,
+      "components": [
+        {
+          "method": "P/B tổng hợp",
+          "target_price_vnd": 15916.30029077988,
+          "weight_pct": 50.0,
+          "contribution_vnd": 7958.150145389939
+        },
+        {
+          "method": "P/E lợi nhuận năm quy đổi",
+          "target_price_vnd": 21963.622804848645,
+          "weight_pct": 50.0,
+          "contribution_vnd": 10981.811402424322
+        }
+      ],
+      "recommendation": "Kết quả kịch bản, chưa tự chuyển thành khuyến nghị đầu tư.",
+      "note": "Trọng số giả định 35/35/30 hoặc người dùng chỉnh, chuẩn hóa trên phương pháp đủ dữ liệu; các phương pháp dùng chung đầu vào không phải bằng chứng độc lập."
+    },
+    "equity_period": "2025",
+    "shares": 8442964520,
+    "shares_snapshot": "2026-10-09",
+    "price_date": "2026-10-08"
+  },
+  "risk_matrix": [
+    {
+      "evidence": "Đóng cửa 20,150 thấp hơn MA20 20,705",
+      "impact": "Động lực giá ngắn hạn yếu trên chuỗi nguồn",
+      "monitor": "Xu hướng giá và thanh khoản; không tự suy ra giá trị doanh nghiệp",
+      "source_ids": [
+        "KBS_price_check_HPG_20261009_152009_511905"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "YAHOO_HPG_20261009_152009_511905",
+      "url_or_file": "https://query1.finance.yahoo.com/v8/finance/chart/HPG.VN?period1=1759942800&period2=1791478800&interval=1d&events=div%2Csplits",
+      "retrieved_at": "2026-10-09T15:20:09.870757+07:00",
+      "page_or_table": "daily OHLCV",
+      "notes": "Raw snapshot: data/raw/prices/HPG_20261009_152009_511905_yahoo.json; VND; adjustment unverified; valid=True"
+    },
+    {
+      "source_id": "HPG_9a2881a88ac8ca4c",
+      "url_or_file": "data/raw/documents/20260828-hpg-bctc-hop-nhat-soat-xet-6-thang-2026-va-giai-trinh-1-2.pdf",
+      "retrieved_at": "2026-10-09T15:20:10.214886+07:00",
+      "page_or_table": "OCR statement pages 10, 11, 12, 13",
+      "notes": "Báo cáo tài chính hợp nhất soát xét 6 tháng 2026; published_at=2026-08-28; mode=local_cache_checked_sha256; source_url=https://file.hoaphat.com.vn/hoaphat-com-vn/2026/08/20260828-hpg-bctc-hop-nhat-soat-xet-6-thang-2026-va-giai-trinh-1-2.pdf; listing=https://www.hoaphat.com.vn/quan-he-co-dong/bao-cao-tai-chinh"
+    },
+    {
+      "source_id": "HPG_1f5c4b14f867d268",
+      "url_or_file": "data/raw/documents/20260730-hpg-bctc-hop-nhat-quy-2-2026-va-giai-trinh.pdf",
+      "retrieved_at": "2026-10-09T15:20:10.248603+07:00",
+      "page_or_table": "whole PDF; metrics not extracted",
+      "notes": "Báo cáo tài chính hợp nhất Quý II/2026; published_at=2026-07-30; mode=local_cache_checked_sha256; source_url=https://file.hoaphat.com.vn/hoaphat-com-vn/2026/07/20260730-hpg-bctc-hop-nhat-quy-2-2026-va-giai-trinh.pdf; listing=https://www.hoaphat.com.vn/quan-he-co-dong/bao-cao-tai-chinh"
+    },
+    {
+      "source_id": "KBS_balance_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/HPG?page=1&pageSize=4&unit=1000&termtype=1&type=CDKT&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:11.143717+07:00",
+      "page_or_table": "balance",
+      "notes": "Financial monetary values requested in thousand VND; EPS in VND/share"
+    },
+    {
+      "source_id": "KBS_cashflow_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/HPG?page=1&pageSize=4&unit=1000&termtype=1&type=LCTT&termType=1&code=HPG",
+      "retrieved_at": "2026-10-09T15:20:10.976862+07:00",
+      "page_or_table": "cashflow",
+      "notes": "Financial monetary values requested in thousand VND; EPS in VND/share"
+    },
+    {
+      "source_id": "KBS_income_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/HPG?page=1&pageSize=4&unit=1000&termtype=1&type=KQKD&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:10.824922+07:00",
+      "page_or_table": "income",
+      "notes": "Financial monetary values requested in thousand VND; EPS in VND/share"
+    },
+    {
+      "source_id": "KBS_news_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/news/HPG?l=1&p=1&s=12",
+      "retrieved_at": "2026-10-09T15:20:10.499059+07:00",
+      "page_or_table": "news",
+      "notes": "Public source snapshot"
+    },
+    {
+      "source_id": "KBS_price_check_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/HPG/data_day?sdate=24-08-2026&edate=08-10-2026",
+      "retrieved_at": "2026-10-09T15:20:10.476964+07:00",
+      "page_or_table": "price_check",
+      "notes": "Public source snapshot"
+    },
+    {
+      "source_id": "KBS_profile_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/profile/HPG?l=1",
+      "retrieved_at": "2026-10-09T15:20:10.546455+07:00",
+      "page_or_table": "profile",
+      "notes": "Public source snapshot"
+    },
+    {
+      "source_id": "MINER_balance_HPG_20261009_152009_511905",
+      "url_or_file": "https://raw.githubusercontent.com/Tumiqa/vn-annual-report-miner/afa208bcf8c24a2b7eb5a1fd446084e376e8838a/src/arminer/data/bctc_data/balance_sheet/HSX.parquet",
+      "retrieved_at": "2026-10-09T13:57:46.163484+07:00",
+      "page_or_table": "HSX/balance_sheet: HPG",
+      "notes": "Pinned afa208bcf8c24a2b7eb5a1fd446084e376e8838a; SHA256 11614209b73b90dec64a7e749db8ed65b0a40e865cb79a1d6e09187dba0972ba; reference only; publication/unit/scope not certified"
+    },
+    {
+      "source_id": "MINER_income_HPG_20261009_152009_511905",
+      "url_or_file": "https://raw.githubusercontent.com/Tumiqa/vn-annual-report-miner/afa208bcf8c24a2b7eb5a1fd446084e376e8838a/src/arminer/data/bctc_data/income_statement/HSX.parquet",
+      "retrieved_at": "2026-10-09T13:57:47.742202+07:00",
+      "page_or_table": "HSX/income_statement: HPG",
+      "notes": "Pinned afa208bcf8c24a2b7eb5a1fd446084e376e8838a; SHA256 5c9c7061440150930caf84ef74f4390bdb6d70e1eb6bf55153cf2161e625c609; reference only; publication/unit/scope not certified"
+    },
+    {
+      "source_id": "MINER_cashflow_HPG_20261009_152009_511905",
+      "url_or_file": "https://raw.githubusercontent.com/Tumiqa/vn-annual-report-miner/afa208bcf8c24a2b7eb5a1fd446084e376e8838a/src/arminer/data/bctc_data/cash_flow/HSX.parquet",
+      "retrieved_at": "2026-10-09T13:57:48.776969+07:00",
+      "page_or_table": "HSX/cash_flow: HPG",
+      "notes": "Pinned afa208bcf8c24a2b7eb5a1fd446084e376e8838a; SHA256 e4420f10ca57170de85c1ad2c2c6991ac64c11a2f326a5cc4a90263308625b16; reference only; publication/unit/scope not certified"
+    },
+    {
+      "source_id": "MINER_catalog_HPG_20261009_152009_511905",
+      "url_or_file": "https://raw.githubusercontent.com/Tumiqa/vn-annual-report-miner/afa208bcf8c24a2b7eb5a1fd446084e376e8838a/data/zenodo_catalog/file_index_full.csv",
+      "retrieved_at": "2026-10-09T13:57:49.970406+07:00",
+      "page_or_table": "Annual-report catalog: HPG; original catalog release 2026-06-27",
+      "notes": "Pinned afa208bcf8c24a2b7eb5a1fd446084e376e8838a; SHA256 9d9d469900c5c9657c636d8785b1308eb5e650585f169e4716eb1415f55bfd7c; reference only; publication/unit/scope not certified"
+    },
+    {
+      "source_id": "ZENODO_PDF_HPG_20261009_152009_511905",
+      "url_or_file": "https://zenodo.org/records/20949551",
+      "retrieved_at": "2026-10-09T15:20:11.977408+07:00",
+      "page_or_table": "HPG/HPG_25CN_BCTN.pdf",
+      "notes": "local_cache_checked_sha256; downloaded_at=None; catalog=https://zenodo.org/records/20949551; SHA256 verified f9fb0c11f2ae20fe6c4e2dad74417876e8e5119749b7dc2d6e951d8ee0f62171; report year 2025; original publication/scope not certified"
+    },
+    {
+      "source_id": "VAL_PROFILE_NKG_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/profile/NKG?l=1",
+      "retrieved_at": "2026-10-09T15:20:19.545248+07:00",
+      "page_or_table": "profile.KLCPLH",
+      "notes": "Current shares; annual equity held constant as an explicit scenario assumption"
+    },
+    {
+      "source_id": "VAL_YAHOO_NKG_HPG_20261009_152009_511905",
+      "url_or_file": "https://query1.finance.yahoo.com/v8/finance/chart/NKG.VN?period1=1787590800&period2=1791478800&interval=1d&events=div%2Csplits",
+      "retrieved_at": "2026-10-09T15:20:20.316059+07:00",
+      "page_or_table": "2026-10-08",
+      "notes": "Only closing price on this date cross-checked; not full adjustment history"
+    },
+    {
+      "source_id": "VAL_KBS_NKG_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/NKG/data_day?sdate=25-08-2026&edate=08-10-2026",
+      "retrieved_at": "2026-10-09T15:20:20.524732+07:00",
+      "page_or_table": "2026-10-08",
+      "notes": "Only closing price on this date cross-checked; not full adjustment history"
+    },
+    {
+      "source_id": "VAL_PROFILE_SHI_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/profile/SHI?l=1",
+      "retrieved_at": "2026-10-09T15:20:20.658393+07:00",
+      "page_or_table": "profile.KLCPLH",
+      "notes": "Current shares; annual equity held constant as an explicit scenario assumption"
+    },
+    {
+      "source_id": "VAL_YAHOO_SHI_HPG_20261009_152009_511905",
+      "url_or_file": "https://query1.finance.yahoo.com/v8/finance/chart/SHI.VN?period1=1787590800&period2=1791478800&interval=1d&events=div%2Csplits",
+      "retrieved_at": "2026-10-09T15:20:21.399327+07:00",
+      "page_or_table": "2026-10-08",
+      "notes": "Only closing price on this date cross-checked; not full adjustment history"
+    },
+    {
+      "source_id": "VAL_KBS_SHI_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/SHI/data_day?sdate=25-08-2026&edate=08-10-2026",
+      "retrieved_at": "2026-10-09T15:20:21.587121+07:00",
+      "page_or_table": "2026-10-08",
+      "notes": "Only closing price on this date cross-checked; not full adjustment history"
+    },
+    {
+      "source_id": "NSO_HPG_20261009_152009_511905_0",
+      "url_or_file": "https://www.nso.gov.vn/bai-top/2026/10/bao-cao-tinh-hinh-kinh-te-xa-hoi-quy-iii-va-9-thang-nam-2026/",
+      "retrieved_at": "2026-10-09T15:20:14.154888+07:00",
+      "page_or_table": "Báo cáo tình hình kinh tế - xã hội quý III và 9 tháng năm 2026",
+      "notes": "NSO; published 2026-10-03; reference 9/2026; raw NSO_HPG_20261009_152009_511905_0.html"
+    },
+    {
+      "source_id": "WDI_cpi_annual_HPG_20261009_152009_511905",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/FP.CPI.TOTL.ZG?format=json&per_page=20",
+      "retrieved_at": "2026-10-09T15:20:14.451188+07:00",
+      "page_or_table": "cpi_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "WDI_fx_annual_HPG_20261009_152009_511905",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/PA.NUS.FCRF?format=json&per_page=20",
+      "retrieved_at": "2026-10-09T15:20:14.451188+07:00",
+      "page_or_table": "fx_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "WDI_gdp_annual_HPG_20261009_152009_511905",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/NY.GDP.MKTP.KD.ZG?format=json&per_page=20",
+      "retrieved_at": "2026-10-09T15:20:14.498634+07:00",
+      "page_or_table": "gdp_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "WDI_lending_annual_HPG_20261009_152009_511905",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/FR.INR.LEND?format=json&per_page=20",
+      "retrieved_at": "2026-10-09T15:20:14.477865+07:00",
+      "page_or_table": "lending_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "SECTOR_1757_HPG_20261009_152009_511905",
+      "url_or_file": "https://iq.vietcap.com.vn/api/iq-insight-service/v2/company/search-bar?language=1",
+      "retrieved_at": "2026-10-09T15:19:58.189691+07:00",
+      "page_or_table": "Vietcap ICB; level 4; code 1757; Thép và sản phẩm thép",
+      "notes": "Vietcap ICB; cache_under_1h; current classification; ratings/targets/intraday quote fields excluded"
+    },
+    {
+      "source_id": "PEER_TVN_balance_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/TVN?page=1&pageSize=4&unit=1000&termtype=1&type=CDKT&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:17.879149+07:00",
+      "page_or_table": "TVN balance",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_TVN_income_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/TVN?page=1&pageSize=4&unit=1000&termtype=1&type=KQKD&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:18.824675+07:00",
+      "page_or_table": "TVN income",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_TVN_cashflow_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/TVN?page=1&pageSize=4&unit=1000&termtype=1&type=LCTT&termType=1&code=TVN",
+      "retrieved_at": "2026-10-09T15:20:18.906432+07:00",
+      "page_or_table": "TVN cashflow",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_NKG_balance_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/NKG?page=1&pageSize=4&unit=1000&termtype=1&type=CDKT&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:14.677947+07:00",
+      "page_or_table": "NKG balance",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_NKG_income_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/NKG?page=1&pageSize=4&unit=1000&termtype=1&type=KQKD&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:18.773318+07:00",
+      "page_or_table": "NKG income",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_NKG_cashflow_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/NKG?page=1&pageSize=4&unit=1000&termtype=1&type=LCTT&termType=1&code=NKG",
+      "retrieved_at": "2026-10-09T15:20:18.878873+07:00",
+      "page_or_table": "NKG cashflow",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_GDA_balance_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/GDA?page=1&pageSize=4&unit=1000&termtype=1&type=CDKT&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:13.344694+07:00",
+      "page_or_table": "GDA balance",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_GDA_income_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/GDA?page=1&pageSize=4&unit=1000&termtype=1&type=KQKD&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:18.774320+07:00",
+      "page_or_table": "GDA income",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_GDA_cashflow_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/GDA?page=1&pageSize=4&unit=1000&termtype=1&type=LCTT&termType=1&code=GDA",
+      "retrieved_at": "2026-10-09T15:20:19.193039+07:00",
+      "page_or_table": "GDA cashflow",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_SHI_balance_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/SHI?page=1&pageSize=4&unit=1000&termtype=1&type=CDKT&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:15.324026+07:00",
+      "page_or_table": "SHI balance",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_SHI_income_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/SHI?page=1&pageSize=4&unit=1000&termtype=1&type=KQKD&languageid=1",
+      "retrieved_at": "2026-10-09T15:20:19.045550+07:00",
+      "page_or_table": "SHI income",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_SHI_cashflow_HPG_20261009_152009_511905",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/SHI?page=1&pageSize=4&unit=1000&termtype=1&type=LCTT&termType=1&code=SHI",
+      "retrieved_at": "2026-10-09T15:20:19.274943+07:00",
+      "page_or_table": "SHI cashflow",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+"""Industry benchmark and peer comparison for relative valuation and industry analysis."""
+from pathlib import Path
+import yaml
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def get_industry_benchmark(ticker: str, root: Path | None = None) -> dict:
+    root = root or ROOT
+    map_file = root / "config/industry_map.yaml"
+    if not map_file.exists():
+        return {
+            "sector_key": "general",
+            "sector_name": "Toàn thị trường",
+            "median_pb": 1.5,
+            "median_pe": 12.0,
+            "median_roe": 15.0,
+            "peers": []
+        }
+    
+    try:
+        data = yaml.safe_load(map_file.read_text(encoding="utf-8")) or {}
+        sectors = data.get("sectors", {})
+        ticker_upper = ticker.strip().upper()
+        
+        for key, s in sectors.items():
+            if ticker_upper in s.get("tickers", []):
+                return {
+                    "sector_key": key,
+                    "sector_name": s.get("name", key),
+                    "median_pb": float(s.get("median_pb", 1.5)),
+                    "median_pe": float(s.get("median_pe", 12.0)),
+                    "median_roe": float(s.get("median_roe", 15.0)),
+                    "peers": s.get("peers", [])
+                }
+        
+        gen = sectors.get("general", {})
+        return {
+            "sector_key": "general",
+            "sector_name": gen.get("name", "Toàn thị trường (VN-Index)"),
+            "median_pb": float(gen.get("median_pb", 1.55)),
+            "median_pe": float(gen.get("median_pe", 13.5)),
+            "median_roe": float(gen.get("median_roe", 14.0)),
+            "peers": []
+        }
+    except Exception:
+        return {
+            "sector_key": "general",
+            "sector_name": "Toàn thị trường",
+            "median_pb": 1.5,
+            "median_pe": 12.0,
+            "median_roe": 15.0,
+            "peers": []
+        }

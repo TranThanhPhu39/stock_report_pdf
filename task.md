@@ -62,3 +62,17 @@ Bộ bàn giao: README, projectcontext/task, docs, outputs/pdf và submission. M
 - [x] Giữ dữ liệu bổ sung ngoài đầu vào định giá khi chưa đủ kiểm chứng.
 - [x] Kiểm thử chống tải cả ZIP, từ chối mirror sai hash, cache hỏng, khóa trùng, thiếu/vô hạn và phiên bản sau ngày phân tích.
 - [ ] Xác minh đầy đủ đơn vị/phạm vi/ngày công bố từ PDF, OCR scan nhiều mã và chứng nhận kỳ 2025 trước khi dùng làm nguồn chính.
+
+## Sửa dữ liệu ACB và tích hợp ZIP
+
+- [x] Đọc/lưu provenance code định giá ZIP; tích hợp phương pháp với kiểm tra điều kiện.
+- [x] Fallback toàn chuỗi KBS khi Yahoo lỗi, giữ snapshot/validation, đối chiếu nguồn khác.
+- [x] Hiển thị phạm vi thực nhận và khoảng đầu kỳ thiếu, tách chế độ báo cáo khỏi chất lượng dữ liệu.
+- [x] Ánh xạ CFO ngân hàng, mẫu chỉ tiêu riêng và kết luận lợi nhuận không phụ thuộc doanh thu.
+- [x] P/B, Gordon, P/B ngành từ mẫu tự lấy, P/E năm, DCF FCFF + bridge, bình quân trọng số.
+- [x] UI/CLI nhập P/E, Ke, WACC, g, tăng trưởng và thuế; lý do chặn từng phương pháp.
+- [x] Gemini tùy chọn, bundle dữ liệu/nguồn, xác minh JSON/dẫn nguồn, fallback, Secrets/environment.
+- [x] PDF tóm tắt/KPI/biểu đồ/độ nhạy/bảng rủi ro/nguồn liên kết theo cấu trúc CFO tham khảo.
+- [x] 76 tests; SDK thật HTTP giả lập; nguồn thực ACB/HPG/VNM; UI thật ACB thiếu key vẫn xuất PDF.
+- [ ] Kiểm chứng API Gemini thật và Streamlit Cloud khi có key/môi trường deploy.
+- [ ] Xác minh NCI ACB từ tài liệu gốc trước khi mở P/B, và nguồn lịch sử đầu 2016.

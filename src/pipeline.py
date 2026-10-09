@@ -19,16 +19,21 @@ from src.analysis.conclusion import build_conclusion
 from src.data.context import collect_context
 from src.data.reference_miner import collect_reference
 from src.analysis.context import integrated_thesis
+from src.data.valuation_peers import collect_valuation_peers
+from src.analysis.ai_commentary import generate_commentary
 
 
-def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5) -> dict:
+def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5,
+                 target_pe=12.0,cost_of_equity=.115,terminal_growth=.035,forecast_growth=.07,wacc=.10,tax_rate=.20,use_ai=False,ai_key=None,ai_model=None) -> dict:
     ticker = ticker.strip().upper()
     if not re.fullmatch(r"[A-Z][A-Z0-9]{1,9}", ticker):
         raise ValueError("Mã cổ phiếu không hợp lệ.")
     if start > completed_day_cutoff(as_of):
         raise ValueError("Ngày bắt đầu phải nằm trước hoặc trong ngày giá đã hoàn tất.")
     root = root or Path(__file__).resolve().parents[1]
-    request = AnalysisRequest(ticker, start, as_of, mode=mode, target_pb=target_pb, **({"sections":sections} if sections is not None else {}))
+    request = AnalysisRequest(ticker, start, as_of, mode=mode, target_pb=target_pb,target_pe=target_pe,cost_of_equity=cost_of_equity,
+                              terminal_growth=terminal_growth,forecast_growth=forecast_growth,wacc=wacc,tax_rate=tax_rate,use_ai=use_ai,
+                              **({"sections":sections} if sections is not None else {}))
     # No pre-existing CSV and no manual fetch step required. This calls the network providers.
     acquisition = acquire(ticker, start, as_of, root)
     rows = []
@@ -59,9 +64,12 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     reference=collect_reference(ticker,as_of,financial,company,root,acquisition["run_id"])
     research["sources"].extend(reference["sources"])
     research["warnings"].extend(reference["warnings"])
-    valuation=analyze_valuation(financial,market,company,research["quote_check"],as_of,target_pb)
-    conclusion=build_conclusion(financial,market,valuation,research["quote_check"],interim)
     context=collect_context(ticker,as_of,financial,root,acquisition["run_id"])
+    benchmark=collect_valuation_peers(context["industry"],as_of,market.get("latest_date") if market else None,root,acquisition["run_id"])
+    research["sources"].extend(benchmark["sources"])
+    valuation=analyze_valuation(financial,market,company,research["quote_check"],as_of,target_pb,target_pe=target_pe,
+                                discount_rate=cost_of_equity,perpetual_growth=terminal_growth,forecast_growth=forecast_growth,wacc=wacc,tax_rate=tax_rate,industry_benchmark=benchmark)
+    conclusion=build_conclusion(financial,market,valuation,research["quote_check"],interim)
     research["sources"].extend(context["sources"])
     research["errors"].extend(context["errors"])
     research["warnings"].extend(context["warnings"])
@@ -70,12 +78,13 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     result = {"request": request.to_dict(),
               "acquisition": acquisition, "market": market, "price_rows": rows,
               "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],"macro":context["macro"],"industry":context["industry"],
-              "reference":reference,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":research["warnings"]+financial["errors"]},
+              "reference":reference,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
               "errors":acquisition["errors"]+research["errors"],"financial_metrics_status":"analyzed" if financial["metrics"] else "unavailable",
-              "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
+              "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or (acquisition["prices"] and acquisition["prices"].get("coverage",{}).get("start_gap_days",0)>7) or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
     import json
     existing_sources = root / "outputs/runs" / acquisition["run_id"] / "sources.json"
     result["sources"] = json.loads(existing_sources.read_text(encoding="utf-8")) + research["sources"]
+    result["ai_commentary"]=generate_commentary(result,key=ai_key,model=ai_model)
     if interim and interim.get("valid"):
         pages_by_source={}
         for field in interim["fields"].values():

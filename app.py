@@ -7,6 +7,7 @@ from src.data.providers import VN_TIME
 from src.models import SECTION_LABELS
 from src.pipeline import run_analysis
 from src.reporting.pdf_exporter import generate_report, formatted
+from src.analysis.ai_commentary import resolve_key
 
 ROOT=Path(__file__).resolve().parent
 today=datetime.now(VN_TIME).date()
@@ -21,13 +22,26 @@ with st.form("analysis_request"):
     mode=st.radio("Độ chi tiết",["Đầy đủ","Tóm tắt"],horizontal=True)
     sections=st.multiselect("Nội dung PDF",list(SECTION_LABELS),default=list(SECTION_LABELS),format_func=SECTION_LABELS.get)
     target_pb=st.number_input("P/B cơ sở giả định",min_value=0.1,max_value=20.0,value=1.5,step=0.1,help="Giả định của bạn cho kịch bản tham chiếu; không phải mức P/B tối ưu được hệ thống ước lượng.")
+    with st.expander("Giả định định giá: P/E, Gordon và DCF"):
+        vc=st.columns(3)
+        target_pe=vc[0].number_input("P/E năm giả định",min_value=.1,max_value=100.,value=12.,step=.5)
+        cost_of_equity=vc[1].number_input("Chi phí vốn chủ Ke (%)",min_value=.1,max_value=99.,value=11.5,step=.5)/100
+        terminal_growth=vc[2].number_input("Tăng trưởng dài hạn g (%)",min_value=0.,max_value=20.,value=3.5,step=.5)/100
+        vc=st.columns(3)
+        wacc=vc[0].number_input("WACC cho FCFF (%)",min_value=.1,max_value=99.,value=10.,step=.5)/100
+        forecast_growth=vc[1].number_input("Tăng trưởng FCFF 3 năm (%)",min_value=-50.,max_value=50.,value=7.,step=.5)/100
+        tax_rate=vc[2].number_input("Thuế suất giả định (%)",min_value=0.,max_value=99.,value=20.,step=1.)/100
+        st.caption("Các tỷ lệ trên là giả định do người dùng chọn. DCF chỉ áp cho doanh nghiệp phi tài chính có FCFF và đầu vào đầy đủ. EPS năm quy đổi không phải EPS công bố/TTM.")
+    use_ai=st.checkbox("Gemini hỗ trợ nhận xét từ dữ liệu và nguồn",value=False,help="Cần GEMINI_API_KEY trong Streamlit Secrets hoặc environment. Gửi số liệu công khai đã thu thập cho Gemini; nếu thiếu key hoặc lỗi, vẫn tạo báo cáo bằng quy tắc.")
     submitted=st.form_submit_button("Phân tích",type="primary")
 if submitted:
     st.session_state.pop("analysis_result",None)
     st.session_state.pop("report_path",None)
     try:
         with st.spinner("Đang lấy dữ liệu, đối chiếu nguồn, phân tích và tạo PDF… Lần đầu đọc PDF scan có thể mất vài phút."):
-            result=run_analysis(ticker,start,as_of,mode="full" if mode=="Đầy đủ" else "summary",sections=sections,target_pb=target_pb)
+            key=resolve_key(secrets=st.secrets) if use_ai else None
+            result=run_analysis(ticker,start,as_of,mode="full" if mode=="Đầy đủ" else "summary",sections=sections,target_pb=target_pb,
+                                target_pe=target_pe,cost_of_equity=cost_of_equity,terminal_growth=terminal_growth,forecast_growth=forecast_growth,wacc=wacc,tax_rate=tax_rate,use_ai=use_ai,ai_key=key)
             if not result["market"] and not result["financial"]["metrics"]:
                 st.error("Không lấy được dữ liệu hợp lệ. Kiểm tra mã cổ phiếu hoặc thử lại khi nguồn truy cập được.")
                 for error in result["errors"]:st.warning(error["message"])
@@ -45,6 +59,9 @@ if result:
         path=Path(st.session_state["report_path"])
         st.download_button("Tải báo cáo phân tích PDF",path.read_bytes(),file_name=path.name,mime="application/pdf",type="primary")
     for error in result["errors"]:st.warning(f"Dữ liệu chưa đủ ({error['stage']}): {error['message']}")
+    for warning in acquisition.get("warnings",[]):st.warning(warning)
+    ai=result.get("ai_commentary",{})
+    if request.get("use_ai") and not ai.get("available"):st.info(ai.get("reason","AI chưa có nhận xét hợp lệ."))
     market=result.get("market")
     if market:
         cols=st.columns(4)
@@ -54,7 +71,7 @@ if result:
         if price_check["status"]=="matched":st.success(f"Giá đóng cửa đã khớp hai nguồn trong {len(price_check['checks'])} phiên được đối chiếu.")
         else:st.warning("Giá chưa được đối chiếu đầy đủ với nguồn thứ hai.")
         prices=pd.DataFrame(result["price_rows"])
-        chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),"Giá điều chỉnh chuẩn hóa":market["chart_prices"]}).set_index("Ngày")
+        chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),market["series_basis"]:market["chart_prices"]}).set_index("Ngày")
         st.line_chart(chart)
         st.caption(market["return_note"])
     context_tabs=st.tabs(["Tổng quan vĩ mô","Phân tích ngành"])
@@ -82,7 +99,7 @@ if result:
             with st.expander("Phạm vi mẫu và mã bị loại"):
                 st.json({"coverage":industry.get("coverage"),"excluded":industry.get("excluded"),"eligible_candidates":industry.get("eligible_candidates")})
         else:st.warning("Nguồn chưa xác nhận phân ngành của mã này; không tự gán ngành.")
-    tabs=st.tabs(["Tài chính","Kịch bản P/B","Cơ hội và rủi ro","Tin tức","Nguồn dữ liệu"])
+    tabs=st.tabs(["Tài chính","Định giá đa phương pháp","Cơ hội và rủi ro","Tin tức","Nguồn dữ liệu"])
     with tabs[0]:
         if result["financial"]["metrics"]:
             st.caption(f"Báo cáo năm {result['financial']['metrics'][0]['period']}; không phải số liệu TTM.")
@@ -116,8 +133,19 @@ if result:
     with tabs[1]:
         val=result["valuation"]
         if val["available"]:
-            st.caption(f"BVPS tham chiếu {formatted(val['book_value_per_share'],'VND/share')} · P/B tham chiếu {val['reference_pb']:.2f} lần")
-            st.dataframe(pd.DataFrame([{"Kịch bản":s["label"],"P/B giả định":s["target_pb"],"Giá trị quy đổi":formatted(s["reference_price_vnd"],"VND/share"),"Chênh lệch":formatted(s["difference_pct"],"%")} for s in val["scenarios"]]),hide_index=True,width="stretch")
+            if val.get("book_value_per_share") is not None:st.caption(f"BVPS mẹ {formatted(val['book_value_per_share'],'VND/share')} · P/B tham chiếu {val['reference_pb']:.2f} lần")
+            if val.get("pb_methods"):st.dataframe(pd.DataFrame(val["pb_methods"]),hide_index=True,width="stretch")
+            if val.get("scenarios"):st.dataframe(pd.DataFrame([{"Kịch bản":s["label"],"P/B giả định":s["target_pb"],"Giá trị quy đổi":formatted(s["reference_price_vnd"],"VND/share"),"Chênh lệch":formatted(s["difference_pct"],"%")} for s in val["scenarios"]]),hide_index=True,width="stretch")
+            for method,label in [("gordon","P/B Gordon"),("industry","P/B mẫu ngành"),("pe","P/E lợi nhuận năm quy đổi"),("dcf","DCF FCFF"),("weighted_average","Bình quân trọng số")]:
+                data=val.get(method,{})
+                with st.expander(label,expanded=bool(data.get("available"))):
+                    if data.get("available"):
+                        if data.get("scenarios"):st.dataframe(pd.DataFrame(data["scenarios"]),hide_index=True,width="stretch")
+                        if data.get("components"):st.dataframe(pd.DataFrame(data["components"]),hide_index=True,width="stretch")
+                        target=data.get("target_price_vnd",data.get("base_price_vnd",data.get("per_share_price_vnd")))
+                        if target is not None:st.metric("Giá trị kịch bản / CP",formatted(target,"VND/share"))
+                        st.caption(data.get("eps_basis") or data.get("explanation") or data.get("formula") or data.get("note", ""))
+                    else:st.info(data.get("reason","Chưa đủ đầu vào."))
             st.info(val["assumption"])
         else:st.info(val["reason"])
     with tabs[2]:
@@ -126,7 +154,16 @@ if result:
         st.write("**Cơ hội / điều kiện theo dõi**")
         for item in result["conclusion"]["opportunities"]:st.write("• "+item)
         st.write("**Rủi ro**")
+        if result["conclusion"].get("risk_matrix"):
+            st.dataframe(pd.DataFrame([{ "Bằng chứng":r["evidence"],"Tác động":r["impact"],"Theo dõi":r["monitor"]} for r in result["conclusion"]["risk_matrix"]]),hide_index=True,width="stretch")
         for item in result["conclusion"]["risks"]:st.write("• "+item)
+        if ai.get("available"):
+            st.write("**Nhận xét Gemini có bằng chứng**")
+            for section,items in ai["sections"].items():
+                for item in items:
+                    st.write(item["text"])
+                    for e in item["evidence"]:st.caption(f"{e['label']} · Kỳ {e['period']} · {e.get('value',e.get('company_value'))} {e.get('unit','')}")
+                    st.caption("Nguồn: "+", ".join(item["source_ids"])+f" · Chốt {ai['as_of']} · {ai['model']}")
     with tabs[3]:
         for item in result["news"]:st.markdown(f"{item['published_at']} · [{item['title']}]({item['url']})")
         if not result["news"]:st.info("Chưa có tin phù hợp từ nguồn.")

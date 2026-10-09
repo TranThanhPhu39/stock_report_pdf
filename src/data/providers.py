@@ -86,6 +86,27 @@ def fetch_daily_prices(ticker: str, start: date, as_of: date, now: datetime | No
             "cutoff": cutoff.isoformat(), "retrieved_at": datetime.now(VN_TIME).isoformat()}
 
 
+def fetch_kbs_prices(ticker: str, start: date, as_of: date) -> dict:
+    """Whole-series fallback. Never splice providers with different adjustment bases."""
+    cutoff = completed_day_cutoff(as_of)
+    query = urlencode({"sdate": start.strftime("%d-%m-%Y"), "edate": cutoff.strftime("%d-%m-%Y")})
+    url = f"https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/{ticker}/data_day?{query}"
+    raw = download(url)
+    try:
+        payload = json.loads(raw)
+        if payload.get("symbol") != ticker:
+            raise DataSourceError("KBS price symbol mismatch")
+        rows = [{"ticker": ticker, "date": r["t"][:10],
+                 **{k: r.get(v) for k, v in {"open":"o", "high":"h", "low":"l", "close":"c", "volume":"v"}.items()},
+                 "adjusted_close": None, "price_basis": "kbs_ohlc_adjustment_unverified",
+                 "price_provider": "KBS", "unit": "VND_per_share"}
+                for r in payload.get("data_day", []) if start.isoformat() <= r["t"][:10] <= cutoff.isoformat()]
+    except (KeyError, TypeError, ValueError) as exc:
+        raise DataSourceError("Unrecognized KBS daily response") from exc
+    return {"url": url, "raw": raw, "rows": sorted(rows, key=lambda r:r["date"]), "meta": {},
+            "cutoff": cutoff.isoformat(), "retrieved_at": datetime.now(VN_TIME).isoformat()}
+
+
 def parse_hpg_reports(html: bytes, as_of: date) -> list[dict]:
     """Read publication dates from the issuer's listing, not from download times."""
     soup = BeautifulSoup(html, "html.parser")

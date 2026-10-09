@@ -7,7 +7,7 @@ from urllib.parse import urlencode, urljoin
 
 from bs4 import BeautifulSoup
 
-from src.data.providers import DataSourceError, VN_TIME, completed_day_cutoff, download
+from src.data.providers import DataSourceError, VN_TIME, completed_day_cutoff, download, fetch_daily_prices
 from src.data.normalize import parse_annual_financials
 
 KBS_BASE = "https://kbbuddywts.kbsec.com.vn/iis-server/investment"
@@ -29,7 +29,7 @@ def compare_prices(primary: list[dict], payload: dict, cutoff: date) -> dict:
             checks.append({"date": row["date"], "yahoo_close": row["close"], "kbs_close": other["c"],
                            "relative_difference": deviation, "match": deviation is not None and deviation <= 0.001})
     latest_match = bool(checks and primary and checks[-1]["date"] == primary[-1]["date"] and checks[-1]["match"])
-    return {"status": "matched" if latest_match and all(r["match"] for r in checks) else "unverified",
+    return {"status": "matched" if latest_match and len(checks)==min(20,len(primary)) and all(r["match"] for r in checks) else "unverified",
             "checks": checks, "latest_match": latest_match,
             "note": "Đối chiếu giá đóng cửa tối đa 20 ngày gần nhất, sai lệch cho phép 0,1%; không xác nhận toàn bộ lịch sử điều chỉnh."}
 
@@ -47,6 +47,10 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
     folder = root / "data/raw/financials"
     folder.mkdir(parents=True, exist_ok=True)
     def retrieve(kind, url):
+        if kind == "price_check" and primary and primary[0].get("price_provider") == "KBS":
+            response = fetch_daily_prices(ticker, cutoff-timedelta(days=45), as_of)
+            data = {"symbol":ticker, "data_day":[{"t":r["date"],"c":r["close"]} for r in response["rows"]]}
+            return kind, response["url"], json.dumps(data).encode(), data
         raw = download(url, timeout=20)
         return kind, url, raw, json.loads(raw)
     with ThreadPoolExecutor(max_workers=3) as executor:
@@ -55,7 +59,8 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
             kind = futures[future]
             try:
                 kind, url, raw, data = future.result()
-                source_id = f"KBS_{kind}_{run_id}"
+                provider="YAHOO" if kind=="price_check" and primary and primary[0].get("price_provider")=="KBS" else "KBS"
+                source_id = f"{provider}_{kind}_{run_id}"
                 (folder / f"{run_id}_{kind}.json").write_bytes(raw)
                 result["sources"].append({"source_id": source_id, "url_or_file": url,
                     "retrieved_at": datetime.now(VN_TIME).isoformat(), "page_or_table": kind,
@@ -73,7 +78,13 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
                 elif kind == "price_check":
                     if data.get("symbol") != ticker:
                         raise DataSourceError("Cross-check symbol mismatch")
-                    result["quote_check"] = {**compare_prices(primary, data, cutoff), "source_id": source_id}
+                    check=compare_prices(primary, data, cutoff)
+                    check["primary_provider"] = "KBS" if primary and primary[0].get("price_provider")=="KBS" else "Yahoo"
+                    check["reference_provider"] = "Yahoo" if check["primary_provider"]=="KBS" else "KBS"
+                    for c in check["checks"]:
+                        c["primary_close"]=c["yahoo_close"];c["reference_close"]=c["kbs_close"]
+                        if check["primary_provider"]=="KBS": c["yahoo_close"],c["kbs_close"]=c["kbs_close"],c["yahoo_close"]
+                    result["quote_check"] = {**check, "source_id": source_id}
                 elif kind == "news":
                     for item in data if isinstance(data, list) else []:
                         published = item.get("PublishTime", "")[:10]

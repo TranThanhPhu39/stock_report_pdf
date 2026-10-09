@@ -33,5 +33,5 @@ def validate_prices(rows: list[dict], ticker: str, start: date, cutoff: date) ->
             errors.append(f"{prefix}: invalid volume")
     return {"valid": not errors, "row_count": len(rows), "errors": errors,
             "warnings": ["Prices have not been cross-checked against an independent source.",
-                         "Yahoo OHLC adjustment basis is not yet verified; do not describe it as raw/adjusted or total return.",
+                         "Provider OHLC adjustment basis is not yet verified; do not describe it as raw/adjusted or total return.",
                          "All current-day observations are excluded conservatively, including after market close."]}

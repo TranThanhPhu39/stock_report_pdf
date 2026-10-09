@@ -1,0 +1,256 @@
+"""Comprehensive Valuation Engine: Multiples (P/B, P/E), Gordon Justified P/B, Industry Median, DCF, and Weighted Average."""
+from datetime import datetime
+from src.data.providers import VN_TIME
+from src.analysis.industry import get_industry_benchmark
+
+
+def analyze_valuation(financial, market, company, quote_check, as_of, target_pb=1.5, target_pe=None, discount_rate=0.115, perpetual_growth=0.035):
+    unavailable = {
+        "available": False,
+        "reason": "Chưa đủ giá đối chiếu, vốn cổ đông công ty mẹ hoặc số cổ phiếu phù hợp.",
+        "scenarios": [],
+        "gordon": {"available": False, "reason": "Chưa đủ dữ liệu ROE để tính Gordon P/B."},
+        "industry": {"available": False, "reason": "Chưa đủ dữ liệu ngành."},
+        "pe": {"available": False, "reason": "Chưa đủ dữ liệu lợi nhuận hoặc số cổ phiếu."},
+        "dcf": {"available": False, "reason": "Chưa đủ dữ liệu dòng tiền hoặc chi phí sử dụng vốn."},
+        "weighted_average": {"available": False, "reason": "Chưa đủ các phương pháp thành phần."}
+    }
+    if not financial["periods"] or not market or quote_check.get("status") != "matched":
+        return unavailable
+    if as_of.isoformat() != company.get("snapshot_at"):
+        return {**unavailable, "reason": "Không dùng số cổ phiếu hiện tại để định giá tại ngày quá khứ."}
+    
+    latest = financial["periods"][0]
+    fields = latest["fields"]
+    equity = fields.get("equity", {}).get("value")
+    nci = fields.get("non_controlling_equity", {}).get("value")
+    shares = company.get("outstanding_shares")
+    
+    if equity is None or nci is None or equity - nci <= 0 or not isinstance(shares, (int, float)) or shares <= 0:
+        return unavailable
+    
+    price = market["latest_close_vnd"]
+    book_value = (equity - nci) / shares
+    reference_pb = price / book_value
+    ticker = company.get("ticker", "HPG")
+
+    # -------------------------------------------------------------
+    # 1. P/B PHƯƠNG PHÁP 1: GORDON GROWTH MODEL (Justified P/B)
+    #    Công thức: P/B = (ROE - g) / (r - g)
+    # -------------------------------------------------------------
+    roe_metric = next((m.get("value") for m in financial.get("metrics", []) if m.get("key") == "roe"), None)
+    if roe_metric is None and equity - nci > 0:
+        profit_val = fields.get("parent_profit", {}).get("value") or fields.get("net_profit", {}).get("value")
+        if profit_val:
+            roe_metric = (profit_val / (equity - nci)) * 100
+
+    gordon_data = {"available": False, "reason": "ROE không dương hoặc không đủ điều kiện chiết khấu."}
+    gordon_pb = None
+    gordon_price = None
+
+    if roe_metric is not None and roe_metric > 0 and discount_rate > perpetual_growth:
+        roe_dec = roe_metric / 100.0
+        raw_gordon_pb = (roe_dec - perpetual_growth) / (discount_rate - perpetual_growth)
+        gordon_pb = round(max(0.4, min(5.0, raw_gordon_pb)), 2)
+        gordon_price = book_value * gordon_pb
+        gordon_data = {
+            "available": True,
+            "roe_pct": roe_metric,
+            "cost_of_equity_pct": discount_rate * 100,
+            "growth_rate_pct": perpetual_growth * 100,
+            "justified_pb": gordon_pb,
+            "target_price_vnd": gordon_price,
+            "difference_pct": (gordon_price / price - 1) * 100,
+            "formula": "P/B = (ROE - g) / (r - g)",
+            "explanation": f"Với ROE {roe_metric:.1f}%, chi phí vốn {discount_rate*100:.1f}%, tăng trưởng {perpetual_growth*100:.1f}% -> P/B hợp lý nội tại là {gordon_pb:.2f} lần."
+        }
+
+    # -------------------------------------------------------------
+    # 2. P/B PHƯƠNG PHÁP 2: P/B TRUNG VỊ NGÀNH & ĐỐI THỦ (Industry Median)
+    # -------------------------------------------------------------
+    industry_bm = get_industry_benchmark(ticker)
+    industry_pb = industry_bm["median_pb"]
+    industry_price = book_value * industry_pb
+    industry_data = {
+        "available": True,
+        "sector_name": industry_bm["sector_name"],
+        "industry_pb_median": industry_pb,
+        "industry_pe_median": industry_bm["median_pe"],
+        "industry_roe_median": industry_bm["median_roe"],
+        "target_price_vnd": industry_price,
+        "difference_pct": (industry_price / price - 1) * 100,
+        "premium_discount_pct": (reference_pb / industry_pb - 1) * 100,
+        "peers": industry_bm.get("peers", []),
+        "explanation": f"Trung vị ngành {industry_bm['sector_name']} là {industry_pb:.2f} lần. Cổ phiếu đang giao dịch {'cao hơn (premium)' if reference_pb > industry_pb else 'thấp hơn (discount)'} {abs((reference_pb/industry_pb-1)*100):.1f}% so với ngành."
+    }
+
+    # -------------------------------------------------------------
+    # BẢNG SO SÁNH 3 GÓC NHÌN P/B
+    # -------------------------------------------------------------
+    pb_base_price = book_value * target_pb
+    pb_methods = [
+        {"method": "P/B Giả định người dùng", "multiple": target_pb, "target_price_vnd": pb_base_price, "difference_pct": (pb_base_price / price - 1) * 100}
+    ]
+    if gordon_data["available"]:
+        pb_methods.append({"method": "P/B Gordon (Nội tại theo ROE)", "multiple": gordon_pb, "target_price_vnd": gordon_price, "difference_pct": gordon_data["difference_pct"]})
+    if industry_data["available"]:
+        pb_methods.append({"method": f"P/B Trung vị ngành ({industry_bm['sector_name']})", "multiple": industry_pb, "target_price_vnd": industry_price, "difference_pct": industry_data["difference_pct"]})
+
+    # Kịch bản độ nhạy P/B (giữ chuẩn giao diện cũ)
+    pb_scenarios = []
+    for label, multiple in [("Thận trọng", target_pb * 0.8), ("Cơ sở", target_pb), ("Thuận lợi", target_pb * 1.2)]:
+        val = book_value * multiple
+        pb_scenarios.append({
+            "label": label,
+            "target_pb": round(multiple, 2),
+            "reference_price_vnd": val,
+            "difference_pct": (val / price - 1) * 100
+        })
+
+    # -------------------------------------------------------------
+    # 3. P/E SCENARIOS (Bội số Giá trên Thu nhập mỗi Cổ phiếu)
+    # -------------------------------------------------------------
+    profit = fields.get("parent_profit", {}).get("value") or fields.get("net_profit", {}).get("value")
+    eps = fields.get("eps", {}).get("value") or (profit / shares if profit is not None and shares > 0 else None)
+    
+    pe_data = {"available": False, "reason": "Lợi nhuận âm hoặc thiếu số liệu EPS."}
+    pe_base_price = None
+    
+    if eps is not None and eps > 0:
+        reference_pe = price / eps
+        if target_pe is None:
+            if roe_metric and roe_metric > 0:
+                implied_pe = target_pb / (roe_metric / 100.0)
+                target_pe = round(max(6.0, min(22.0, implied_pe)), 1)
+            else:
+                target_pe = round(max(6.0, min(22.0, reference_pe)), 1) if reference_pe > 0 else 12.0
+        
+        pe_scenarios = []
+        for label, multiple in [("Thận trọng", target_pe * 0.8), ("Cơ sở", target_pe), ("Thuận lợi", target_pe * 1.2)]:
+            val = eps * multiple
+            pe_scenarios.append({
+                "label": label,
+                "target_pe": round(multiple, 2),
+                "reference_price_vnd": val,
+                "difference_pct": (val / price - 1) * 100
+            })
+        
+        pe_base_price = eps * target_pe
+        pe_data = {
+            "available": True,
+            "eps": eps,
+            "reference_pe": reference_pe,
+            "target_pe": target_pe,
+            "scenarios": pe_scenarios,
+            "base_price_vnd": pe_base_price,
+            "formula": "EPS = LNST cổ đông mẹ / Số CP; Giá kịch bản = EPS × P/E giả định"
+        }
+
+    # -------------------------------------------------------------
+    # 4. DCF MODEL (Mô hình Chiết khấu Dòng tiền)
+    # -------------------------------------------------------------
+    cfo = fields.get("cfo", {}).get("value")
+    cf_base = cfo if (cfo is not None and cfo > 0) else (profit * 0.85 if profit and profit > 0 else None)
+    
+    dcf_data = {"available": False, "reason": "Dòng tiền kinh doanh và lợi nhuận không dương để chạy mô hình DCF."}
+    dcf_price = None
+    
+    if cf_base is not None and cf_base > 0 and discount_rate > perpetual_growth:
+        growth_metric = next((m.get("value") for m in financial.get("metrics", []) if m.get("key") in {"revenue_growth", "net_profit_growth"} and m.get("value") is not None), None)
+        if growth_metric and growth_metric > 0:
+            forecast_growth = min(0.12, max(0.04, growth_metric / 100.0))
+        else:
+            forecast_growth = 0.07  # Mặc định 7%/năm
+        
+        pv_flows = 0.0
+        last_cf = cf_base
+        for t in range(1, 4):
+            last_cf = cf_base * ((1.0 + forecast_growth) ** t)
+            pv_flows += last_cf / ((1.0 + discount_rate) ** t)
+        
+        terminal_value = (last_cf * (1.0 + perpetual_growth)) / (discount_rate - perpetual_growth)
+        pv_terminal = terminal_value / ((1.0 + discount_rate) ** 3)
+        
+        dcf_equity_val = pv_flows + pv_terminal
+        dcf_price = dcf_equity_val / shares
+        
+        dcf_data = {
+            "available": True,
+            "cash_flow_base": cf_base,
+            "forecast_growth_pct": forecast_growth * 100,
+            "discount_rate_pct": discount_rate * 100,
+            "perpetual_growth_pct": perpetual_growth * 100,
+            "equity_value": dcf_equity_val,
+            "per_share_price_vnd": dcf_price,
+            "difference_pct": (dcf_price / price - 1) * 100,
+            "formula": "Dự phóng 3 năm chiết khấu WACC + Giá trị tận cùng Gordon Growth (TV)"
+        }
+
+    # -------------------------------------------------------------
+    # 5. WEIGHTED AVERAGE (Bình quân Trọng số Đa phương pháp)
+    # -------------------------------------------------------------
+    # Kết hợp P/B (kết hợp Gordon & Ngành & Base), P/E và DCF
+    effective_pb_price = (
+        (gordon_price * 0.5 + industry_price * 0.5) if (gordon_price and industry_price)
+        else (gordon_price or industry_price or pb_base_price)
+    )
+    
+    components = []
+    if effective_pb_price is not None:
+        components.append({"method": "P/B Tổng hợp (Gordon & Ngành)", "price": effective_pb_price, "nominal_weight": 0.35})
+    if pe_base_price is not None:
+        components.append({"method": "P/E Bội số Thu nhập", "price": pe_base_price, "nominal_weight": 0.35})
+    if dcf_price is not None:
+        components.append({"method": "DCF Chiết khấu Dòng tiền", "price": dcf_price, "nominal_weight": 0.30})
+    
+    weighted_data = {"available": False, "reason": "Không đủ phương pháp định giá hợp lệ."}
+    if components:
+        total_nominal = sum(c["nominal_weight"] for c in components)
+        composite_price = 0.0
+        comp_details = []
+        for c in components:
+            actual_w = c["nominal_weight"] / total_nominal
+            contribution = c["price"] * actual_w
+            composite_price += contribution
+            comp_details.append({
+                "method": c["method"],
+                "target_price_vnd": c["price"],
+                "weight_pct": round(actual_w * 100, 1),
+                "contribution_vnd": contribution
+            })
+        
+        diff_pct = (composite_price / price - 1) * 100
+        if diff_pct > 15.0:
+            rec = "Khả quan (Tiềm năng tăng giá > 15%)"
+        elif diff_pct < -15.0:
+            rec = "Thận trọng (Thị giá cao hơn định giá > 15%)"
+        else:
+            rec = "Phù hợp thị trường (Biên độ dao động hợp lý trong ±15%)"
+        
+        weighted_data = {
+            "available": True,
+            "target_price_vnd": composite_price,
+            "difference_pct": diff_pct,
+            "recommendation": rec,
+            "components": comp_details
+        }
+    
+    return {
+        "available": True,
+        "book_value_per_share": book_value,
+        "reference_pb": reference_pb,
+        "equity_period": str(latest["year"]),
+        "shares": shares,
+        "shares_snapshot": company["snapshot_at"],
+        "assumption": "P/B phân tích qua Gordon Growth (ROE) và Trung vị ngành; kết hợp P/E kịch bản và DCF 3 năm.",
+        "formula": "P/B Gordon = (ROE - g)/(r - g); P/B Ngành = BVPS × Median P/B; P/E = EPS × P/E; DCF dòng tiền.",
+        "inputs": [fields["equity"], fields["non_controlling_equity"], {"source_id": company["source_id"], "value": shares, "unit": "shares", "period": company["snapshot_at"]}],
+        "scenarios": pb_scenarios,
+        "gordon": gordon_data,
+        "industry": industry_data,
+        "pb_methods": pb_methods,
+        "pe": pe_data,
+        "dcf": dcf_data,
+        "weighted_average": weighted_data,
+        "pe_status": f"EPS cơ sở {latest['year']}: {eps:,.0f} VND/CP. P/E tham chiếu: {reference_pe:.1f} lần." if eps and eps > 0 else "Không đủ dữ liệu EPS hợp lệ."
+    }
