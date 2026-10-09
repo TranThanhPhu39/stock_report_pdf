@@ -9,3 +9,7 @@
 7. Nhập mã sai hoặc ngắt nguồn: ứng dụng báo lỗi, không dùng kết quả lượt trước làm kết quả mới.
 
 Mẫu đã tạo trong `outputs/pdf/`; minh chứng kết quả chạy trong `submission/acceptance.json`, `submission/ui_check.json`. Danh sách hạn chế nằm trong README; không tuyên bố mọi ngành đã được kiểm chứng.
+
+## Demo phần bổ sung
+
+Chạy HPG, mở Tổng quan vĩ mô để xem kỳ GDP/CPI và ngày đo tín dụng; mở Phân tích ngành để xem mẫu thép, kỳ báo cáo và chênh lệch trung vị. Chọn Tóm tắt, chỉ chọn macro/industry rồi tải PDF để chứng minh yêu cầu tùy chọn. Thử VCB/SSI để xem tỷ số riêng và cảnh báo kỳ 2025 sai metadata; thử FPT để thấy ngành được mở rộng khi thiếu mẫu phần mềm và định giá bị chặn vì giá lệch nguồn. Không nói đã chạy tất cả mã.

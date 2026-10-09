@@ -13,6 +13,10 @@
 | analysis/* | Thị trường, tài chính, kịch bản định giá và kết luận có điều kiện |
 | reporting/* | Biểu đồ, bảng, PDF tiếng Việt có phần tùy chọn và nguồn bắt buộc |
 
-`analysis.json` là kết quả chung cho UI/PDF: request, acquisition, price_rows, market, company, financial, interim, valuation, conclusion, news, quality, errors, sources, status. Mỗi metric tài chính gồm giá trị, đơn vị, kỳ, formula, inputs và reason khi thiếu. JSON/CSV/raw sources theo run_id cho phép tái kiểm tra.
+`analysis.json` là kết quả chung cho UI/PDF: request, acquisition, price_rows, market, company, financial, interim, valuation, conclusion, news, macro, industry, quality, errors, sources, status. Mỗi metric tài chính gồm giá trị, đơn vị, kỳ, formula, inputs và reason khi thiếu. JSON/CSV/raw sources theo run_id cho phép tái kiểm tra.
 
 Lỗi từng nguồn được giữ như dữ liệu thiếu một phần. Giao diện xóa kết quả cũ khi gửi yêu cầu mới; nếu mọi dữ liệu phân tích đều thiếu thì không cấp PDF mới. Không tự lấy giá cũ thay giá mới khi mạng lỗi. Font Unicode nằm trong repository; dependency có phiên bản đã chạy kiểm chứng.
+
+## Bối cảnh tự động
+
+`data/context.py` chạy hai nhánh thu thập vĩ mô và ngành. `data/macro.py` đọc HTML NSO và API World Bank, lưu raw và metadata. `data/industry.py` đọc ICB Vietcap (cache một giờ), chọn doanh nghiệp theo báo cáo năm KBS; mở rộng cấp ngành khi thiếu mẫu. `analysis/context.py` tính trung vị và tạo kênh tác động có điều kiện. Pipeline hợp nhất nguồn/cảnh báo vào cùng AnalysisResult, UI và PDF không tính hai bộ số liệu khác nhau. Bằng chứng lựa chọn gồm tập ứng viên, ngày cuối kỳ, phạm vi, mã bị loại/lý do và nguồn của mã được chọn.

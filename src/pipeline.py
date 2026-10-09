@@ -16,6 +16,8 @@ from src.analysis.market import analyze_market
 from src.analysis.financial import analyze_financials
 from src.analysis.valuation import analyze_valuation
 from src.analysis.conclusion import build_conclusion
+from src.data.context import collect_context
+from src.analysis.context import integrated_thesis
 
 
 def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5) -> dict:
@@ -55,12 +57,18 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     company={**research["company"],"name":acquisition["prices"].get("company_name") if acquisition["prices"] else ticker}
     valuation=analyze_valuation(financial,market,company,research["quote_check"],as_of,target_pb)
     conclusion=build_conclusion(financial,market,valuation,research["quote_check"],interim)
+    context=collect_context(ticker,as_of,financial,root,acquisition["run_id"])
+    research["sources"].extend(context["sources"])
+    research["errors"].extend(context["errors"])
+    research["warnings"].extend(context["warnings"])
+    conclusion["integrated_thesis"]=integrated_thesis(context["macro"],context["industry"],financial)
+    conclusion["summary"]="Đánh giá kết hợp dữ liệu vĩ mô đã công bố, vị trí trong mẫu doanh nghiệp cùng ngành, kết quả kinh doanh và rủi ro giá. Các kênh truyền dẫn là nhận định có điều kiện, không phải quan hệ nhân quả đã định lượng."
     result = {"request": request.to_dict(),
               "acquisition": acquisition, "market": market, "price_rows": rows,
-              "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],
+              "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],"macro":context["macro"],"industry":context["industry"],
               "quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":research["warnings"]+financial["errors"]},
               "errors":acquisition["errors"]+research["errors"],"financial_metrics_status":"analyzed" if financial["metrics"] else "unavailable",
-              "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or research["quote_check"]["status"]!="matched" or not financial["metrics"] else "analyzed"}
+              "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
     import json
     existing_sources = root / "outputs/runs" / acquisition["run_id"] / "sources.json"
     result["sources"] = json.loads(existing_sources.read_text(encoding="utf-8")) + research["sources"]

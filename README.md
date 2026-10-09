@@ -1,6 +1,6 @@
 # StockInsight
 
-Ứng dụng phân tích cổ phiếu Việt Nam và tự tạo PDF theo nhu cầu người dùng. **Không cần chuẩn bị data**: mỗi lần bấm Phân tích, chương trình tự lấy giá, tài chính, hồ sơ doanh nghiệp, tin công bố và đối chiếu nguồn.
+Ứng dụng phân tích cổ phiếu Việt Nam và tự tạo PDF theo nhu cầu người dùng. **Không cần chuẩn bị data**: mỗi lần bấm Phân tích, chương trình tự lấy giá, tài chính, hồ sơ doanh nghiệp, tin công bố, vĩ mô, doanh nghiệp cùng ngành và đối chiếu nguồn.
 
 ## Chạy ứng dụng
 
@@ -19,7 +19,7 @@ Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS), chọn khoảng ng
 
 ```powershell
 python -m scripts.analyze HPG --start 2025-10-09 --as-of 2026-10-09
-python -m scripts.analyze VNM --mode summary --sections market financial risks --target-pb 2.0
+python -m scripts.analyze VNM --mode summary --sections macro industry financial risks --target-pb 2.0
 python -m unittest discover -s tests -v
 ```
 
@@ -30,17 +30,21 @@ Tệp theo lượt chạy nằm tại `outputs/runs/<run_id>/`: request.json, va
 - Giá cuối ngày Yahoo Finance; giá đóng cửa tối đa 20 phiên gần nhất được đối chiếu KBS. Luôn bỏ ngày hiện tại theo UTC+7, kể cả sau giờ giao dịch.
 - Lợi suất theo Yahoo Adj Close, MA20/MA50, drawdown, biến động năm hóa và khối lượng. Chuỗi điều chỉnh không đồng nghĩa lợi nhuận thực nhận sau phí/thuế.
 - Báo cáo năm qua KBS: doanh thu thuần, LNST, tài sản, vốn, CFO, tăng trưởng, ROE hợp nhất, biên lợi nhuận và nợ vay/vốn khi phù hợp. Bán niên HPG được đọc trực tiếp từ PDF soát xét của doanh nghiệp bằng OCR.
+- Vĩ mô: tự đọc NSO (GDP lũy kế, CPI bình quân, IIP, tín dụng, bán lẻ thực, xuất khẩu…) và World Bank cho lịch sử năm. Lãi suất cho vay và tỷ giá World Bank là số lịch sử, không phải giá hiện tại.
+- Ngành: phân loại ICB từ Vietcap, chọn tối đa bốn doanh nghiệp theo tài sản, cùng ngày cuối kỳ/phạm vi báo cáo; so với trung vị mẫu, loại mã đang phân tích. Nếu ngành hẹp không đủ mẫu, mở rộng cấp ICB và ghi rõ. Phân loại khoảng 1.582 mã không có nghĩa đã phân tích/kiểm chứng toàn bộ.
 - P/B tham chiếu và ba kịch bản theo giả định người dùng. Chặn khi giá lệch nguồn, thiếu vốn/số CP, hoặc phân tích quá khứ với số CP hiện tại. Không tính P/E TTM từ API quý có kỳ không rõ ràng.
 - Tin công bố có ngày và liên kết. Nhận định được tạo bằng quy tắc từ dữ liệu; không tự suy diễn tác động từ tiêu đề tin.
 
 ## Kiểm chứng ngày 09/10/2026
 
-26 kiểm thử offline đạt. Nút Phân tích thật trên Streamlit đã tự lấy 261 phiên HPG, đọc bán niên và tạo PDF, không có ngoại lệ. HPG và VNM khớp 20/20 giá đóng cửa được đối chiếu. FPT lệch 2/20 phiên (21–22/09/2026), vì vậy định giá bị chặn và báo cáo ghi trạng thái thiếu một phần. Số liệu năm 2025 khớp **các chỉ tiêu chọn đối chiếu**, không phải chứng nhận toàn bộ dữ liệu. Xem `submission/acceptance.json` và `docs/hpg_data_check.md`.
+40 kiểm thử offline đạt. Đã chạy dữ liệu thực cho HPG, FPT, VNM, VCB, SSI, MWG, DGC và REE; đây là tám mã kiểm chứng, không phải toàn thị trường. Nút Phân tích thật trên Streamlit đã tự lấy 261 phiên HPG, đọc bán niên và tạo PDF, không có ngoại lệ. HPG và VNM khớp 20/20 giá đóng cửa được đối chiếu. FPT lệch 2/20 phiên (21–22/09/2026), vì vậy định giá bị chặn và báo cáo ghi trạng thái thiếu một phần. Số liệu năm 2025 khớp **các chỉ tiêu chọn đối chiếu**, không phải chứng nhận toàn bộ dữ liệu. Xem `submission/acceptance.json` và `docs/hpg_data_check.md`.
 
 Báo cáo mẫu: `outputs/pdf/HPG_report.pdf`, `FPT_report.pdf`, `VNM_report.pdf`. Các mẫu đã được kiểm tra chữ tiếng Việt và bố cục trang.
 
 ## Giới hạn
 
-Mã cổ phiếu là tham số, không cố định HPG; khả năng có số liệu phụ thuộc nguồn. Đã kiểm chứng ba doanh nghiệp phi tài chính. Ngân hàng/chứng khoán chỉ nhận các chỉ tiêu ánh xạ được; không áp tỷ số phi tài chính và chưa có mô hình chuyên ngành hoàn chỉnh. API công khai có thể thay đổi hoặc giới hạn truy cập. Baseline trong `config/verification_baselines.json` là số tham chiếu đã đọc từ tài liệu gốc, **không thay dữ liệu tự lấy** và chỉ áp dụng đúng kỳ. Không dùng dữ liệu giả khi nguồn lỗi.
+Mã cổ phiếu là tham số, không cố định HPG; khả năng có số liệu phụ thuộc nguồn. Có tỷ số riêng ngân hàng (thu nhập lãi, CIR, cho vay/tiền gửi) và chứng khoán (cơ cấu môi giới/cho vay). NIM/NPL/CAR và dư nợ margin chưa được xác minh. VCB/SSI/DGC/REE dùng năm hợp lệ gần nhất 2024 vì metadata kỳ 2025 từ nguồn ghi 24 tháng; báo cáo cảnh báo độ trễ. API công khai có thể thay đổi hoặc giới hạn truy cập. Baseline trong `config/verification_baselines.json` là số tham chiếu đã đọc từ tài liệu gốc, **không thay dữ liệu tự lấy** và chỉ áp dụng đúng kỳ. Không dùng dữ liệu giả khi nguồn lỗi.
 
 `projectcontext.md` ghi phạm vi đề gốc; `task.md` ghi hạng mục đã làm. Đề gốc và đề xuất triển khai trong `docs/references/` được giữ riêng.
+
+Đối chiếu đề cập nhật trong ảnh người dùng (bao gồm vĩ mô/ngành, hạn 16:20 ngày 09/10/2026): `docs/assignment_requirements.md`.

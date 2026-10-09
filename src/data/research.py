@@ -12,6 +12,12 @@ from src.data.normalize import parse_annual_financials
 
 KBS_BASE = "https://kbbuddywts.kbsec.com.vn/iis-server/investment"
 
+def financial_url(ticker,kind):
+    code={"income":"KQKD","balance":"CDKT","cashflow":"LCTT"}[kind]
+    params={"page":1,"pageSize":4,"unit":1000,"termtype":1,"type":code}
+    params.update({"termType":1,"code":ticker} if kind=="cashflow" else {"languageid":1})
+    return f"{KBS_BASE}/stock/finance-info/{ticker}?{urlencode(params)}"
+
 
 def compare_prices(primary: list[dict], payload: dict, cutoff: date) -> dict:
     observed = {r["t"][:10]: r for r in payload.get("data_day", []) if r.get("t", "")[:10] <= cutoff.isoformat()}
@@ -35,9 +41,7 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
             "news": f"{KBS_BASE}/stockinfo/news/{ticker}?l=1&p=1&s=12",
             "price_check": f"{KBS_BASE}/stocks/{ticker}/data_day?{urlencode({'sdate': (cutoff-timedelta(days=45)).strftime('%d-%m-%Y'), 'edate':cutoff.strftime('%d-%m-%Y')})}"}
     for kind, code in [("income", "KQKD"), ("balance", "CDKT"), ("cashflow", "LCTT")]:
-        params = {**common, "type": code}
-        params.update({"termType": 1, "code": ticker} if code == "LCTT" else {"languageid": 1})
-        jobs[kind] = f"{KBS_BASE}/stock/finance-info/{ticker}?{urlencode(params)}"
+        jobs[kind] = financial_url(ticker,kind)
     result = {"company": {}, "financial_records": [], "news": [], "quote_check": {"status": "unverified"},
               "sources": [], "errors": [], "warnings": ["Phân tích tài chính dùng báo cáo năm đã công bố; không sử dụng API quý có ánh xạ kỳ không rõ ràng."]}
     folder = root / "data/raw/financials"
@@ -57,7 +61,7 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
                     "retrieved_at": datetime.now(VN_TIME).isoformat(), "page_or_table": kind,
                     "notes": "Financial monetary values requested in thousand VND; EPS in VND/share" if kind in {"income", "balance", "cashflow"} else "Public source snapshot"})
                 if kind in {"income", "balance", "cashflow"}:
-                    parsed = parse_annual_financials(data, kind, as_of, source_id)
+                    parsed = parse_annual_financials(data, kind, as_of, source_id,result["warnings"])
                     result["financial_records"].extend({**period, "kind": kind} for period in parsed)
                 elif kind == "profile":
                     if data.get("SB") != ticker:

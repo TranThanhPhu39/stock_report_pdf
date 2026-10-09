@@ -1,18 +1,14 @@
 {
-  "ticker": "HPG",
-  "run_id": "HPG_20261009_122131_869845",
   "exceptions": [],
-  "price_records": 261,
-  "report_exists": true,
-  "interim_ocr_valid": true,
-  "selected_pdf_check": true,
-  "selected_ticker": "FPT",
-  "sections": [
-    "market",
-    "financial",
-    "risks"
+  "ticker": "HPG",
+  "macro_indicators": 14,
+  "industry_peers": 4,
+  "selected_pdf": [
+    "macro",
+    "industry"
   ],
   "mode": "summary",
-  "fpt_valuation_blocked": true,
-  "invalid_request_clears_previous_result": true
+  "selected_sections_verified": true,
+  "report_exists": true,
+  "run_id": "HPG_20261009_132022_348161"
 }

@@ -17,3 +17,7 @@ FPT: các chỉ tiêu năm 2025 chọn đối chiếu khớp báo cáo thường
 VNM: 20/20 phiên đóng cửa khớp; LNST 2025 khớp giá trị làm tròn 9.414 tỷ trong báo cáo thường niên. Doanh thu thuần 63.645,89 tỷ không đồng nhất tổng doanh thu 63.724 tỷ, nên không lấy con số tổng doanh thu làm baseline doanh thu thuần.
 
 Đối chiếu chỉ xác nhận những chỉ tiêu/kỳ được liệt kê. `submission/acceptance.json` lưu mã lượt chạy, số kiểm tra, sai lệch và trạng thái; PDF mẫu chứa nguồn chi tiết. Nút Streamlit với HPG đã chạy thật, không ngoại lệ, tự lấy dữ liệu và xuất PDF. 26 kiểm thử offline đạt.
+
+## Kiểm tra phần vĩ mô/ngành bổ sung
+
+HPG: 14 chỉ tiêu vĩ mô, mẫu thép TVN/NKG/GDA/SHI cùng ngày cuối kỳ 2025-12-31 và phạm vi hợp nhất; sáu tỷ số so sánh. Tám mã đã chạy ở submission/acceptance.json. PDF mẫu mới HPG/FPT/VNM đã xem toàn bộ 8/8/7 trang. 40 kiểm thử offline đạt, giao diện đã kiểm tra xuất chỉ phần macro/industry.

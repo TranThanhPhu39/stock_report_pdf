@@ -57,6 +57,31 @@ if result:
         chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),"Giá điều chỉnh chuẩn hóa":market["chart_prices"]}).set_index("Ngày")
         st.line_chart(chart)
         st.caption(market["return_note"])
+    context_tabs=st.tabs(["Tổng quan vĩ mô","Phân tích ngành"])
+    with context_tabs[0]:
+        macro=result.get("macro",{})
+        rows=macro.get("indicators",[])
+        if rows:
+            st.dataframe(pd.DataFrame([{"Chỉ tiêu":r["label"],"Giá trị":formatted(r["value"],r["unit"]),"Kỳ":r["period"],"Công bố / cập nhật":r.get("published_at") or "Cập nhật "+r.get("source_updated_at","")} for r in rows]),hide_index=True,width="stretch")
+            st.write(macro.get("assessment",""))
+            st.caption("Các kỳ riêng biệt; số liệu năm WDI không thay số liệu tháng. Lãi suất/tỷ giá bình quân lịch sử không phải mức hiện tại.")
+        else:st.warning("Chưa lấy được dữ liệu vĩ mô hợp lệ.")
+    with context_tabs[1]:
+        industry=result.get("industry",{})
+        if industry.get("available"):
+            st.write(f"**{industry['name']}** · {industry.get('taxonomy','KBS')}")
+            st.caption(f"{len(industry['members'])} thành viên · Kỳ so sánh {industry.get('period_end','chưa có')} · Mẫu: {', '.join(p['ticker'] for p in industry['peers']) or 'chưa đủ'}")
+            st.caption(industry["selection"])
+            comparisons=industry.get("comparisons",[])
+            if comparisons:
+                st.dataframe(pd.DataFrame([{"Chỉ tiêu":c["label"],"Mã phân tích":formatted(c["company_value"],c["unit"]),"Trung vị mẫu":formatted(c["sample_median"],c["unit"]),"Chênh lệch":formatted(c["difference"],"điểm %" if c["unit"]=="%" else c["unit"]),"Số mẫu":c["sample_size"]} for c in comparisons]),hide_index=True,width="stretch")
+            else:st.warning("Chưa đủ chỉ tiêu đồng kỳ của ít nhất hai doanh nghiệp để tính trung vị.")
+            for driver in industry.get("drivers",[]):
+                row=driver["indicator"];st.write(f"• {row['label']}: {row['value']:.2f}% ({row['period']}). "+driver["channel"])
+            for risk in industry.get("structural_risks",[]):st.caption(risk)
+            with st.expander("Phạm vi mẫu và mã bị loại"):
+                st.json({"coverage":industry.get("coverage"),"excluded":industry.get("excluded"),"eligible_candidates":industry.get("eligible_candidates")})
+        else:st.warning("Nguồn chưa xác nhận phân ngành của mã này; không tự gán ngành.")
     tabs=st.tabs(["Tài chính","Kịch bản P/B","Cơ hội và rủi ro","Tin tức","Nguồn dữ liệu"])
     with tabs[0]:
         if result["financial"]["metrics"]:
@@ -75,6 +100,8 @@ if result:
             st.info(val["assumption"])
         else:st.info(val["reason"])
     with tabs[2]:
+        st.write("**Luận điểm vĩ mô → ngành → doanh nghiệp**")
+        for item in result["conclusion"].get("integrated_thesis",[]):st.write("• "+item)
         st.write("**Cơ hội / điều kiện theo dõi**")
         for item in result["conclusion"]["opportunities"]:st.write("• "+item)
         st.write("**Rủi ro**")

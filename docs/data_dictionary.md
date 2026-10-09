@@ -18,3 +18,9 @@ Thiếu là null; không gán 0. Kỳ báo cáo năm là năm dương lịch the
 `interim.fields.previous`: revenue/net_profit/gross_profit/parent_profit/cfo là 6 tháng cùng kỳ; assets/equity/liabilities/debt là số đầu năm. Chỉ bảng 6 tháng có các dòng kết quả kinh doanh và CFO, không đặt cột đầu năm dưới nhãn cùng kỳ.
 
 `market.chart_prices`: Adj Close chuẩn hóa về close cuối, dùng MA và biểu đồ. `market.latest_close_vnd` là OHLC close nguồn, không phải Adj Close. `valuation.reference_price_vnd` là quy đổi giả định P/B, không được ghi thành dự báo giá.
+
+## Bối cảnh
+
+`macro.indicators`: key, label, value, unit, period, published_at (NSO), source_updated_at (World Bank), source_id, basis và staleness khi có. Ngày cập nhật World Bank không phải ngày công bố.
+
+`industry`: taxonomy, name/code/level, members, classification_snapshot, period_end/scope, peers, eligible_candidates, selection_candidates, excluded, comparisons và drivers. `comparisons`: target, median, difference, unit, n; mẫu loại mục tiêu. `conclusion.integrated_thesis`: luận điểm tổng hợp có điều kiện.

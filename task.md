@@ -19,23 +19,35 @@ Cập nhật 09/10/2026. Các yêu cầu chính đã có luồng chạy thực; 
 - [x] Xuất PDF tiếng Việt có biểu đồ/bảng/nguồn; thực sự áp dụng summary/full và phần chọn.
 - [x] UI/PDF dùng chung AnalysisResult; lưu request, validation, acquisition, sources, analysis, chart và PDF theo lượt.
 - [x] Font Unicode có giấy phép, dependency có phiên bản kiểm thử, README và tài liệu phương pháp/demo cập nhật.
-- [x] 26 kiểm thử offline đạt.
+- [x] 40 kiểm thử offline đạt.
 - [x] Streamlit HPG thật: 261 phiên, OCR bán niên hợp lệ, PDF tồn tại, không ngoại lệ.
 - [x] Streamlit FPT thật: chọn summary/market/financial/risks, PDF bỏ phần khác, định giá bị chặn đúng.
 - [x] Yêu cầu sai xóa kết quả/PDF lượt trước, không trả kết quả cũ.
-- [x] Ba lượt dữ liệu thực HPG/FPT/VNM và ba PDF mẫu; xem acceptance.json.
+- [x] Tám lượt dữ liệu thực HPG/FPT/VNM/VCB/SSI/MWG/DGC/REE và ba PDF mẫu; xem acceptance.json.
 - [x] Kiểm tra hiển thị tất cả trang PDF mẫu, chữ tiếng Việt, bảng và nguồn.
 
 ## Hạn chế đã công bố
 
-FPT có hai phiên giá lệch nguồn, được ghi cảnh báo/chặn P/B. Baseline chỉ kiểm chứng một số chỉ tiêu đúng kỳ. Bộ tỷ số đầy đủ đã kiểm thử ở doanh nghiệp phi tài chính; ngân hàng/chứng khoán không nhận tỷ số phi tài chính và cần mô hình riêng nếu mở rộng. PDF scan bán niên hiện tự trích chỉ cho HPG. Thiếu nguồn/thiếu OCR được thông báo, không dùng dữ liệu giả.
+FPT có hai phiên giá lệch nguồn, được ghi cảnh báo/chặn P/B. Baseline chỉ kiểm chứng một số chỉ tiêu đúng kỳ. Bộ tỷ số đầy đủ đã kiểm thử ở doanh nghiệp phi tài chính; ngân hàng/chứng khoán có tỷ số riêng; chưa có NIM/NPL/CAR hoặc dư nợ margin xác minh. PDF scan bán niên hiện tự trích chỉ cho HPG. Thiếu nguồn/thiếu OCR được thông báo, không dùng dữ liệu giả.
 
 ## Mở rộng ngoài phạm vi bắt buộc
 
 - [ ] Tự khám phá và kiểm tra PDF cho mọi doanh nghiệp.
-- [ ] Mô hình chuyên ngành ngân hàng/chứng khoán.
+- [ ] Bổ sung NIM/NPL/CAR và rủi ro margin khi có nguồn xác minh.
 - [ ] Adapter bốn quý độc lập đã xác minh để tính TTM/P/E.
 - [ ] Phân tích toàn văn tin, dự báo hoặc DCF có giả định được thẩm định.
 - [ ] Realtime/triển khai Internet nếu người dùng yêu cầu.
 
 Bộ bàn giao: README, projectcontext/task, docs, outputs/pdf và submission. Minh chứng snapshot trong submission/evidence là kết quả cố định của lượt kiểm thử, không phải nguồn đầu vào bắt buộc của chương trình.
+
+## Bổ sung theo ảnh đề cập nhật
+
+- [x] Tự lấy vĩ mô NSO và lịch sử World Bank, có kỳ đo/ngày công bố/ngày cập nhật.
+- [x] Tổng quan GDP, CPI, công nghiệp, tín dụng, tiêu dùng, đầu tư, xuất khẩu; công bố rõ độ trễ lãi suất/tỷ giá lịch sử.
+- [x] Tự phân loại ICB từ Vietcap; fallback KBS khi nguồn phân loại lỗi.
+- [x] Tự lấy tài chính cùng ngành, chọn tối đa bốn mã, so sánh trung vị cùng kỳ/phạm vi, loại mã mục tiêu khỏi mẫu.
+- [x] Mở rộng cấp ngành khi thiếu mẫu, nêu cấp ngành thực dùng và các mã bị loại.
+- [x] Liên kết vĩ mô → ngành → dữ kiện doanh nghiệp bằng nhận định có điều kiện.
+- [x] Tỷ số ngân hàng/chứng khoán phù hợp; loại kỳ 24 tháng sai metadata.
+- [x] Tab và PDF vĩ mô/ngành; kiểm thử lựa chọn hai phần ở chế độ tóm tắt.
+- [x] Đối chiếu yêu cầu đề cập nhật và giới hạn kiểm chứng trong docs/assignment_requirements.md.

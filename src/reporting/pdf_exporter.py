@@ -33,22 +33,23 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     styles=getSampleStyleSheet()
     styles.add(ParagraphStyle(name="BodyVN",fontName="DV",fontSize=9,leading=14,spaceAfter=6,textColor=colors.HexColor("#263640")))
     styles.add(ParagraphStyle(name="SmallVN",parent=styles["BodyVN"],fontSize=7.2,leading=11,spaceAfter=3,wordWrap="CJK"))
+    styles.add(ParagraphStyle(name="SourceVN",parent=styles["SmallVN"],leading=9,spaceAfter=2))
     styles.add(ParagraphStyle(name="HeadingVN",parent=styles["BodyVN"],fontName="DV-Bold",fontSize=14,leading=19,spaceBefore=14,spaceAfter=9,keepWithNext=True,textColor=colors.HexColor("#14566e")))
     styles.add(ParagraphStyle(name="TitleVN",parent=styles["HeadingVN"],fontSize=26,leading=32,spaceBefore=0))
     story=[]
-    def p(value,small=False):
+    def p(value,small=False,source=False):
         safe=str(value).translate(str.maketrans({"—":"-","–":"-","‑":"-","−":"-"}))
-        return Paragraph(escape(safe).replace("\n","<br/>"),styles["SmallVN" if small else "BodyVN"])
+        return Paragraph(escape(safe).replace("\n","<br/>"),styles["SourceVN" if source else "SmallVN" if small else "BodyVN"])
     def text(value,small=False):story.append(p(value,small))
     def heading(value):story.append(Paragraph(escape(value),styles["HeadingVN"]))
-    def table(headers,rows,widths=None):
+    def table(headers,rows,widths=None,keep=False):
         if not rows:return
         cells=[[p(h,True) for h in headers]]+[[p(v,True) for v in row] for row in rows]
-        t=Table(cells,colWidths=widths or [174*mm/len(headers)]*len(headers),repeatRows=1,hAlign="LEFT")
+        t=Table(cells,colWidths=widths or [174*mm/len(headers)]*len(headers),repeatRows=1,hAlign="LEFT",rowSplitRange=(2,-2) if len(rows)>4 else None)
         t.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,0),colors.HexColor("#e3eef2")),("VALIGN",(0,0),(-1,-1),"TOP"),
             ("LEFTPADDING",(0,0),(-1,-1),7),("RIGHTPADDING",(0,0),(-1,-1),7),("TOPPADDING",(0,0),(-1,-1),5),("BOTTOMPADDING",(0,0),(-1,-1),5),
             ("LINEBELOW",(0,0),(-1,0),.7,colors.HexColor("#14566e")),("ROWBACKGROUNDS",(0,1),(-1,-1),[colors.white,colors.HexColor("#f5f7f8")])]))
-        if len(rows)<=4:story.append(KeepTogether([t,Spacer(1,6)]))
+        if len(rows)<=4 or keep:story.append(KeepTogether([t,Spacer(1,6)]))
         else:story.extend([t,Spacer(1,6)])
     selected=set(request["sections"]);full=request["mode"]=="full"
     heading("STOCKINSIGHT")
@@ -61,12 +62,38 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     labels={"matched":"Đã khớp nguồn thứ hai","unverified":"Chưa xác minh đầy đủ","matched_selected_fields":"Khớp các chỉ tiêu đã chọn","mismatch":"Có sai lệch — đã chặn","not_independently_checked":"Chưa đối chiếu độc lập","analyzed":"Đã phân tích","partial":"Thiếu một phần dữ liệu"}
     table(["Kiểm tra giá","Kiểm tra tài chính","Trạng thái"],[[labels.get(quality["price_check"]["status"],quality["price_check"]["status"]),labels.get(quality["financial_check"]["status"],quality["financial_check"]["status"]),labels.get(result["status"],result["status"])]])
     text("Các kiểm tra chỉ áp dụng cho số liệu và kỳ được nêu; không xác nhận toàn bộ lịch sử. Báo cáo dùng dữ liệu công khai và các giả định công bố bên dưới.",True)
+    if "macro" in selected:
+        heading(SECTION_LABELS["macro"])
+        macro=result.get("macro",{})
+        indicators=macro.get("indicators",[])
+        chosen=indicators if full else [r for r in indicators if r["key"] in {"gdp_ytd","cpi_ytd","credit_growth","usd_index_yoy","gdp_annual","cpi_annual"}]
+        table(["Chỉ tiêu","Giá trị","Kỳ tham chiếu","Công bố / cập nhật nguồn"],[[r["label"],formatted(r["value"],r["unit"]),r["period"],r.get("published_at") or "Cập nhật "+r.get("source_updated_at","")] for r in chosen],[69*mm,27*mm,38*mm,40*mm])
+        text(macro.get("assessment","Chưa có dữ liệu vĩ mô hợp lệ."))
+        text("NSO là dữ liệu báo cáo/ước tính có ngày công bố; WDI là nền năm, ngày cập nhật nguồn không phải ngày công bố lần đầu. Lãi suất cho vay lịch sử và tỷ giá bình quân năm không phải mức hiện tại. Không so trực tiếp các kỳ khác độ dài.",True)
+    if "industry" in selected:
+        heading(SECTION_LABELS["industry"])
+        industry=result.get("industry",{})
+        if industry.get("available"):
+            text(f"{industry['name']} · Phân loại {industry.get('taxonomy','KBS')} · {len(industry['members'])} thành viên trong nguồn.")
+            text(industry["selection"],True)
+            text(f"Mẫu đủ điều kiện: {industry.get('eligible_candidates',0)}; đã chọn {len(industry['peers'])} doanh nghiệp. Ngày cuối kỳ {industry.get('period_end','chưa có')}; phạm vi {industry.get('scope','chưa có')}. Phân ngành chụp tại {industry['classification_snapshot'][:10]}.",True)
+            comparisons=industry.get("comparisons",[])
+            table(["Chỉ tiêu","Mã phân tích","Trung vị mẫu","Chênh lệch","n"],[[c["label"],formatted(c["company_value"],c["unit"]),formatted(c["sample_median"],c["unit"]),formatted(c["difference"],"điểm %" if c["unit"]=="%" else c["unit"]),str(c["sample_size"])] for c in comparisons],[62*mm,32*mm,32*mm,33*mm,15*mm])
+            table(["Doanh nghiệp mẫu","LNST YoY (%)","ROE (%)","ROA (%)"],[[r["ticker"]]+[formatted(r["values"].get(k)) for k in ["net_profit_growth","roe","roa"]] for r in industry.get("comparison_rows",[])])
+            if not comparisons:text("Chưa đủ hai doanh nghiệp có chỉ tiêu hợp lệ cùng kỳ để tính trung vị; không tự tạo số so sánh.")
+            for driver in industry.get("drivers",[])[:(5 if full else 2)]:
+                r=driver["indicator"];text(f"{r['label']}: {r['value']:.2f}% ({r['period']}). "+driver["channel"])
+            for risk in industry.get("structural_risks",[]):text("• "+risk,True)
+            if full and industry.get("excluded"):
+                text("Các mã bị loại do kỳ/phạm vi/dữ liệu chưa phù hợp: "+", ".join(r["ticker"] for r in industry["excluded"])+". Lý do chi tiết trong analysis.json.",True)
+        else:text("Chưa có phân ngành được nguồn xác nhận; không tự gán ngành hoặc tạo mẫu so sánh.")
     if "overview" in selected:
         heading(SECTION_LABELS["overview"])
         text(f"Sàn: {result['company'].get('exchange') or 'chưa có'} · Website: {result['company'].get('website') or 'chưa có'}")
         business=result["company"].get("business") or "Nguồn chưa cung cấp mô tả doanh nghiệp."
         limit=1000 if full else 500
         text(business if len(business)<=limit else business[:limit].rsplit(" ",1)[0]+"… (mô tả rút gọn từ nguồn)")
+        for item in result["conclusion"].get("integrated_thesis",[])[:(6 if full else 2)]:text("• "+item)
         for item in result["conclusion"]["opportunities"][:(8 if full else 3)]:text("• "+item)
     if "market" in selected:
         heading(SECTION_LABELS["market"]);market=result.get("market")
@@ -84,7 +111,9 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     if "financial" in selected:
         heading(SECTION_LABELS["financial"]);metrics=result["financial"]["metrics"]
         if metrics:
-            text(f"Báo cáo năm {metrics[0]['period']}; tăng trưởng so với năm trước cùng phạm vi. Tiền quy đổi: tỷ VND.")
+            caption=p(f"Báo cáo năm {metrics[0]['period']}; tăng trưởng so với năm trước cùng phạm vi. Tiền quy đổi: tỷ VND.")
+            caption.keepWithNext=True
+            story.append(caption)
             chosen=metrics if full else [m for m in metrics if m["key"] in {"revenue","net_profit","revenue_growth","net_profit_growth","roe","cash_conversion"}]
             table(["Chỉ tiêu","Giá trị"],[[m["label"],formatted(m["value"],m["unit"])] for m in chosen],[100*mm,74*mm])
             if full:table(["Năm","Doanh thu thuần (tỷ)","LNST hợp nhất (tỷ)","CFO (tỷ)"],[[str(year["year"])]+[formatted(year["fields"].get(k,{}).get("value"),"VND").replace(" tỷ VND","") for k in ["revenue","net_profit","cfo"]] for year in result["financial"]["periods"]])
@@ -96,7 +125,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             text(interim["note"],True)
         if full:
             names={"revenue":"Doanh thu thuần","net_profit":"LNST","assets":"Tài sản","equity":"Vốn chủ","liabilities":"Nợ phải trả"}
-            table(["Đối chiếu / kỳ","Nguồn API (tỷ)","Tài liệu gốc (tỷ)","Kết quả"],[[names.get(c["metric"],c["metric"])+" / "+c["period"],formatted(c["actual_billion_vnd"]),formatted(c["reference_billion_vnd"]),"Khớp" if c["match"] else "Sai lệch"] for c in quality["financial_check"].get("checks",[])])
+            table(["Đối chiếu / kỳ","Nguồn API (tỷ)","Tài liệu gốc (tỷ)","Kết quả"],[[names.get(c["metric"],c["metric"])+" / "+c["period"],formatted(c["actual_billion_vnd"]),formatted(c["reference_billion_vnd"]),"Khớp" if c["match"] else "Sai lệch"] for c in quality["financial_check"].get("checks",[])],keep=True)
     if "valuation" in selected:
         heading(SECTION_LABELS["valuation"]);val=result["valuation"]
         if val["available"]:
@@ -117,20 +146,24 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         for item in result["conclusion"]["risks"]:text("• "+item)
     heading("Phương pháp và giới hạn dữ liệu")
     if "market" in selected:text("Giá dùng phiên trước ngày hiện tại để tránh phiên chưa kết thúc. Biến động = (Adj Close cuối / đầu − 1) × 100; MA dùng chuỗi điều chỉnh chuẩn hóa về giá đóng cửa cuối. Drawdown = mức giảm lớn nhất từ đỉnh trước đó; biến động năm hóa = độ lệch chuẩn lợi suất log ngày × √252 × 100.",True)
+    if "macro" in selected:text("Trích vĩ mô theo câu so sánh cụ thể (GDP lũy kế, CPI bình quân, tín dụng so với cuối năm, chỉ số USD cùng tháng); giữ khác biệt giữa YoY, YTD, danh nghĩa và thực. Dữ liệu WDI có null được bỏ, không lấy năm chưa kết thúc.",True)
+    if "industry" in selected:text("Mẫu so sánh cùng phân ngành, ngày cuối kỳ, phạm vi và loại hình; ưu tiên 4 mã khác lớn nhất theo tổng tài sản trong kỳ. Trung vị tính riêng cho mỗi chỉ tiêu có ít nhất 2 giá trị hợp lệ, không gồm mã phân tích. Chênh lệch tỷ lệ là điểm phần trăm, không phải tăng trưởng tương đối. Chưa đối chiếu độc lập toàn bộ số liệu mẫu.",True)
     if "financial" in selected:
         for metric in result["financial"]["metrics"]:
             if metric["key"] not in {"revenue","net_profit","parent_profit","assets","equity","cfo"}:text(metric["label"]+": "+metric["formula"]+(". "+metric["reason"] if metric["reason"] else ""),True)
     if "valuation" in selected and result["valuation"]["available"]:text(result["valuation"]["formula"],True)
     for warning in quality["warnings"]:text("• "+warning,True)
     for error in result["errors"]:text(f"Thiếu dữ liệu ({error['stage']}): {error['message']}",True)
+    sources_start=len(story)
     heading("Nguồn và khả năng truy vết")
-    for source in result["sources"]:
-        story.append(KeepTogether([p(source["source_id"],True),p(source.get("url_or_file") or source.get("url") or "",True),p(f"Truy xuất: {source.get('retrieved_at','')} · Vị trí: {source.get('page_or_table','')} · {source.get('notes','')}",True)]))
+    for index,source in enumerate(result["sources"]):
+        story.append(KeepTogether([p(source["source_id"],source=True),p(source.get("url_or_file") or source.get("url") or "",source=True),p(f"Truy xuất: {source.get('retrieved_at','')} · Vị trí: {source.get('page_or_table','')} · {source.get('notes','')}",source=True)]))
+        if index==0:story[sources_start:]=[KeepTogether(story[sources_start:])]
     seen=set()
     for check in quality["financial_check"].get("checks",[]):
         ref=check.get("url")
         if ref and ref not in seen:
-            story.append(KeepTogether([p("Tài liệu đối chiếu: "+ref,True),p("Vị trí: "+check["locator"],True)]));seen.add(ref)
+            story.append(KeepTogether([p("Tài liệu đối chiếu: "+ref,source=True),p("Vị trí: "+check["locator"],source=True)]));seen.add(ref)
     text(f"Mã lượt chạy: {run_id}. Tệp analysis.json lưu giá trị, công thức và đầu vào nguồn cho từng chỉ tiêu.",True)
     def footer(canvas,doc):
         canvas.saveState();canvas.setStrokeColor(colors.HexColor("#cedde3"));canvas.line(18*mm,17*mm,192*mm,17*mm)

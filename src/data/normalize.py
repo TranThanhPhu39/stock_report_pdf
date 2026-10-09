@@ -12,9 +12,13 @@ FIELD_IDS = {
                 3077: "short_debt", 3078: "long_debt", 3003: "cash", 3000: "current_assets", 3012: "current_liabilities"},
     "cashflow": {2234: "cfo"},
 }
+FIELD_IDS["income"].update({4378:"net_profit",4380:"parent_profit",4381:"eps",4385:"net_interest_income",4391:"operating_cost",4376:"pre_provision_profit",4392:"credit_provision",4377:"pretax_profit",
+    4590:"revenue",4585:"net_profit",4587:"parent_profit",4588:"eps",4599:"brokerage_revenue",5436:"lending_revenue",4584:"pretax_profit"})
+FIELD_IDS["balance"].update({4375:"assets",4304:"liabilities",4325:"equity",5699:"non_controlling_equity",4348:"customer_loans",4320:"customer_deposits",
+    4476:"assets",4477:"liabilities",4478:"equity",4482:"non_controlling_equity",5373:"financial_loans"})
 
 
-def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: str) -> list[dict]:
+def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: str, issues: list | None=None) -> list[dict]:
     heads = payload.get("Head", [])
     if not heads:
         raise DataSourceError("Nguồn không có metadata kỳ tài chính")
@@ -44,6 +48,10 @@ def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: st
         if not 1<=end_month<=12:
             raise DataSourceError("Tháng cuối kỳ không hợp lệ")
         period_end=date(end_year,end_month,calendar.monthrange(end_year,end_month)[1]).isoformat()
+        months=(end_year-int(begin[:4]))*12+end_month-int(begin[4:])+1
+        if months!=12 or date.fromisoformat(period_end)>min(as_of,date.fromisoformat(published[:10])):
+            if issues is not None:issues.append(f"{source_id}: loại kỳ {year}, metadata {begin}–{end} không phải 12 tháng đã kết thúc trước công bố")
+            continue
         scope = {"HN": "consolidated", "CTM": "parent", "ĐL": "separate"}.get(head.get("United"), "unknown")
         fields = {}
         raw_fields = []
@@ -58,7 +66,7 @@ def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: st
                     continue
             except (ValueError, TypeError):
                 continue
-            unit = "VND_per_share" if row.get("ReportNormID") == 2215 else "VND"
+            unit = "VND_per_share" if row.get("ReportNormID") in {2215,4381,4588,5480} else "VND"
             normalized = value if unit == "VND_per_share" else value * 1000
             provenance = {"value": normalized, "unit": unit, "source_id": source_id,
                           "source_field": row.get("ReportNormID"), "source_label": row.get("Name"),

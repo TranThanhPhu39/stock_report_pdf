@@ -31,3 +31,15 @@ BVPS tham chiếu = (VCSH hợp nhất − lợi ích cổ đông không kiểm 
 Quy tắc dùng tăng trưởng, CFO/LNST, vị trí so với MA, drawdown và HPG bán niên để trình bày dữ kiện → điều kiện theo dõi. Không áp ngưỡng mua/bán chung. Tin chỉ là danh sách công bố có ngày/liên kết; chưa suy diễn nội dung toàn văn.
 
 Baseline tài chính là tham chiếu đã đọc từ báo cáo thường niên gốc, riêng đúng mã/năm/chỉ tiêu. Sai lệch quá dung sai chặn tài chính/định giá. Không có baseline thì trạng thái chưa đối chiếu độc lập, không tuyên bố khớp. Các phép kiểm tra không chứng nhận toàn bộ số liệu.
+
+## Vĩ mô và ngành
+
+NSO: lấy bản công bố mới nhất không sau ngày phân tích. GDP dùng tăng trưởng lũy kế, CPI dùng bình quân cùng giai đoạn; không tráo tăng trưởng quý/tháng vào chỉ tiêu này. Tín dụng giữ ngày đo riêng và cơ sở cuối năm trước. Bán lẻ thực đã loại yếu tố giá. Chỉ số giá USD theo năm không phải tỷ giá giao ngay.
+
+World Bank: dùng số liệu năm có giá trị và năm nhỏ hơn năm phân tích; ngày cập nhật không được coi là ngày công bố đầu tiên. Lãi suất cho vay mới nhất hiện là 2023, tỷ giá bình quân là 2024, chỉ phục vụ bối cảnh lịch sử. Không suy đoán lãi suất điều hành hiện tại. Bản công bố NSO có thể được sửa; chưa có kho dữ liệu vintage để tái dựng hoàn toàn thông tin quá khứ.
+
+ICB Vietcap chỉ dùng phân loại và sàn HOSE/HNX/UPCOM, bỏ OTC/chỉ số và không sử dụng khuyến nghị/giá mục tiêu của API. Chọn cấp hẹp nhất, mở rộng cấp 3/2 nếu ít hơn hai doanh nghiệp hợp lệ. Kiểm tra cùng ngày cuối kỳ, phạm vi và nhóm báo cáo; loại kỳ sai, thiếu bảng cân đối hoặc không khớp tài sản = nợ + vốn. Chọn tối đa bốn doanh nghiệp có tài sản lớn nhất trong tập hợp lệ. Trung vị mỗi tỷ số cần ít nhất hai giá trị, không gồm mã mục tiêu. Chênh lệch phần trăm được trình bày theo điểm phần trăm; tỷ số lần theo số lần. Mẫu này không phải chỉ số ngành và có thể chứa quan hệ công ty mẹ/con.
+
+ROA = LNST / tài sản bình quân ×100. Ngân hàng: CIR = chi phí hoạt động / (lợi nhuận trước dự phòng + chi phí hoạt động) ×100; cho vay khách hàng gộp / tiền gửi khách hàng là tỷ số phân tích, không đồng nhất LDR theo quy định. Chứng khoán: tỷ trọng doanh thu môi giới và lãi cho vay/phải thu chia doanh thu hoạt động ×100; khoản cho vay tài chính không tự coi là dư nợ margin. Kỳ năm khác 12 tháng hoặc kết thúc sau ngày công bố bị loại, không tự sửa metadata.
+
+Luận điểm tổng hợp mô tả kênh tác động có điều kiện (ví dụ xây dựng → nhu cầu thép), dữ kiện vĩ mô và vị trí doanh nghiệp so với mẫu. Không coi tương quan là quan hệ nhân quả, không phát sinh khuyến nghị mua/bán tự động.
