@@ -5,6 +5,7 @@ import sys
 from xml.sax.saxutils import escape, quoteattr
 from src.models import SECTION_LABELS
 from src.reporting.charts import market_chart, research_chart
+from src.analysis.price_quality import latest_price_matches
 
 ROOT=Path(__file__).resolve().parents[2]
 try:
@@ -84,7 +85,10 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     text(result["conclusion"]["summary"])
     quality=result["quality"]
     labels={"matched":"Đã khớp nguồn thứ hai","unverified":"Chưa xác minh đầy đủ","matched_selected_fields":"Khớp các chỉ tiêu đã chọn","mismatch":"Có sai lệch — đã chặn","not_independently_checked":"Chưa đối chiếu độc lập","analyzed":"Đã phân tích","partial":"Thiếu một phần dữ liệu"}
-    table(["Kiểm tra giá","Kiểm tra tài chính","Trạng thái"],[[labels.get(quality["price_check"]["status"],quality["price_check"]["status"]),labels.get(quality["financial_check"]["status"],quality["financial_check"]["status"]),labels.get(result["status"],result["status"])]])
+    quote=quality["price_check"]
+    sample_count=quote.get("expected_count",len(quote.get("checks",[])))
+    matched_count=quote.get("matched_count",sum(c["match"] for c in quote.get("checks",[])))
+    table(["Giá mới nhất","Mẫu giá lịch sử","Kiểm tra tài chính","Trạng thái"],[["Đã khớp đúng ngày" if latest_price_matches(quote,result.get("market")) else "Chưa khớp đúng ngày",f"Khớp {matched_count}/{sample_count} phiên" if sample_count else "Chưa đối chiếu",labels.get(quality["financial_check"]["status"],quality["financial_check"]["status"]),labels.get(result["status"],result["status"])]],[43*mm,40*mm,51*mm,40*mm])
     text("Các kiểm tra chỉ áp dụng cho số liệu và kỳ được nêu; không xác nhận toàn bộ lịch sử. Báo cáo dùng dữ liệu công khai và các giả định công bố bên dưới.",True)
     if "overview" in selected:
         heading(SECTION_LABELS["overview"])
@@ -145,16 +149,22 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         if full:story.append(PageBreak())
         heading(SECTION_LABELS["market"]);market=result.get("market")
         if market:
+            history_blocked=not market.get("history_indicators_available",True)
+            history_label="Không tính: lịch sử chưa khớp"
             table(["Chỉ tiêu","Giá trị"],[["Đóng cửa / ngày",formatted(market["latest_close_vnd"],"VND/share")+" / "+market["latest_date"]],
-                ["Biến động trong khoảng chọn",formatted(market["return_pct"],"%")],["Sụt giảm tối đa",formatted(market["max_drawdown_pct"],"%")],
-                ["Biến động năm hóa",formatted(market["annualized_volatility_pct"],"%")],["MA20 / MA50",formatted(market["ma20_vnd"],"VND/share")+" / "+formatted(market["ma50_vnd"],"VND/share")],
+                ["Biến động trong khoảng chọn",history_label if history_blocked else formatted(market["return_pct"],"%")],["Sụt giảm tối đa",history_label if history_blocked else formatted(market["max_drawdown_pct"],"%")],
+                ["Biến động năm hóa",history_label if history_blocked else formatted(market["annualized_volatility_pct"],"%")],["MA20 / MA50",history_label if history_blocked else formatted(market["ma20_vnd"],"VND/share")+" / "+formatted(market["ma50_vnd"],"VND/share")],
                 ["Khối lượng bình quân 20 phiên",formatted(market["average_volume_20"],"CP")]], [70*mm,104*mm])
             chart=market_chart(result,path.parent/"charts")
             if chart:story.append(Image(str(chart),width=174*mm,height=87*mm))
             citations([r["source_id"] for r in result["price_rows"] if r.get("source_id")]+[quality["price_check"].get("source_id")])
             text(market["return_note"],True);text(quality["price_check"].get("note","Không có đối chiếu giá."),True)
             differences=[c for c in quality["price_check"].get("checks",[]) if not c["match"]]
-            if differences:table(["Ngày lệch nguồn","Yahoo (VND)","KBS (VND)","Sai lệch"],[[c["date"],formatted(c["yahoo_close"]),formatted(c["kbs_close"]),formatted(c["relative_difference"]*100,"%")] for c in differences])
+            if differences:
+                differences_start=len(story)
+                heading("Đối chiếu lịch sử: các phiên lệch")
+                table(["Ngày lệch nguồn","Yahoo (VND)","KBS (VND)","Sai lệch"],[[c["date"],formatted(c["yahoo_close"]),formatted(c["kbs_close"]),formatted(c["relative_difference"]*100,"%")] for c in differences],keep=True)
+                story[differences_start:]=[KeepTogether(story[differences_start:])]
         else:text("Chưa có chuỗi giá hợp lệ; không tính các chỉ tiêu thị trường.")
     if "financial" in selected:
         if full:story.append(PageBreak())
@@ -210,6 +220,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         heading(SECTION_LABELS["valuation"]);val=result["valuation"]
         if val["available"]:
             text(val["assumption"])
+            if val.get("price_warning"):text(val["price_warning"],True)
             text(f"Kỳ tài chính {val['equity_period']}; số CP snapshot {val['shares_snapshot']}: {val['shares']:,.0f}.",True)
             a=val.get("assumptions",{})
             if a:text(f"Giả định: P/B {a['target_pb']:.2f}x; P/E {a['target_pe']:.2f}x; Ke {a['cost_of_equity']*100:.2f}%; WACC {a['wacc']*100:.2f}%; g dài hạn {a['terminal_growth']*100:.2f}%; tăng FCFF {a['forecast_growth']*100:.2f}%; thuế {a['tax_rate']*100:.2f}%.",True)

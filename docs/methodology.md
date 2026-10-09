@@ -24,7 +24,7 @@ PDF hợp nhất soát xét HPG được OCR tự động. Tiền ghi bằng VND
 
 ## Kịch bản P/B
 
-BVPS tham chiếu = (VCSH hợp nhất − lợi ích cổ đông không kiểm soát) / số CP hiện tại. P/B tham chiếu = giá đóng cửa / BVPS. Giá trị kịch bản = BVPS × P/B do người dùng giả định; thận trọng/cơ sở/thuận lợi tương ứng 80%/100%/120% giả định cơ sở. Đây là phân tích độ nhạy; giả định vốn cuối năm giữ nguyên trên số CP hiện tại, không phải dự báo giá trị nội tại. Chặn nếu giá không khớp nguồn, số CP/vốn thiếu hoặc dùng ngày quá khứ với số CP hiện tại. Không tính P/E TTM vì API quý chưa có ánh xạ đủ tin cậy.
+BVPS tham chiếu = (VCSH hợp nhất − lợi ích cổ đông không kiểm soát) / số CP hiện tại. P/B tham chiếu = giá đóng cửa / BVPS. Giá trị kịch bản = BVPS × P/B do người dùng giả định; thận trọng/cơ sở/thuận lợi tương ứng 80%/100%/120% giả định cơ sở. Đây là phân tích độ nhạy; giả định vốn cuối năm giữ nguyên trên số CP hiện tại, không phải dự báo giá trị nội tại. Chặn nếu giá mới nhất không khớp nguồn độc lập đúng ngày/giá sử dụng trong 0,1%, số CP/vốn thiếu hoặc dùng ngày quá khứ với số CP hiện tại. Không tính P/E TTM vì API quý chưa có ánh xạ đủ tin cậy.
 
 ## Nhận định và đối chiếu
 
@@ -47,3 +47,5 @@ Luận điểm tổng hợp mô tả kênh tác động có điều kiện (ví 
 ## Bổ sung định giá từ ZIP (09/10/2026)
 
 Phần P/B phía trên là cơ sở phiên bản trước. Hiện có Gordon, P/B trung vị mẫu tự thu thập, P/E lợi nhuận năm quy đổi, DCF FCFF với WACC/equity bridge và bình quân trọng số. Công thức, kiểm tra đầu vào và giới hạn tại [valuation_upgrade.md](valuation_upgrade.md). P/E năm quy đổi không phải P/E TTM. Gemini tùy chọn sử dụng bundle bằng chứng có ngày/kỳ/ngành/nguồn, không tự tạo số liệu.
+
+Giá mới nhất và mẫu giá lịch sử được kiểm tra riêng. Khi mẫu tối đa 20 phiên chưa khớp đầy đủ, chỉ vẽ đóng cửa nguồn chính có cảnh báo, không tính MA, lợi suất, drawdown hoặc biến động năm hóa. Giá mới nhất khớp không xác nhận toàn bộ lịch sử hoặc cơ sở điều chỉnh.

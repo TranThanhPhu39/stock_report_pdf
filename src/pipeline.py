@@ -59,7 +59,7 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     if financial_check["status"]=="mismatch":
         research["errors"].append({"stage":"financial_check","message":"Chỉ tiêu không khớp tài liệu gốc; chặn phân tích tài chính và định giá."})
         financial={**financial,"periods":[],"metrics":[]}
-    market=analyze_market(rows)
+    market=analyze_market(rows,research["quote_check"])
     company={**research["company"],"name":acquisition["prices"].get("company_name") if acquisition["prices"] else ticker}
     reference=collect_reference(ticker,as_of,financial,company,root,acquisition["run_id"])
     research["sources"].extend(reference["sources"])

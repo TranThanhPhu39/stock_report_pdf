@@ -17,7 +17,7 @@ Cơ sở DCF và phân biệt FCFF/WACC với FCFE/Ke: https://pages.stern.nyu.e
 
 ## Dữ liệu và ACB
 
-Yahoo có OHLC sai tại 04–05/06/2025 (high khoảng 793 VND, low khoảng 18.717 VND). Giữ raw và validation của lần thất bại, tự lấy toàn chuỗi KBS thay thế, không ghép giá khác cơ sở điều chỉnh. Khi KBS là nguồn chính, Yahoo là nguồn đối chiếu. Cần khớp tất cả ngày trong mẫu gần nhất tối đa 20 phiên, không coi một ngày khớp là đủ.
+Yahoo có OHLC sai tại 04–05/06/2025 (high khoảng 793 VND, low khoảng 18.717 VND). Giữ raw và validation của lần thất bại, tự lấy toàn chuỗi KBS thay thế, không ghép giá khác cơ sở điều chỉnh. Khi KBS là nguồn chính, Yahoo là nguồn đối chiếu. Kiểm tra lịch sử cần khớp tất cả ngày trong mẫu gần nhất tối đa 20 phiên. Định giá dùng kiểm tra riêng giá đóng cửa mới nhất: bản ghi đúng ngày và giá sử dụng, khớp nguồn thứ hai trong 0,1%. Một ngày khớp không chứng nhận chuỗi lịch sử; lịch sử chưa khớp sẽ hạn chế MA/lợi suất/drawdown/biến động nhưng không chặn riêng giá mới nhất đã khớp.
 
 ACB nhận 2.574 phiên 15/06/2016–08/10/2026, yêu cầu từ 20/03/2016 nên vẫn có khoảng lịch sử chưa được bao phủ. PDF/UI hiển thị khoảng thực nhận, chế độ bản đầy đủ tách khỏi trạng thái dữ liệu. KBS không cung cấp Adj Close có metadata xác minh nên chỉ vẽ chuỗi đóng cửa/MA/volume, không tính lợi suất/drawdown/biến động từ chuỗi này.
 

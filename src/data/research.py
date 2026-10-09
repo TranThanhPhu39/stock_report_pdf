@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 
 from src.data.providers import DataSourceError, VN_TIME, completed_day_cutoff, download, fetch_daily_prices
 from src.data.normalize import parse_annual_financials
+from src.analysis.price_quality import PRICE_TOLERANCE
 
 KBS_BASE = "https://kbbuddywts.kbsec.com.vn/iis-server/investment"
 
@@ -27,10 +28,14 @@ def compare_prices(primary: list[dict], payload: dict, cutoff: date) -> dict:
         if other and other.get("c") is not None:
             deviation = abs(float(row["close"]) - float(other["c"])) / float(other["c"]) if float(other["c"]) > 0 else None
             checks.append({"date": row["date"], "yahoo_close": row["close"], "kbs_close": other["c"],
-                           "relative_difference": deviation, "match": deviation is not None and deviation <= 0.001})
+                           "relative_difference": deviation, "match": deviation is not None and deviation <= PRICE_TOLERANCE})
     latest_match = bool(checks and primary and checks[-1]["date"] == primary[-1]["date"] and checks[-1]["match"])
     return {"status": "matched" if latest_match and len(checks)==min(20,len(primary)) and all(r["match"] for r in checks) else "unverified",
             "checks": checks, "latest_match": latest_match,
+            "latest_status": "matched" if latest_match else "unverified",
+            "latest_date": primary[-1]["date"] if primary else None,
+            "expected_count": min(20,len(primary)), "matched_count":sum(c["match"] for c in checks),
+            "mismatch_count":sum(not c["match"] for c in checks), "missing_count":min(20,len(primary))-len(checks),
             "note": "Đối chiếu giá đóng cửa tối đa 20 ngày gần nhất, sai lệch cho phép 0,1%; không xác nhận toàn bộ lịch sử điều chỉnh."}
 
 

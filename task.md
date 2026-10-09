@@ -76,3 +76,5 @@ Bộ bàn giao: README, projectcontext/task, docs, outputs/pdf và submission. M
 - [x] 76 tests; SDK thật HTTP giả lập; nguồn thực ACB/HPG/VNM; UI thật ACB thiếu key vẫn xuất PDF.
 - [ ] Kiểm chứng API Gemini thật và Streamlit Cloud khi có key/môi trường deploy.
 - [ ] Xác minh NCI ACB từ tài liệu gốc trước khi mở P/B, và nguồn lịch sử đầu 2016.
+
+- [x] Tách kiểm tra giá mới nhất cho định giá khỏi mẫu lịch sử; UI/PDF, cảnh báo và thống kê chuỗi đồng bộ; 83 kiểm thử đạt.

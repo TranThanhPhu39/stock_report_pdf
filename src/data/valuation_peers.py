@@ -55,6 +55,6 @@ def collect_valuation_peers(industry, as_of, price_date, root, run_id):
             if error:result["excluded"].append(error)
     values=[p["pb"] for p in result["peers"] if p["pb"] is not None]
     if len(values)>=2:
-        result.update(available=True,median_pb=statistics.median(values),sample_size=len(values),price_date=price_date,
+        result.update(available=True,reason="",median_pb=statistics.median(values),sample_size=len(values),price_date=price_date,
                       explanation=f"Trung vị {len(values)} mã khác trong mẫu {industry.get('name')}, giá {price_date}; vốn năm quy đổi trên CP snapshot. Không phải chỉ số P/B toàn ngành.")
     return result

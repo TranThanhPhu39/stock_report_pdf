@@ -45,3 +45,5 @@ Tự lấy Parquet tài chính HSX/HNX và BCTN nhiều mã từ danh mục vn-a
 Đã tích hợp định giá đa phương pháp từ ZIP, có chỉnh các cơ sở chưa phù hợp; chi tiết docs/valuation_upgrade.md và provenance bản gốc. Thêm nguồn giá KBS thay cả chuỗi khi Yahoo lỗi, đối chiếu ngược Yahoo, báo phạm vi thực nhận. Ngân hàng có CFO đúng mã, thu nhập lãi/tổng thu nhập hoạt động, tăng trưởng tín dụng và kết luận lợi nhuận độc lập. PDF có sáu nhóm biểu đồ, bảng rủi ro và nguồn tại luận điểm.
 
 76 kiểm thử đạt; dữ liệu thực ACB/HPG/VNM và UI thật ACB. ACB chưa đủ đoạn đầu 2016 và NCI, có P/E năm quy đổi; HPG FCFF âm nên DCF chặn; VNM đủ phương pháp. Gemini tùy chọn từ bundle số liệu/nguồn, key qua Secrets/environment; missing key/API/JSON có fallback. SDK thật đã test HTTP giả lập, chưa test API/deploy thật. Không coi P/E năm là TTM; không coi số ngành cố định ZIP là dữ liệu thị trường. Minh chứng submission/upgrade_acceptance.json.
+
+Cập nhật NVL: định giá dùng giá mới nhất có bản ghi đúng ngày/giá khớp hai nguồn trong 0,1%; mẫu lịch sử giữ kiểm tra độc lập, chưa khớp thì chặn thống kê chuỗi. 83 kiểm thử đạt; không bỏ kiểm tra tài chính.

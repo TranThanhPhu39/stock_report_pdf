@@ -1,5 +1,6 @@
 """Valuation methods adapted from updated_valuation_files.zip with explicit assumptions."""
 import math
+from src.analysis.price_quality import latest_price_matches
 
 
 def number(v, positive=False):
@@ -27,7 +28,7 @@ def analyze_valuation(financial, market, company, quote_check, as_of, target_pb=
     reasons=val["blocked_reasons"];shares=company.get("outstanding_shares")
     if not financial.get("periods"):reasons.append("Thiếu kỳ tài chính hợp lệ.")
     if not market:reasons.append("Chưa có chuỗi giá hợp lệ.")
-    if quote_check.get("status")!="matched":reasons.append("Giá chưa khớp nguồn độc lập trong các phiên đối chiếu.")
+    if not latest_price_matches(quote_check,market):reasons.append("Giá đóng cửa mới nhất chưa khớp nguồn độc lập đúng ngày và giá sử dụng.")
     if not number(shares,True):reasons.append("Thiếu số cổ phiếu lưu hành dương.")
     if company.get("snapshot_at")!=as_of.isoformat():reasons.append("Snapshot số CP khác ngày phân tích; không dùng CP hiện tại cho ngày quá khứ.")
     if market and not number(market.get("latest_close_vnd"),True):reasons.append("Giá đối chiếu không dương/hữu hạn.")
@@ -36,6 +37,7 @@ def analyze_valuation(financial, market, company, quote_check, as_of, target_pb=
         for key in ["gordon","industry","pe","dcf","weighted_average"]:val[key]["reason"]=val["reason"]
         return val
     latest=financial["periods"][0];fields=latest["fields"];price=market["latest_close_vnd"]
+    val["price_warning"]="" if quote_check.get("status")=="matched" else "Giá đóng cửa mới nhất đã khớp hai nguồn để đối chiếu định giá; mẫu lịch sử chưa khớp đầy đủ. Không xác nhận chuỗi giá hoặc cơ sở điều chỉnh."
     def get(k):return fields.get(k,{}).get("value")
     def refs(keys):return [fields[k] for k in keys if k in fields]
     def parent_book(p):

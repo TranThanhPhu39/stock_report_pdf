@@ -27,7 +27,7 @@ Tệp theo lượt chạy nằm tại `outputs/runs/<run_id>/`: request.json, va
 
 ## Phân tích và nguồn
 
-- Giá cuối ngày Yahoo Finance; nếu lỗi tải/OHLC, tự thử toàn chuỗi KBS và đối chiếu ngược bằng Yahoo. Không ghép OHLC khác cơ sở điều chỉnh hoặc tự sửa giá nguồn. Giá đóng cửa phải khớp toàn bộ mẫu tối đa 20 phiên gần nhất; ghi phạm vi thực nhận và khoảng đầu kỳ thiếu. Luôn bỏ ngày hiện tại theo UTC+7, kể cả sau giờ giao dịch.
+- Giá cuối ngày Yahoo Finance; nếu lỗi tải/OHLC, tự thử toàn chuỗi KBS và đối chiếu ngược bằng Yahoo. Không ghép OHLC khác cơ sở điều chỉnh hoặc tự sửa giá nguồn. Định giá kiểm tra riêng giá đóng cửa mới nhất: đúng ngày, đúng giá sử dụng, khớp nguồn thứ hai trong 0,1%. Mẫu lịch sử tối đa 20 phiên có trạng thái riêng; nếu chưa khớp đầy đủ thì giữ biểu đồ đóng cửa nhưng không tính MA/lợi suất/drawdown/biến động năm hóa. Ghi phạm vi thực nhận và khoảng đầu kỳ thiếu. Luôn bỏ ngày hiện tại theo UTC+7, kể cả sau giờ giao dịch.
 - Lợi suất theo Yahoo Adj Close, MA20/MA50, drawdown, biến động năm hóa và khối lượng. Chuỗi điều chỉnh không đồng nghĩa lợi nhuận thực nhận sau phí/thuế.
 - Báo cáo năm qua KBS: doanh thu thuần, LNST, tài sản, vốn, CFO, tăng trưởng, ROE hợp nhất, biên lợi nhuận và nợ vay/vốn khi phù hợp. Bán niên HPG được đọc trực tiếp từ PDF soát xét của doanh nghiệp bằng OCR.
 - Vĩ mô: tự đọc NSO (GDP lũy kế, CPI bình quân, IIP, tín dụng, bán lẻ thực, xuất khẩu…) và World Bank cho lịch sử năm. Lãi suất cho vay và tỷ giá World Bank là số lịch sử, không phải giá hiện tại.
@@ -71,3 +71,7 @@ GEMINI_MODEL = "gemini-flash-latest"
 ```
 
 Key cũng có thể đặt trong `[gemini]` với tên `api_key`. Model có thể đổi bằng environment `GEMINI_MODEL`; secrets cấp gốc được Streamlit cung cấp như environment. File secrets đã được ignore; không đưa key vào code/Git. CLI `--use-ai` đọc environment. Không tự tải `.env`: nếu dùng file này, cần nạp biến vào environment trước khi chạy. Mỗi request AI có timeout và chỉ gửi dữ liệu công khai đã thu thập; thiếu ngành/key hoặc lỗi API/JSON/dẫn nguồn thì giữ kết luận quy tắc. Những nhận xét qua kiểm tra dẫn nguồn vẫn cần đánh giá về nội dung; đây không phải chứng nhận AI suy luận đúng.
+
+## Sửa điều kiện giá NVL (09/10/2026)
+
+83 kiểm thử đạt. Giá mới nhất được kiểm tra bằng bản ghi đối chiếu thực tế, không chỉ bằng cờ trạng thái. Lệch/thiếu các phiên lịch sử không chặn giá mới nhất đã khớp; giá mới nhất sai/thiếu/cũ, giá sử dụng khác bản ghi hoặc sai lệch >0,1% vẫn chặn định giá. UI/PDF tách hai trạng thái. Khi mẫu lịch sử chưa khớp, không tính MA20/50, lợi suất, drawdown hoặc biến động năm hóa; vẫn hiển thị chuỗi đóng cửa có cảnh báo. Các kiểm tra tài chính/NCI/phạm vi/CP snapshot vẫn giữ. Bấm **Phân tích** lại để thay kết quả cũ trong phiên giao diện. Chứng cứ chạy NVL: `submission/nvl_price_scope.json`.

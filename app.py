@@ -8,6 +8,7 @@ from src.models import SECTION_LABELS
 from src.pipeline import run_analysis
 from src.reporting.pdf_exporter import generate_report, formatted
 from src.analysis.ai_commentary import resolve_key
+from src.analysis.price_quality import latest_price_matches
 
 ROOT=Path(__file__).resolve().parent
 today=datetime.now(VN_TIME).date()
@@ -66,10 +67,14 @@ if result:
     if market:
         cols=st.columns(4)
         for col,label,key,unit in zip(cols,["Giá đóng cửa","Biến động khoảng chọn","Sụt giảm tối đa","MA20"],["latest_close_vnd","return_pct","max_drawdown_pct","ma20_vnd"],["VND/share","%","%","VND/share"]):
-            col.metric(label,formatted(market[key],unit))
+            display="Không tính" if key!="latest_close_vnd" and not market.get("history_indicators_available",True) else formatted(market[key],unit)
+            col.metric(label,display)
+            if display=="Không tính":col.caption("Lịch sử chưa khớp")
         price_check=result["quality"]["price_check"]
-        if price_check["status"]=="matched":st.success(f"Giá đóng cửa đã khớp hai nguồn trong {len(price_check['checks'])} phiên được đối chiếu.")
-        else:st.warning("Giá chưa được đối chiếu đầy đủ với nguồn thứ hai.")
+        if latest_price_matches(price_check,market):st.success(f"Giá đóng cửa mới nhất {market['latest_close_vnd']:,.0f} VND ngày {market['latest_date']} đã khớp hai nguồn để đối chiếu định giá.")
+        else:st.warning("Giá đóng cửa mới nhất chưa khớp nguồn thứ hai đúng ngày; định giá bị chặn.")
+        if price_check["status"]=="matched":st.caption(f"Mẫu lịch sử: khớp {len(price_check['checks'])}/{price_check.get('expected_count',len(price_check['checks']))} phiên; không xác nhận toàn bộ lịch sử điều chỉnh.")
+        else:st.warning(f"Mẫu lịch sử chưa khớp đầy đủ: {price_check.get('matched_count',sum(c['match'] for c in price_check.get('checks',[])))}/{price_check.get('expected_count',20)} phiên khớp. Hạn chế MA, lợi suất, drawdown và biến động năm hóa; kiểm tra giá mới nhất được tách riêng.")
         prices=pd.DataFrame(result["price_rows"])
         chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),market["series_basis"]:market["chart_prices"]}).set_index("Ngày")
         st.line_chart(chart)
@@ -133,6 +138,7 @@ if result:
     with tabs[1]:
         val=result["valuation"]
         if val["available"]:
+            if val.get("price_warning"):st.warning(val["price_warning"])
             if val.get("book_value_per_share") is not None:st.caption(f"BVPS mẹ {formatted(val['book_value_per_share'],'VND/share')} · P/B tham chiếu {val['reference_pb']:.2f} lần")
             if val.get("pb_methods"):st.dataframe(pd.DataFrame(val["pb_methods"]),hide_index=True,width="stretch")
             if val.get("scenarios"):st.dataframe(pd.DataFrame([{"Kịch bản":s["label"],"P/B giả định":s["target_pb"],"Giá trị quy đổi":formatted(s["reference_price_vnd"],"VND/share"),"Chênh lệch":formatted(s["difference_pct"],"%")} for s in val["scenarios"]]),hide_index=True,width="stretch")

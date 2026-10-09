@@ -34,7 +34,9 @@ def financial(bank=False):
 
 def company():return {"ticker":"ACB","snapshot_at":NOW.isoformat(),"outstanding_shares":10e6,"source_id":"fixture"}
 def market():return {"latest_close_vnd":20000,"latest_date":"2026-10-08"}
-def value(f=None,**kw):return analyze_valuation(f or financial(),market(),company(),{"status":"matched"},NOW,**kw)
+def value(f=None,**kw):
+    quote=compare_prices([{"date":"2026-10-08","close":20000}],{"data_day":[{"t":"2026-10-08","c":20000}]},NOW)
+    return analyze_valuation(f or financial(),market(),company(),quote,NOW,**kw)
 
 
 def result(sections=None):

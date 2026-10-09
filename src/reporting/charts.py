@@ -12,7 +12,8 @@ def market_chart(result, folder: Path):
     fig,axes=plt.subplots(2,1,figsize=(9,4.5),sharex=True,gridspec_kw={"height_ratios":[3,1]})
     axes[0].plot(dates,values,color="#14566e",label=result["market"]["series_basis"])
     for days,color in [(20,"#d99d32"),(50,"#5a927b")]:
-        axes[0].plot(dates,values.rolling(days).mean(),color=color,label=f"MA{days}",linewidth=1)
+        if result["market"].get("history_indicators_available",True):
+            axes[0].plot(dates,values.rolling(days).mean(),color=color,label=f"MA{days}",linewidth=1)
     axes[0].set_ylabel("VND / share");axes[0].legend(fontsize=7,loc="upper left")
     axes[1].bar(dates,frame["volume"]/1e6,color="#94b2bc",width=1.8);axes[1].set_ylabel("Million shares")
     for ax in axes:ax.grid(alpha=.18);ax.spines[["top","right"]].set_visible(False)

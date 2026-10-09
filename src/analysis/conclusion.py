@@ -1,4 +1,5 @@
 """Rules produce observations, implications and follow-up conditions, not buy/sell labels."""
+from src.analysis.price_quality import latest_price_matches
 
 
 def build_conclusion(financial, market, valuation, quote_check, interim=None):
@@ -37,8 +38,11 @@ def build_conclusion(financial, market, valuation, quote_check, interim=None):
         fields=interim["fields"];profit=fields["net_profit"];revenue=fields["revenue"]
         if profit["previous"]>0 and revenue["previous"]>0:
             opportunities.append(f"BCTC gốc kỳ kết thúc {interim['period_end']}: doanh thu thuần thay đổi {(revenue['value']/revenue['previous']-1)*100:.1f}%, LNST thay đổi {(profit['value']/profit['previous']-1)*100:.1f}% so với cùng kỳ. Cần kiểm tra đóng góp từ thu nhập tài chính và hoạt động cốt lõi.")
+    latest_verified=latest_price_matches(quote_check,market)
+    if not latest_verified:
+        risks.append("Giá đóng cửa mới nhất chưa khớp nguồn độc lập đúng ngày; chưa dùng để đối chiếu định giá.")
     if quote_check.get("status")!="matched":
-        risks.append("Giá chưa được đối chiếu đầy đủ với nguồn độc lập; chưa dùng để đưa kết luận định giá.")
+        risks.append("Mẫu giá lịch sử chưa khớp đầy đủ; không tính MA, lợi suất, drawdown hoặc biến động năm hóa. Kiểm tra giá mới nhất cho định giá được thực hiện riêng.")
     risks.append("Các tỷ số năm phản ánh kỳ đã công bố, có thể khác tình hình hiện tại. Kịch bản P/B nhạy với giả định và không tự động dẫn đến quyết định mua/bán.")
     if not opportunities:
         opportunities.append("Chưa đủ bằng chứng để kết luận cơ hội nổi bật; cần bổ sung hoặc xác minh dữ liệu.")
@@ -47,8 +51,10 @@ def build_conclusion(financial, market, valuation, quote_check, interim=None):
         matrix.append({"evidence":f"LNST năm {year} giảm {abs(value('net_profit_growth')):.2f}%", "impact":"Áp lực duy trì lợi nhuận", "monitor":"Thu nhập lãi và dự phòng" if financial.get("industry_group")=="bank" else "Sản lượng, biên lợi nhuận và khoản bất thường", "source_ids":[i["source_id"] for i in metrics["net_profit_growth"]["inputs"] if i.get("source_id")]})
     if market and market.get("ma20_vnd") is not None and market["latest_close_vnd"]<market["ma20_vnd"]:
         matrix.append({"evidence":f"Đóng cửa {market['latest_close_vnd']:,.0f} thấp hơn MA20 {market['ma20_vnd']:,.0f}","impact":"Động lực giá ngắn hạn yếu trên chuỗi nguồn","monitor":"Xu hướng giá và thanh khoản; không tự suy ra giá trị doanh nghiệp","source_ids":[quote_check["source_id"]] if quote_check.get("source_id") else []})
+    if not latest_verified:
+        matrix.append({"evidence":"Giá đóng cửa mới nhất chưa được xác minh","impact":"Không đủ cơ sở đối chiếu định giá","monitor":"Khớp đúng ngày, giá sử dụng và nguồn thứ hai","source_ids":[quote_check["source_id"]] if quote_check.get("source_id") else []})
     if quote_check.get("status")!="matched":
-        matrix.append({"evidence":"Giá chưa khớp đủ phiên nguồn thứ hai","impact":"Không đủ cơ sở đối chiếu định giá","monitor":"Khớp ngày, đơn vị và cơ sở điều chỉnh","source_ids":[quote_check["source_id"]] if quote_check.get("source_id") else []})
+        matrix.append({"evidence":"Mẫu giá lịch sử chưa khớp đầy đủ","impact":"Hạn chế chỉ tiêu dựa trên chuỗi giá; không chặn riêng giá mới nhất đã khớp","monitor":"Đối chiếu các phiên lệch và cơ sở điều chỉnh; chưa tự sửa giá nguồn","source_ids":[quote_check["source_id"]] if quote_check.get("source_id") else []})
     for reason in valuation.get("blocked_reasons",[])[:2]:
         matrix.append({"evidence":reason,"impact":"Một số phương pháp bị chặn","monitor":"Xác minh đầu vào còn thiếu từ tài liệu gốc","source_ids":[]})
     if financial.get("industry_group")=="bank":

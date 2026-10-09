@@ -83,10 +83,11 @@ class FinancialGuardTests(unittest.TestCase):
     def test_valuation_rejects_historical_current_shares_and_unverified_prices(self):
         f=analyze_financials([period(2025,20,120)])
         company={"snapshot_at":"2026-10-09","outstanding_shares":10,"source_id":"test"}
-        m={"latest_close_vnd":20}
-        self.assertFalse(analyze_valuation(f,m,company,{"status":"matched","latest_match":True},date(2026,10,8),1.5)["available"])
+        m={"latest_close_vnd":20,"latest_date":"2026-10-08"}
+        verified=compare_prices([{"date":"2026-10-08","close":20}],{"data_day":[{"t":"2026-10-08","c":20}]},date(2026,10,8))
+        self.assertFalse(analyze_valuation(f,m,company,verified,date(2026,10,8),1.5)["available"])
         self.assertFalse(analyze_valuation(f,m,company,{"status":"unverified","latest_match":True},date(2026,10,9),1.5)["available"])
-        self.assertTrue(analyze_valuation(f,m,company,{"status":"matched","latest_match":True},date(2026,10,9),1.5)["available"])
+        self.assertTrue(analyze_valuation(f,m,company,verified,date(2026,10,9),1.5)["available"])
     def test_ocr_requires_balance_identity_and_rejects_wrong_unit(self):
         text="""BÁO CÁO hợp nhất Đơn vị: VND kết thúc ngày 30 tháng 6 năm 2026
 TỔNG CỘNG TÀI SẢN 200.000.000 180.000.000
