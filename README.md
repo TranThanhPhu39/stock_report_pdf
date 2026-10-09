@@ -4,7 +4,7 @@ Khung dự án phân tích cơ hội đầu tư cổ phiếu Việt Nam và tự
 
 ## Trạng thái
 
-Đã có bộ lấy giá ngày tự động và tải BCTC hợp nhất HPG. Đã thử nguồn thật cho HPG và chạy 5 kiểm thử offline. Các mô-đun phân tích/giao diện/PDF còn là khung, chưa có báo cáo phân tích hoàn chỉnh. Giá chưa đối chiếu độc lập; chỉ tiêu tài chính chưa trích xuất.
+Đã có giao diện Streamlit: bấm **Phân tích** để tự lấy giá ngày và tải BCTC hợp nhất HPG, kiểm tra rồi hiển thị dữ liệu/biểu đồ. Không cần chuẩn bị CSV hoặc chạy lệnh lấy dữ liệu riêng. Đã kiểm thử nút Phân tích với nguồn thật: 261 bản ghi giá HPG, 2 PDF tài chính, không lỗi. Giá chưa đối chiếu độc lập; chỉ tiêu tài chính và PDF phân tích chưa hoàn thiện.
 
 Đọc `projectcontext.md` để hiểu yêu cầu/kiến trúc và `task.md` để theo dõi tiến độ. Đề gốc và bản đề xuất nằm trong `docs/references/`.
 
@@ -25,9 +25,18 @@ Khung dự án phân tích cơ hội đầu tư cổ phiếu Việt Nam và tự
 
 Python + Streamlit + pandas/numpy + matplotlib + ReportLab + PyYAML. `requirements.txt` chưa chốt phiên bản hoặc cài đặt.
 
-Sau khi triển khai P0, lệnh chạy dự kiến: `python -m streamlit run app.py`. Hiện chưa có ứng dụng phân tích để chạy.
+## Chạy ứng dụng
 
-## Tự lấy dữ liệu HPG
+```powershell
+python -m pip install streamlit pandas beautifulsoup4
+python -m streamlit run app.py
+```
+
+Trong trình duyệt, để mã **HPG**, chọn khoảng ngày và bấm **Phân tích**. Ứng dụng tự truy cập nguồn trực tuyến, lưu dữ liệu và hiển thị kết quả. Không có bước nhập CSV bắt buộc. PDF tải xuống hiện là tài liệu tài chính gốc, chưa phải báo cáo phân tích do hệ thống tạo.
+
+Giá và danh sách công bố được lấy lại mỗi lần bấm. PDF đã tải trong 24 giờ có thể được dùng lại khi checksum khớp; giao diện ghi rõ bản lưu. Bản quá hạn hoặc lỗi checksum được tải lại. Đang dùng phiên ngày trước ngày hiện tại để tránh dữ liệu trong phiên.
+
+## Lệnh lấy dữ liệu riêng (tùy chọn)
 
 Cài dependency cho bộ lấy dữ liệu: `python -m pip install beautifulsoup4`.
 

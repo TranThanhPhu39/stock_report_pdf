@@ -7,7 +7,7 @@ Cập nhật: 09/10/2026. Thư mục gốc dự án: `gk/`.
 - Đề gốc: `docs/references/261BFF401101_Dethigiuaky.pdf` (bản sao nguyên trạng từ tài liệu người dùng cung cấp).
 - Hướng triển khai: `docs/references/implementation_proposal.txt` (nội dung người dùng gửi, là đề xuất kỹ thuật).
 - Yêu cầu hiện tại: kiểm thử HPG và tự lấy dữ liệu bằng code vì nhóm chưa có dữ liệu; đề xuất dữ liệu trong phiên hay cuối ngày.
-- Giai đoạn hiện tại: đã triển khai bộ lấy dữ liệu giá ngày và tải PDF tài chính cho HPG. Chưa có ứng dụng phân tích hoàn chỉnh hoặc PDF phân tích đầu ra.
+- Giai đoạn hiện tại: giao diện Streamlit gọi trực tiếp pipeline tự lấy giá ngày và tải PDF tài chính HPG mỗi lần bấm Phân tích. Đã có hiển thị dữ liệu/biểu đồ; chưa hoàn thiện chỉ tiêu tài chính và PDF phân tích đầu ra.
 
 Nội dung tài liệu là căn cứ bài tập/phương án. Người dùng đã yêu cầu tự lấy dữ liệu và kiểm thử HPG; chưa có yêu cầu triển khai Internet hoặc nộp bài.
 
@@ -143,3 +143,5 @@ Nguồn giá thử nghiệm: Yahoo Finance chart, mã HPG.VN, đơn vị VND t�
 Đã tải từ trang quan hệ cổ đông Hòa Phát: BCTC hợp nhất soát xét 6 tháng 2026 (công bố 28/08/2026, 67 trang) và BCTC hợp nhất quý II/2026 (30/07/2026, 37 trang). Hai tài liệu có kỳ chồng lấp, không được xem như hai kỳ độc lập để cộng TTM. Chưa trích xuất chỉ tiêu tài chính. Bộ tìm PDF hiện chỉ hỗ trợ HPG và trang danh sách đầu tiên; chưa tìm đủ lịch sử cho mọi ngày phân tích.
 
 5 kiểm thử offline đạt: cutoff theo múi giờ, loại phiên hiện tại, metadata giá, dữ liệu lỗi và ngày công bố/phạm vi báo cáo. Xem `docs/hpg_data_check.md` để biết kết quả và phần còn thiếu.
+
+Người dùng đã xác nhận yêu cầu code tự lấy dữ liệu ngay trong ứng dụng. Bộ thu thập dùng chung tại `src/data/acquisition.py`; `src/pipeline.py` gọi bộ này trước khi tính/hiển thị kết quả. `app.py` có form mã/ngày và nút Phân tích, không đòi CSV hoặc CLI trước. Mỗi lần bấm gọi lại nguồn; nguồn lỗi hiển thị trạng thái, không thay bằng kết quả cũ. CLI chỉ là công cụ tùy chọn. Có thêm 3 kiểm thử pipeline (8 tổng cộng), gồm workspace trống và lỗi nguồn.

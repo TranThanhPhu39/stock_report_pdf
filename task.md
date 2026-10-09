@@ -99,4 +99,15 @@ Chốt hợp đồng dữ liệu, đối chiếu giá HPG và cơ sở điều c
 - [ ] Bổ sung lịch sử báo cáo từ các trang tiếp theo và quy tắc chọn phiên bản soát xét/kiểm toán.
 - [ ] Hoàn thiện AnalysisResult, phân tích và PDF đầu ra.
 
+### Tự lấy dữ liệu trong ứng dụng
+
+- [x] Chuyển thu thập vào `src/data/acquisition.py` dùng chung cho ứng dụng và CLI.
+- [x] Nối `src/pipeline.py` để luôn tự lấy dữ liệu trước khi trả kết quả mới.
+- [x] Tạo giao diện nhập mã/ngày và nút Phân tích; không yêu cầu CSV hoặc chạy CLI trước.
+- [x] Hiển thị dữ liệu giá, biểu đồ và PDF tài chính gốc lấy được từ nguồn.
+- [x] Xóa kết quả giao diện cũ khi gửi yêu cầu mới; hiển thị lỗi nguồn và kết quả từng phần.
+- [x] 8 kiểm thử offline đạt, gồm luồng tự lấy dữ liệu từ workspace trống.
+- [x] Kiểm thử nút Phân tích bằng Streamlit AppTest với nguồn HPG thật: 261 bản ghi giá, 2 PDF, không lỗi nguồn.
+- [x] Tái sử dụng PDF trong 24 giờ khi checksum khớp, ghi rõ bản lưu trên UI; giá/danh sách nguồn vẫn lấy lại mỗi lần bấm.
+
 Đề xuất tần suất bản đầu: dữ liệu cuối ngày, lấy tự động khi chạy; chưa chạy nền/realtime. Các mục P0/P1 bên trên giữ trạng thái chưa hoàn thành nếu mới chỉ đạt một phần.
