@@ -24,3 +24,7 @@ Thiếu là null; không gán 0. Kỳ báo cáo năm là năm dương lịch the
 `macro.indicators`: key, label, value, unit, period, published_at (NSO), source_updated_at (World Bank), source_id, basis và staleness khi có. Ngày cập nhật World Bank không phải ngày công bố.
 
 `industry`: taxonomy, name/code/level, members, classification_snapshot, period_end/scope, peers, eligible_candidates, selection_candidates, excluded, comparisons và drivers. `comparisons`: target, median, difference, unit, n; mẫu loại mục tiêu. `conclusion.integrated_thesis`: luận điểm tổng hợp có điều kiện.
+
+## Nguồn bổ sung
+
+`reference.records`: year/kind/scope=unknown/published_at=null; fields có value gốc, unit=source_value, item/source_file/source_sheet/source_id. `checks`: primary_vnd/reference_raw/relative_difference/match/scope_certified=false. `reports`: năm, đường dẫn danh mục, SHA256, file local nếu tải thành công, downloaded_at/download_url/retrieval_mode/inspection. `used_in_primary_analysis=false`: không đưa nguồn chưa đủ metadata vào tài chính/định giá. Ngày phiên bản và ngày tải khác ngày công bố gốc.

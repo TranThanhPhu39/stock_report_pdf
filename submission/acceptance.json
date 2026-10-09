@@ -1,10 +1,10 @@
 {
-  "offline_tests": 40,
+  "offline_tests": 54,
   "ui_evidence": "submission/ui_check.json",
   "runs": [
     {
       "ticker": "HPG",
-      "run_id": "HPG_20261009_132459_609926",
+      "run_id": "HPG_20261009_141749_031374",
       "status": "analyzed",
       "price_records": 261,
       "price_check": "matched",
@@ -80,12 +80,26 @@
       "errors": [],
       "evidence": "submission/evidence/HPG_analysis.json",
       "pdf": "outputs/pdf/HPG_report.pdf",
-      "pdf_pages": 8,
-      "peer_period_scope_verified": true
+      "pdf_pages": 9,
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 24,
+      "reference_matches": 24,
+      "reference_pdf": {
+        "pages": 141,
+        "text_pages": 89,
+        "status": "mixed_requires_ocr",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     },
     {
       "ticker": "FPT",
-      "run_id": "FPT_20261009_132509_579539",
+      "run_id": "FPT_20261009_141756_206385",
       "status": "partial",
       "price_records": 261,
       "price_check": "unverified",
@@ -134,12 +148,26 @@
       "errors": [],
       "evidence": "submission/evidence/FPT_analysis.json",
       "pdf": "outputs/pdf/FPT_report.pdf",
-      "pdf_pages": 8,
-      "peer_period_scope_verified": true
+      "pdf_pages": 9,
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 20,
+      "reference_matches": 20,
+      "reference_pdf": {
+        "pages": 233,
+        "text_pages": 232,
+        "status": "text_available",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     },
     {
       "ticker": "VNM",
-      "run_id": "VNM_20261009_132515_894923",
+      "run_id": "VNM_20261009_141802_608221",
       "status": "analyzed",
       "price_records": 261,
       "price_check": "matched",
@@ -179,12 +207,26 @@
       "errors": [],
       "evidence": "submission/evidence/VNM_analysis.json",
       "pdf": "outputs/pdf/VNM_report.pdf",
-      "pdf_pages": 7,
-      "peer_period_scope_verified": true
+      "pdf_pages": 8,
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 24,
+      "reference_matches": 24,
+      "reference_pdf": {
+        "pages": 111,
+        "text_pages": 111,
+        "status": "text_available",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     },
     {
       "ticker": "VCB",
-      "run_id": "VCB_20261009_132525_257984",
+      "run_id": "VCB_20261009_141810_593924",
       "status": "partial",
       "price_records": 261,
       "price_check": "matched",
@@ -213,11 +255,25 @@
       "valuation_available": true,
       "errors": [],
       "evidence": "submission/evidence/VCB_analysis.json",
-      "peer_period_scope_verified": true
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 12,
+      "reference_matches": 11,
+      "reference_pdf": {
+        "pages": 113,
+        "text_pages": 112,
+        "status": "text_available",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     },
     {
       "ticker": "SSI",
-      "run_id": "SSI_20261009_132531_828014",
+      "run_id": "SSI_20261009_141817_412007",
       "status": "partial",
       "price_records": 261,
       "price_check": "matched",
@@ -246,11 +302,25 @@
       "valuation_available": true,
       "errors": [],
       "evidence": "submission/evidence/SSI_analysis.json",
-      "peer_period_scope_verified": true
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 6,
+      "reference_matches": 6,
+      "reference_pdf": {
+        "pages": 148,
+        "text_pages": 1,
+        "status": "scan_requires_ocr",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     },
     {
       "ticker": "MWG",
-      "run_id": "MWG_20261009_132543_436594",
+      "run_id": "MWG_20261009_141823_023933",
       "status": "partial",
       "price_records": 261,
       "price_check": "unverified",
@@ -279,11 +349,25 @@
       "valuation_available": false,
       "errors": [],
       "evidence": "submission/evidence/MWG_analysis.json",
-      "peer_period_scope_verified": true
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 24,
+      "reference_matches": 24,
+      "reference_pdf": {
+        "pages": 158,
+        "text_pages": 154,
+        "status": "text_available",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     },
     {
       "ticker": "DGC",
-      "run_id": "DGC_20261009_132548_383911",
+      "run_id": "DGC_20261009_141829_778497",
       "status": "partial",
       "price_records": 261,
       "price_check": "unverified",
@@ -312,11 +396,25 @@
       "valuation_available": false,
       "errors": [],
       "evidence": "submission/evidence/DGC_analysis.json",
-      "peer_period_scope_verified": true
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 18,
+      "reference_matches": 15,
+      "reference_pdf": {
+        "pages": 58,
+        "text_pages": 1,
+        "status": "scan_requires_ocr",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     },
     {
       "ticker": "REE",
-      "run_id": "REE_20261009_132556_048387",
+      "run_id": "REE_20261009_141835_459544",
       "status": "partial",
       "price_records": 261,
       "price_check": "matched",
@@ -345,17 +443,32 @@
       "valuation_available": true,
       "errors": [],
       "evidence": "submission/evidence/REE_analysis.json",
-      "peer_period_scope_verified": true
+      "peer_period_scope_verified": true,
+      "reference_records": 45,
+      "reference_checks": 18,
+      "reference_matches": 18,
+      "reference_pdf": {
+        "pages": 81,
+        "text_pages": 80,
+        "status": "text_available",
+        "scope_certified": false,
+        "publication_at": null
+      },
+      "reference_errors": [],
+      "reference_used_in_primary": false,
+      "reference_commit": "afa208bcf8c24a2b7eb5a1fd446084e376e8838a",
+      "reference_pdf_checksum_verified": true
     }
   ],
   "note": "Eight live stocks verified; classification coverage does not certify all stocks. Peer comparisons require matching financial period and scope. Selected financial fields only independently checked.",
   "pdf_visual_review": {
     "all_pages_reviewed": true,
     "reports": {
-      "HPG": 8,
-      "FPT": 8,
-      "VNM": 7
+      "HPG": 9,
+      "FPT": 9,
+      "VNM": 8
     },
     "unicode_tables_sources_verified": true
-  }
+  },
+  "reference_ui_evidence": "submission/reference_ui_check.json"
 }

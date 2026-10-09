@@ -13,3 +13,7 @@ Mẫu đã tạo trong `outputs/pdf/`; minh chứng kết quả chạy trong `su
 ## Demo phần bổ sung
 
 Chạy HPG, mở Tổng quan vĩ mô để xem kỳ GDP/CPI và ngày đo tín dụng; mở Phân tích ngành để xem mẫu thép, kỳ báo cáo và chênh lệch trung vị. Chọn Tóm tắt, chỉ chọn macro/industry rồi tải PDF để chứng minh yêu cầu tùy chọn. Thử VCB/SSI để xem tỷ số riêng và cảnh báo kỳ 2025 sai metadata; thử FPT để thấy ngành được mở rộng khi thiếu mẫu phần mềm và định giá bị chặn vì giá lệch nguồn. Không nói đã chạy tất cả mã.
+
+## Demo nguồn mới
+
+Chạy HPG → Tài chính → mở nguồn bổ sung, xem lịch sử 2011–2025 và bảng đối chiếu, tải CSV và BCTN gốc. Chọn PDF chỉ phần reference để chứng minh tùy chọn. Chạy VCB để thấy Parquet/BCTN 2025 bên cạnh kỳ chính 2024; giải thích tại sao chưa tự ghi đè khi thiếu metadata. SSI/DGC có nhiều trang scan cần OCR thêm.

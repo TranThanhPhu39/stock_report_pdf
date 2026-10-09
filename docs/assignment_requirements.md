@@ -14,6 +14,6 @@ Căn cứ ảnh đề người dùng cung cấp: “Xây dựng hệ thống ph�
 | PDF theo nhu cầu | Chọn full/summary và các phần, nguồn/phương pháp vẫn được giữ; kiểm thử UI lựa chọn macro/industry |
 | Chính xác/phù hợp/sáng tạo | Không tạo số giả; chặn giá lệch/kỳ sai; truy vết nguồn, OCR, so sánh ngành, kịch bản minh bạch |
 
-40 kiểm thử offline đạt; xem submission/acceptance.json, ui_check.json và evidence/. Ba PDF mẫu HPG/FPT/VNM được xuất bằng luồng mới. Phân loại khoảng 1.582 mã chỉ là độ phủ danh mục, không phải số mã đã kiểm thử. FPT giá lệch nguồn nên không cấp định giá; VCB/SSI/DGC/REE dùng năm hợp lệ 2024 vì kỳ 2025 sai metadata. Nguồn lỗi/thiếu → trạng thái partial và lý do.
+54 kiểm thử offline đạt; xem submission/acceptance.json, ui_check.json và evidence/. Ba PDF mẫu HPG/FPT/VNM được xuất bằng luồng mới. Phân loại khoảng 1.582 mã chỉ là độ phủ danh mục, không phải số mã đã kiểm thử. FPT giá lệch nguồn nên không cấp định giá; VCB/SSI/DGC/REE dùng năm hợp lệ 2024 vì kỳ 2025 sai metadata. Nguồn lỗi/thiếu → trạng thái partial và lý do.
 
 Các nhóm chức năng của đề đã được triển khai. Chất lượng thông tin từng mã/kỳ vẫn phụ thuộc dữ liệu công khai; không tuyên bố mọi số liệu đã được chứng nhận. Realtime, AI, DCF và triển khai Internet không được đề chỉ định là bắt buộc.

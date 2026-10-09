@@ -3,7 +3,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import date
 
 SECTION_LABELS = {"overview": "Tổng quan", "macro": "Tổng quan vĩ mô", "industry": "Phân tích ngành", "market": "Giá và giao dịch", "financial": "Tài chính",
-                  "valuation": "Định giá theo giả định", "news": "Tin tức", "risks": "Cơ hội và rủi ro"}
+                  "reference": "Dữ liệu và báo cáo bổ sung", "valuation": "Định giá theo giả định", "news": "Tin tức", "risks": "Cơ hội và rủi ro"}
 
 
 @dataclass

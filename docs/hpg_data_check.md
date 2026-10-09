@@ -20,4 +20,8 @@ VNM: 20/20 phiên đóng cửa khớp; LNST 2025 khớp giá trị làm tròn 9.
 
 ## Kiểm tra phần vĩ mô/ngành bổ sung
 
-HPG: 14 chỉ tiêu vĩ mô, mẫu thép TVN/NKG/GDA/SHI cùng ngày cuối kỳ 2025-12-31 và phạm vi hợp nhất; sáu tỷ số so sánh. Tám mã đã chạy ở submission/acceptance.json. PDF mẫu mới HPG/FPT/VNM đã xem toàn bộ 8/8/7 trang. 40 kiểm thử offline đạt, giao diện đã kiểm tra xuất chỉ phần macro/industry.
+HPG: 14 chỉ tiêu vĩ mô, mẫu thép TVN/NKG/GDA/SHI cùng ngày cuối kỳ 2025-12-31 và phạm vi hợp nhất; sáu tỷ số so sánh. Tám mã đã chạy ở submission/acceptance.json. PDF mẫu mới HPG/FPT/VNM đã xem toàn bộ 9/9/8 trang. 54 kiểm thử offline đạt, giao diện đã kiểm tra xuất chỉ phần macro/industry.
+
+## Nguồn bổ sung đã chạy thực
+
+Tám mã đã tự tải BCTN 2025, tất cả hash khớp danh mục. Parquet có 45 bản ghi bảng–năm/mã trong mẫu 2011–2025. Đối chiếu giá trị: HPG 24/24, FPT 20/20, VNM 24/24, VCB 11/12, SSI 6/6, MWG 24/24, DGC 15/18, REE 18/18. Sai lệch được giữ rõ trong reference.checks; không tự ghi đè nguồn chính. UI đã chạy phần reference riêng và tải BCTN/CSV được hiển thị. Minh chứng: submission/reference_ui_check.json.

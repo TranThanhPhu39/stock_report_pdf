@@ -19,7 +19,7 @@ Cập nhật 09/10/2026. Các yêu cầu chính đã có luồng chạy thực; 
 - [x] Xuất PDF tiếng Việt có biểu đồ/bảng/nguồn; thực sự áp dụng summary/full và phần chọn.
 - [x] UI/PDF dùng chung AnalysisResult; lưu request, validation, acquisition, sources, analysis, chart và PDF theo lượt.
 - [x] Font Unicode có giấy phép, dependency có phiên bản kiểm thử, README và tài liệu phương pháp/demo cập nhật.
-- [x] 40 kiểm thử offline đạt.
+- [x] 54 kiểm thử offline đạt.
 - [x] Streamlit HPG thật: 261 phiên, OCR bán niên hợp lệ, PDF tồn tại, không ngoại lệ.
 - [x] Streamlit FPT thật: chọn summary/market/financial/risks, PDF bỏ phần khác, định giá bị chặn đúng.
 - [x] Yêu cầu sai xóa kết quả/PDF lượt trước, không trả kết quả cũ.
@@ -51,3 +51,14 @@ Bộ bàn giao: README, projectcontext/task, docs, outputs/pdf và submission. M
 - [x] Tỷ số ngân hàng/chứng khoán phù hợp; loại kỳ 24 tháng sai metadata.
 - [x] Tab và PDF vĩ mô/ngành; kiểm thử lựa chọn hai phần ở chế độ tóm tắt.
 - [x] Đối chiếu yêu cầu đề cập nhật và giới hạn kiểm chứng trong docs/assignment_requirements.md.
+
+## Bổ sung dữ liệu từ repository tham khảo
+
+- [x] Tự tải Parquet theo sàn và mã; giữ nguồn/khóa/giá trị gốc.
+- [x] Chốt phiên bản, cache 24h và kiểm tra checksum.
+- [x] Tự tra BCTN, tải PDF nhiều mã bằng mirror khớp hash hoặc Range ZIP.
+- [x] Đối chiếu giá trị cùng năm, nêu rõ sai lệch/metadata chưa xác minh.
+- [x] UI/CSV/PDF cho nguồn bổ sung; nút tải BCTN gốc.
+- [x] Giữ dữ liệu bổ sung ngoài đầu vào định giá khi chưa đủ kiểm chứng.
+- [x] Kiểm thử chống tải cả ZIP, từ chối mirror sai hash, cache hỏng, khóa trùng, thiếu/vô hạn và phiên bản sau ngày phân tích.
+- [ ] Xác minh đầy đủ đơn vị/phạm vi/ngày công bố từ PDF, OCR scan nhiều mã và chứng nhận kỳ 2025 trước khi dùng làm nguồn chính.

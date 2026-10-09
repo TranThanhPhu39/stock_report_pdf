@@ -92,6 +92,27 @@ if result:
         if interim and interim["valid"]:
             st.write(f"**Bán niên HPG đến {interim['period_end']}**")
             st.dataframe(pd.DataFrame([{"Chỉ tiêu":label,"Hiện tại":formatted(interim["fields"][key]["value"],"VND"),"6 tháng cùng kỳ":formatted(interim["fields"][key]["previous"],"VND"),"Trang PDF":interim["fields"][key]["page"]} for key,label in [("revenue","Doanh thu thuần"),("net_profit","LNST"),("cfo","Dòng tiền kinh doanh")]]),hide_index=True,width="stretch")
+        reference=result.get("reference",{})
+        with st.expander("Nguồn bổ sung: Parquet và báo cáo thường niên",expanded=True):
+            st.caption("Giá trị Parquet là giá trị gốc; đơn vị, phạm vi và ngày công bố chưa được chứng nhận. Không dùng để tự thay tài chính/định giá chính.")
+            reference_rows=[{"Năm":record["year"],"Chỉ tiêu":field["source_label"],"Giá trị gốc":field["value"],"Đơn vị":"Chưa xác minh","Phạm vi":record["scope"],"Nguồn":field["source_id"],"Mã chỉ tiêu":field["source_field"],"File gốc":field["source_file"],"Sheet gốc":field["source_sheet"]} for record in reference.get("records",[]) for field in record["fields"].values()]
+            if reference_rows:
+                ref_frame=pd.DataFrame(reference_rows)
+                st.dataframe(ref_frame,hide_index=True,width="stretch")
+                st.download_button("Tải dữ liệu tài chính bổ sung CSV",ref_frame.to_csv(index=False).encode("utf-8-sig"),file_name=f"{request['ticker']}_reference_financials.csv",mime="text/csv")
+            checks=reference.get("checks",[])
+            if checks:
+                st.write("Đối chiếu giá trị cùng năm — chưa chứng nhận phạm vi hay nguồn độc lập")
+                st.dataframe(pd.DataFrame([{"Năm":c["year"],"Chỉ tiêu":c["label"],"Nguồn chính (VND)":c["primary_vnd"],"Parquet (gốc)":c["reference_raw"],"Sai lệch (%)":c["relative_difference"]*100,"Kết quả":"Khớp giá trị" if c["match"] else "Lệch"} for c in checks]),hide_index=True,width="stretch")
+            for report in reference.get("reports",[]):
+                st.caption(f"BCTN {report['year']} · {report['file_name']} · SHA256 {report['sha256'][:12]}…")
+                if report.get("file"):
+                    original=ROOT/report["file"]
+                    st.download_button(f"Tải BCTN gốc {report['year']}",original.read_bytes(),file_name=report["file_name"],mime="application/pdf",key=f"reference_pdf_{report['record_id']}")
+                    st.caption(f"{report['inspection']['pages']} trang; {report['inspection']['text_pages']} trang đọc được text. Checksum đã khớp danh mục.")
+                    if report["inspection"]["status"]!="text_available":st.caption("Báo cáo chứa nhiều trang scan; cần OCR thêm trước khi tự trích/kiểm chứng số liệu.")
+            for error in reference.get("errors",[]):st.warning(error["message"])
+            if not reference.get("available"):st.info("Chưa có dữ liệu bổ sung đủ điều kiện theo phiên bản nguồn/ngày phân tích/sàn.")
     with tabs[1]:
         val=result["valuation"]
         if val["available"]:

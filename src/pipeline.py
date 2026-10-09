@@ -17,6 +17,7 @@ from src.analysis.financial import analyze_financials
 from src.analysis.valuation import analyze_valuation
 from src.analysis.conclusion import build_conclusion
 from src.data.context import collect_context
+from src.data.reference_miner import collect_reference
 from src.analysis.context import integrated_thesis
 
 
@@ -55,6 +56,9 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
         financial={**financial,"periods":[],"metrics":[]}
     market=analyze_market(rows)
     company={**research["company"],"name":acquisition["prices"].get("company_name") if acquisition["prices"] else ticker}
+    reference=collect_reference(ticker,as_of,financial,company,root,acquisition["run_id"])
+    research["sources"].extend(reference["sources"])
+    research["warnings"].extend(reference["warnings"])
     valuation=analyze_valuation(financial,market,company,research["quote_check"],as_of,target_pb)
     conclusion=build_conclusion(financial,market,valuation,research["quote_check"],interim)
     context=collect_context(ticker,as_of,financial,root,acquisition["run_id"])
@@ -66,7 +70,7 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     result = {"request": request.to_dict(),
               "acquisition": acquisition, "market": market, "price_rows": rows,
               "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],"macro":context["macro"],"industry":context["industry"],
-              "quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":research["warnings"]+financial["errors"]},
+              "reference":reference,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":research["warnings"]+financial["errors"]},
               "errors":acquisition["errors"]+research["errors"],"financial_metrics_status":"analyzed" if financial["metrics"] else "unavailable",
               "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
     import json

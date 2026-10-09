@@ -20,3 +20,7 @@ Lỗi từng nguồn được giữ như dữ liệu thiếu một phần. Giao 
 ## Bối cảnh tự động
 
 `data/context.py` chạy hai nhánh thu thập vĩ mô và ngành. `data/macro.py` đọc HTML NSO và API World Bank, lưu raw và metadata. `data/industry.py` đọc ICB Vietcap (cache một giờ), chọn doanh nghiệp theo báo cáo năm KBS; mở rộng cấp ngành khi thiếu mẫu. `analysis/context.py` tính trung vị và tạo kênh tác động có điều kiện. Pipeline hợp nhất nguồn/cảnh báo vào cùng AnalysisResult, UI và PDF không tính hai bộ số liệu khác nhau. Bằng chứng lựa chọn gồm tập ứng viên, ngày cuối kỳ, phạm vi, mã bị loại/lý do và nguồn của mã được chọn.
+
+## Adapter repository tham khảo
+
+`data/reference_miner.py` thu thập Parquet và danh mục, so sánh số cùng năm và tải PDF có checksum. Pipeline gọi sau khi tính tài chính chính; kết quả lưu trong `reference`, không thay `financial`. Lỗi nguồn bổ sung được giữ riêng, không làm mất dữ liệu chính. UI/PDF đọc chung đối tượng reference. HTTP Range chỉ chấp nhận 206 đúng offset/độ dài; bản mirror phải khớp SHA-256 danh mục. Bộ đọc ZIP có giới hạn dung lượng và số lần thử lại.

@@ -20,7 +20,7 @@ API KBS pageSize 1/2 có thể gắn dữ liệu cũ vào năm mới; dữ liệ
 
 ## Kết quả kiểm chứng
 
-40 kiểm thử offline đạt; giao diện thật tự lấy 261 phiên HPG và tạo PDF không lỗi. HPG/VNM khớp 20 phiên giá, FPT có hai phiên lệch và định giá bị chặn. Các tài chính năm chọn đối chiếu khớp tài liệu gốc; bán niên HPG có kiểm tra tài sản = nợ + vốn và cột đầu năm đối chiếu số liệu năm 2025. Ba PDF mẫu có nguồn và giới hạn. Chưa chứng nhận mọi cổ phiếu, mọi kỳ và mọi ngành.
+54 kiểm thử offline đạt; giao diện thật tự lấy 261 phiên HPG và tạo PDF không lỗi. HPG/VNM khớp 20 phiên giá, FPT có hai phiên lệch và định giá bị chặn. Các tài chính năm chọn đối chiếu khớp tài liệu gốc; bán niên HPG có kiểm tra tài sản = nợ + vốn và cột đầu năm đối chiếu số liệu năm 2025. Ba PDF mẫu có nguồn và giới hạn. Chưa chứng nhận mọi cổ phiếu, mọi kỳ và mọi ngành.
 
 ## Quyết định phát triển
 
@@ -35,3 +35,7 @@ Các mở rộng không bắt buộc còn lại: NIM/NPL/CAR ngân hàng và r�
 Luồng bổ sung: tài chính hợp lệ → collect_context → NSO/World Bank và ICB/so sánh KBS → analyze_context → luận điểm vĩ mô–ngành–doanh nghiệp → UI/PDF. Không cần nhóm chuẩn bị dữ liệu. Vĩ mô giữ kỳ đo/ngày công bố; lịch sử World Bank giữ ngày cập nhật riêng. Phân loại ICB là ảnh chụp hiện tại, không chứng nhận ngành trong quá khứ. Mẫu so sánh tối đa bốn mã, cùng ngày cuối kỳ/phạm vi/nhóm tài chính, không đại diện chỉ số ngành.
 
 Ngân hàng có CIR và cho vay/tiền gửi; chứng khoán có cơ cấu doanh thu. Kỳ năm phải dài 12 tháng và kết thúc trước ngày công bố/ngày phân tích. VCB/SSI/DGC/REE kỳ 2025 bị loại do metadata 24 tháng; sử dụng 2024 kèm cảnh báo. HPG lấy thêm bán niên 2026 trực tiếp qua OCR. Giao diện đã kiểm thử phần vĩ mô/ngành và xuất PDF chỉ chứa hai phần này. Bằng chứng tám lượt thực được lưu trong submission/evidence.
+
+## Nguồn tham khảo được tích hợp
+
+Tự lấy Parquet tài chính HSX/HNX và BCTN nhiều mã từ danh mục vn-annual-report-miner/Zenodo. Bản nguồn được chốt theo commit; cache có hash, PDF mirror phải khớp checksum danh mục hoặc tải riêng bằng Range. UI/CSV/PDF có dữ liệu bổ sung và bảng đối chiếu. Không tự dùng Parquet vào định giá vì còn thiếu đơn vị/phạm vi/ngày công bố. VCB/SSI/DGC/REE vẫn giữ kỳ chính hợp lệ 2024, đồng thời có dữ liệu tham khảo/BCTN 2025 để tiếp tục xác minh.

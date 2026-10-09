@@ -1,0 +1,15 @@
+{
+  "exceptions": [],
+  "ticker": "HPG",
+  "reference_records": 45,
+  "reference_checks": 24,
+  "reference_pdf": "data/raw/reference_miner/pdfs/HPG_2025_f9fb0c11f2ae.pdf",
+  "reference_primary_unchanged": true,
+  "selected_pdf": [
+    "reference"
+  ],
+  "mode": "summary",
+  "selected_sections_verified": true,
+  "report_exists": true,
+  "run_id": "HPG_20261009_141929_355672"
+}

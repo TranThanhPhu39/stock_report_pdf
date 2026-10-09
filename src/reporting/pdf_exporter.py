@@ -126,6 +126,29 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         if full:
             names={"revenue":"Doanh thu thuần","net_profit":"LNST","assets":"Tài sản","equity":"Vốn chủ","liabilities":"Nợ phải trả"}
             table(["Đối chiếu / kỳ","Nguồn API (tỷ)","Tài liệu gốc (tỷ)","Kết quả"],[[names.get(c["metric"],c["metric"])+" / "+c["period"],formatted(c["actual_billion_vnd"]),formatted(c["reference_billion_vnd"]),"Khớp" if c["match"] else "Sai lệch"] for c in quality["financial_check"].get("checks",[])],keep=True)
+    if "reference" in selected:
+        heading(SECTION_LABELS["reference"])
+        reference=result.get("reference",{})
+        text("Nguồn vn-annual-report-miner cung cấp lịch sử năm và danh mục BCTN. Parquet chưa có metadata chứng nhận đơn vị, phạm vi và ngày công bố; không dùng để thay tài chính/định giá chính.",True)
+        grouped={}
+        for record in reference.get("records",[]):grouped.setdefault(record["year"],{}).update(record["fields"])
+        years=sorted(grouped,reverse=True)[:(5 if full else 2)]
+        if years:
+            text("Bảng dưới chỉ chia giá trị gốc cho 10^9 để dễ đọc; không tự xác nhận đơn vị tỷ VND.",True)
+            table(["Năm","Doanh thu / 10^9","LNST / 10^9","Tài sản / 10^9","CFO / 10^9"],[[str(year)]+[formatted(grouped[year].get(k,{}).get("value")/1e9) if grouped[year].get(k,{}).get("value") is not None else "Chưa có" for k in ["revenue","net_profit","assets","cfo"]] for year in years])
+        checks=reference.get("checks",[])
+        if checks:
+            latest=max(c["year"] for c in checks)
+            chosen=[c for c in checks if c["year"]==latest]
+            text(f"Đối chiếu giá trị với nguồn chính, năm {latest}; khớp số không chứng nhận phạm vi hoặc nguồn độc lập.",True)
+            table(["Chỉ tiêu","Nguồn chính / 10^9","Parquet / 10^9","Sai lệch"],[[c["label"],formatted(c["primary_vnd"]/1e9),formatted(c["reference_raw"]/1e9),formatted(c["relative_difference"]*100,"%")+(" - Lệch" if not c["match"] else " - Khớp")] for c in chosen])
+        for report in reference.get("reports",[])[:(3 if full else 1)]:
+            inspection=report.get("inspection",{})
+            text(f"BCTN {report['year']}: {report['file_name']}. "+(f"Đã tải; SHA256 khớp danh mục; {inspection.get('pages',0)} trang, {inspection.get('text_pages',0)} trang có text." if report.get("file") else "Có trong danh mục; chưa tải."),True)
+            if report.get("file") and inspection.get("status")!="text_available":text("Báo cáo có nhiều trang scan; cần OCR thêm trước khi tự trích/kiểm chứng số liệu.",True)
+        for error in reference.get("errors",[]):text("Nguồn bổ sung chưa đủ: "+error["message"],True)
+        if not reference.get("available"):text("Chưa có dữ liệu bổ sung phù hợp ngày phân tích/sàn/phiên bản nguồn.")
+        if reference.get("commit"):text("Phiên bản dữ liệu: "+reference["commit"]+"; ghi nhận tại "+reference["version_available_at"]+". Năm báo cáo không phải ngày công bố.",True)
     if "valuation" in selected:
         heading(SECTION_LABELS["valuation"]);val=result["valuation"]
         if val["available"]:
@@ -154,11 +177,19 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     if "valuation" in selected and result["valuation"]["available"]:text(result["valuation"]["formula"],True)
     for warning in quality["warnings"]:text("• "+warning,True)
     for error in result["errors"]:text(f"Thiếu dữ liệu ({error['stage']}): {error['message']}",True)
-    sources_start=len(story)
     heading("Nguồn và khả năng truy vết")
+    source_group,pending=None,[]
     for index,source in enumerate(result["sources"]):
-        story.append(KeepTogether([p(source["source_id"],source=True),p(source.get("url_or_file") or source.get("url") or "",source=True),p(f"Truy xuất: {source.get('retrieved_at','')} · Vị trí: {source.get('page_or_table','')} · {source.get('notes','')}",source=True)]))
-        if index==0:story[sources_start:]=[KeepTogether(story[sources_start:])]
+        group="PEER_"+source["source_id"].split("_")[1] if source["source_id"].startswith("PEER_") else source["source_id"]
+        if group!=source_group and pending:
+            story.append(KeepTogether(pending));pending=[]
+        source_group=group
+        if index==0:pending.append(story.pop())
+        notes=source.get("notes","")
+        if source["source_id"].startswith("MINER_"):notes="Nguồn tham khảo; phiên bản và SHA256 trong analysis.json; chưa xác minh ngày công bố/đơn vị/phạm vi."
+        elif source["source_id"].startswith("ZENODO_PDF_"):notes="PDF đã khớp SHA256 danh mục Zenodo; chưa chứng nhận số liệu/phạm vi/ngày công bố. Chi tiết tải trong analysis.json."
+        pending.extend([p(source["source_id"],source=True),p(source.get("url_or_file") or source.get("url") or "",source=True),p(f"Truy xuất: {source.get('retrieved_at','')} · Vị trí: {source.get('page_or_table','')} · {notes}",source=True)])
+    if pending:story.append(KeepTogether(pending))
     seen=set()
     for check in quality["financial_check"].get("checks",[]):
         ref=check.get("url")

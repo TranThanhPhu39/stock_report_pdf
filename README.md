@@ -19,7 +19,7 @@ Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS), chọn khoảng ng
 
 ```powershell
 python -m scripts.analyze HPG --start 2025-10-09 --as-of 2026-10-09
-python -m scripts.analyze VNM --mode summary --sections macro industry financial risks --target-pb 2.0
+python -m scripts.analyze VNM --mode summary --sections macro industry financial reference risks --target-pb 2.0
 python -m unittest discover -s tests -v
 ```
 
@@ -37,7 +37,7 @@ Tệp theo lượt chạy nằm tại `outputs/runs/<run_id>/`: request.json, va
 
 ## Kiểm chứng ngày 09/10/2026
 
-40 kiểm thử offline đạt. Đã chạy dữ liệu thực cho HPG, FPT, VNM, VCB, SSI, MWG, DGC và REE; đây là tám mã kiểm chứng, không phải toàn thị trường. Nút Phân tích thật trên Streamlit đã tự lấy 261 phiên HPG, đọc bán niên và tạo PDF, không có ngoại lệ. HPG và VNM khớp 20/20 giá đóng cửa được đối chiếu. FPT lệch 2/20 phiên (21–22/09/2026), vì vậy định giá bị chặn và báo cáo ghi trạng thái thiếu một phần. Số liệu năm 2025 khớp **các chỉ tiêu chọn đối chiếu**, không phải chứng nhận toàn bộ dữ liệu. Xem `submission/acceptance.json` và `docs/hpg_data_check.md`.
+54 kiểm thử offline đạt. Đã chạy dữ liệu thực cho HPG, FPT, VNM, VCB, SSI, MWG, DGC và REE; đây là tám mã kiểm chứng, không phải toàn thị trường. Nút Phân tích thật trên Streamlit đã tự lấy 261 phiên HPG, đọc bán niên và tạo PDF, không có ngoại lệ. HPG và VNM khớp 20/20 giá đóng cửa được đối chiếu. FPT lệch 2/20 phiên (21–22/09/2026), vì vậy định giá bị chặn và báo cáo ghi trạng thái thiếu một phần. Số liệu năm 2025 khớp **các chỉ tiêu chọn đối chiếu**, không phải chứng nhận toàn bộ dữ liệu. Xem `submission/acceptance.json` và `docs/hpg_data_check.md`.
 
 Báo cáo mẫu: `outputs/pdf/HPG_report.pdf`, `FPT_report.pdf`, `VNM_report.pdf`. Các mẫu đã được kiểm tra chữ tiếng Việt và bố cục trang.
 
@@ -48,3 +48,11 @@ Mã cổ phiếu là tham số, không cố định HPG; khả năng có số li
 `projectcontext.md` ghi phạm vi đề gốc; `task.md` ghi hạng mục đã làm. Đề gốc và đề xuất triển khai trong `docs/references/` được giữ riêng.
 
 Đối chiếu đề cập nhật trong ảnh người dùng (bao gồm vĩ mô/ngành, hạn 16:20 ngày 09/10/2026): `docs/assignment_requirements.md`.
+
+## Nguồn bổ sung từ vn-annual-report-miner
+
+Mỗi lượt phân tích tự lấy Parquet tài chính HSX/HNX và tra danh mục BCTN, tải báo cáo mới nhất của mã đó. Dùng phiên bản cố định trong `config/reference_sources.json`, cache Parquet/danh mục 24 giờ và kiểm tra SHA-256. PDF tải từ CDN CafeF chỉ được chấp nhận nếu khớp SHA-256 và dung lượng trong danh mục Zenodo; nếu không, tải riêng PDF bằng HTTP Range trong ZIP, không tải cả kho. PDF cache được kiểm tra checksum mỗi lượt.
+
+Tab Tài chính có mục nguồn bổ sung, bảng giá trị gốc, đối chiếu cùng năm và nút tải CSV/BCTN gốc. Phần PDF `reference` có thể chọn riêng. Nguồn gốc và ngày truy xuất được lưu trong analysis.json/sources.json; source_file/source_sheet/item_code được giữ cho từng giá trị.
+
+**Parquet chưa có metadata xác minh đơn vị, phạm vi và ngày công bố.** Đây là nguồn bổ sung, chưa tự thay kỳ 2024 hay đầu vào định giá. Khớp giá trị không chứng nhận nguồn độc lập/phạm vi. Phiên bản nguồn sau ngày phân tích bị loại; ngày commit không được coi là ngày công bố BCTC. Các báo cáo scan được thông báo cần OCR thêm. Xem `docs/reference_data.md`.
