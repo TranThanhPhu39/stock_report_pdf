@@ -48,6 +48,7 @@ def parse_yahoo_chart(payload: dict, ticker: str, start: date, end: date) -> tup
             raise DataSourceError("Unexpected source symbol or currency")
         timestamps = result["timestamp"]
         quotes = result["indicators"]["quote"][0]
+        adjusted = result["indicators"].get("adjclose", [{}])[0].get("adjclose", [])
         fields = ("open", "high", "low", "close", "volume")
         if any(len(quotes[f]) != len(timestamps) for f in fields):
             raise DataSourceError("Source arrays have inconsistent lengths")
@@ -57,6 +58,7 @@ def parse_yahoo_chart(payload: dict, ticker: str, start: date, end: date) -> tup
             if start <= session_date <= end:
                 rows.append({"ticker": ticker, "date": session_date.isoformat(),
                              **{f: quotes[f][i] for f in fields},
+                             "adjusted_close": adjusted[i] if i < len(adjusted) else None,
                              "price_basis": "yahoo_chart_ohlc_unverified", "unit": "VND_per_share"})
         return sorted(rows, key=lambda row: row["date"]), meta
     except (KeyError, IndexError, TypeError, ValueError) as exc:

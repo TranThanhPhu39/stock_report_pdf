@@ -21,6 +21,10 @@ def price_response():
 
 
 class AutomaticPipelineTests(unittest.TestCase):
+    def setUp(self):
+        mock=patch("src.pipeline.collect_research",return_value={"company":{},"financial_records":[],"news":[],"quote_check":{"status":"unverified"},"sources":[],"errors":[],"warnings":[]})
+        mock.start()
+        self.addCleanup(mock.stop)
     def test_empty_workspace_fetches_sources_and_persists_result(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)

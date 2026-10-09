@@ -1,52 +1,46 @@
 # StockInsight
 
-Khung dự án phân tích cơ hội đầu tư cổ phiếu Việt Nam và tự động xuất PDF theo lựa chọn người dùng.
-
-## Trạng thái
-
-Đã có giao diện Streamlit: bấm **Phân tích** để tự lấy giá ngày và tải BCTC hợp nhất HPG, kiểm tra rồi hiển thị dữ liệu/biểu đồ. Không cần chuẩn bị CSV hoặc chạy lệnh lấy dữ liệu riêng. Đã kiểm thử nút Phân tích với nguồn thật: 261 bản ghi giá HPG, 2 PDF tài chính, không lỗi. Giá chưa đối chiếu độc lập; chỉ tiêu tài chính và PDF phân tích chưa hoàn thiện.
-
-Đọc `projectcontext.md` để hiểu yêu cầu/kiến trúc và `task.md` để theo dõi tiến độ. Đề gốc và bản đề xuất nằm trong `docs/references/`.
-
-## Thư mục
-
-- `config/`: cài đặt, quy tắc, giả định định giá.
-- `src/data/`: mã đọc nguồn, chuẩn hóa, kiểm tra.
-- `src/analysis/`: tính chỉ tiêu, tạo nhận định.
-- `src/reporting/`: biểu đồ, xuất PDF.
-- `assets/fonts/`: font Unicode sẽ được bổ sung.
-- `data/`: dữ liệu gốc, dữ liệu chuẩn, danh mục nguồn.
-- `outputs/runs/`: kết quả từng lần chạy.
-- `tests/fixtures/`: dữ liệu kiểm thử sẽ được bổ sung.
-- `docs/`: kiến trúc, phương pháp, từ điển dữ liệu, demo.
-- `submission/`: bộ nộp thực tế sau khi hoàn thiện.
-
-## Công nghệ dự kiến
-
-Python + Streamlit + pandas/numpy + matplotlib + ReportLab + PyYAML. `requirements.txt` chưa chốt phiên bản hoặc cài đặt.
+Ứng dụng phân tích cổ phiếu Việt Nam và tự tạo PDF theo nhu cầu người dùng. **Không cần chuẩn bị data**: mỗi lần bấm Phân tích, chương trình tự lấy giá, tài chính, hồ sơ doanh nghiệp, tin công bố và đối chiếu nguồn.
 
 ## Chạy ứng dụng
 
+Python 3.11+; máy kiểm thử dùng Python 3.12.10. Chạy trong thư mục dự án:
+
 ```powershell
-python -m pip install streamlit pandas beautifulsoup4
+python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-Trong trình duyệt, để mã **HPG**, chọn khoảng ngày và bấm **Phân tích**. Ứng dụng tự truy cập nguồn trực tuyến, lưu dữ liệu và hiển thị kết quả. Không có bước nhập CSV bắt buộc. PDF tải xuống hiện là tài liệu tài chính gốc, chưa phải báo cáo phân tích do hệ thống tạo.
+Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS), chọn khoảng ngày, bản đầy đủ/tóm tắt, phần cần xuất và P/B giả định. Bấm **Phân tích**, sau đó **Tải báo cáo phân tích PDF**. Luồng chính không yêu cầu chạy script lấy dữ liệu riêng.
 
-Giá và danh sách công bố được lấy lại mỗi lần bấm. PDF đã tải trong 24 giờ có thể được dùng lại khi checksum khớp; giao diện ghi rõ bản lưu. Bản quá hạn hoặc lỗi checksum được tải lại. Đang dùng phiên ngày trước ngày hiện tại để tránh dữ liệu trong phiên.
+Để đọc PDF scan bán niên HPG tự động, cài Tesseract OCR có gói `vie` và `eng`, thêm `tesseract` vào PATH. Windows cũng nhận đường dẫn `C:/Program Files/Tesseract-OCR/tesseract.exe`. Thiếu OCR: hệ thống báo thiếu phần bán niên và vẫn dùng số liệu năm hợp lệ. Tệp PDF gốc tải lần đầu có thể mất vài phút; bản lưu được kiểm tra SHA-256 và thời hạn 24 giờ trước khi dùng lại. Giá, tài chính và danh sách công bố vẫn được truy cập mới mỗi lượt.
 
-## Lệnh lấy dữ liệu riêng (tùy chọn)
-
-Cài dependency cho bộ lấy dữ liệu: `python -m pip install beautifulsoup4`.
+## Dùng dòng lệnh (tùy chọn)
 
 ```powershell
-python -m scripts.fetch_data --ticker HPG --start 2025-10-09 --as-of 2026-10-09
+python -m scripts.analyze HPG --start 2025-10-09 --as-of 2026-10-09
+python -m scripts.analyze VNM --mode summary --sections market financial risks --target-pb 2.0
 python -m unittest discover -s tests -v
 ```
 
-Giá được lưu trong `data/processed/`, dữ liệu gốc trong `data/raw/`; log và trạng thái trong `outputs/runs/<run_id>/`. Lỗi từng nguồn được lưu và CLI trả mã lỗi khác 0 nếu có lỗi. Các nguồn công khai có thể thay đổi, chặn hoặc giới hạn truy cập.
+Tệp theo lượt chạy nằm tại `outputs/runs/<run_id>/`: request.json, validation.json, acquisition.json, sources.json, analysis.json, charts/, và `<ticker>_report.pdf`. Dữ liệu gốc và bảng chuẩn nằm tại `data/`. PDF và số liệu giao diện dùng chung một kết quả tính toán. PDF tiếng Việt dùng font DejaVu có giấy phép trong `assets/fonts/LICENSE.txt`.
 
-Chế độ bản đầu đề xuất: cuối ngày, luôn loại ngày hiện tại theo UTC+7 để tránh phiên chưa hoàn tất. Không có cập nhật nền/realtime. Không dùng cơ sở giá chưa xác minh để khẳng định lợi suất điều chỉnh hay giá mục tiêu. PDF tài chính tải từ nguồn công bố chưa được chuyển thành chỉ tiêu. Bộ tìm báo cáo hiện chỉ hỗ trợ HPG và trang danh sách đầu tiên.
+## Phân tích và nguồn
 
-Xem `docs/hpg_data_check.md` để biết kết quả thử nguồn thật và phần cần hoàn thiện.
+- Giá cuối ngày Yahoo Finance; giá đóng cửa tối đa 20 phiên gần nhất được đối chiếu KBS. Luôn bỏ ngày hiện tại theo UTC+7, kể cả sau giờ giao dịch.
+- Lợi suất theo Yahoo Adj Close, MA20/MA50, drawdown, biến động năm hóa và khối lượng. Chuỗi điều chỉnh không đồng nghĩa lợi nhuận thực nhận sau phí/thuế.
+- Báo cáo năm qua KBS: doanh thu thuần, LNST, tài sản, vốn, CFO, tăng trưởng, ROE hợp nhất, biên lợi nhuận và nợ vay/vốn khi phù hợp. Bán niên HPG được đọc trực tiếp từ PDF soát xét của doanh nghiệp bằng OCR.
+- P/B tham chiếu và ba kịch bản theo giả định người dùng. Chặn khi giá lệch nguồn, thiếu vốn/số CP, hoặc phân tích quá khứ với số CP hiện tại. Không tính P/E TTM từ API quý có kỳ không rõ ràng.
+- Tin công bố có ngày và liên kết. Nhận định được tạo bằng quy tắc từ dữ liệu; không tự suy diễn tác động từ tiêu đề tin.
+
+## Kiểm chứng ngày 09/10/2026
+
+26 kiểm thử offline đạt. Nút Phân tích thật trên Streamlit đã tự lấy 261 phiên HPG, đọc bán niên và tạo PDF, không có ngoại lệ. HPG và VNM khớp 20/20 giá đóng cửa được đối chiếu. FPT lệch 2/20 phiên (21–22/09/2026), vì vậy định giá bị chặn và báo cáo ghi trạng thái thiếu một phần. Số liệu năm 2025 khớp **các chỉ tiêu chọn đối chiếu**, không phải chứng nhận toàn bộ dữ liệu. Xem `submission/acceptance.json` và `docs/hpg_data_check.md`.
+
+Báo cáo mẫu: `outputs/pdf/HPG_report.pdf`, `FPT_report.pdf`, `VNM_report.pdf`. Các mẫu đã được kiểm tra chữ tiếng Việt và bố cục trang.
+
+## Giới hạn
+
+Mã cổ phiếu là tham số, không cố định HPG; khả năng có số liệu phụ thuộc nguồn. Đã kiểm chứng ba doanh nghiệp phi tài chính. Ngân hàng/chứng khoán chỉ nhận các chỉ tiêu ánh xạ được; không áp tỷ số phi tài chính và chưa có mô hình chuyên ngành hoàn chỉnh. API công khai có thể thay đổi hoặc giới hạn truy cập. Baseline trong `config/verification_baselines.json` là số tham chiếu đã đọc từ tài liệu gốc, **không thay dữ liệu tự lấy** và chỉ áp dụng đúng kỳ. Không dùng dữ liệu giả khi nguồn lỗi.
+
+`projectcontext.md` ghi phạm vi đề gốc; `task.md` ghi hạng mục đã làm. Đề gốc và đề xuất triển khai trong `docs/references/` được giữ riêng.
