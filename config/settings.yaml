@@ -1,0 +1,20 @@
+project:
+  name: StockInsight
+  timezone: Asia/Saigon
+  language: vi
+  stage: scaffold
+paths:
+  raw_data: data/raw
+  processed_data: data/processed
+  source_registry: data/metadata/source_registry.csv
+  runs: outputs/runs
+  fonts: assets/fonts
+data:
+  price_unit: VND_per_share
+  financial_unit: VND
+  supported_tickers: []
+  supported_industry_groups: []
+report:
+  default_mode: summary
+  optional_sections: [overview, market, financial, valuation, news, risks]
+  required_sections: [methodology, sources, data_status]

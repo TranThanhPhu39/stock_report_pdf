@@ -1,0 +1,7 @@
+# Planned dependencies; versions will be pinned after environment validation.
+streamlit
+pandas
+numpy
+matplotlib
+reportlab
+PyYAML
