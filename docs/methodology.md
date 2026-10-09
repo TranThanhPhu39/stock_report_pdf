@@ -43,7 +43,3 @@ ICB Vietcap chỉ dùng phân loại và sàn HOSE/HNX/UPCOM, bỏ OTC/chỉ s�
 ROA = LNST / tài sản bình quân ×100. Ngân hàng: CIR = chi phí hoạt động / (lợi nhuận trước dự phòng + chi phí hoạt động) ×100; cho vay khách hàng gộp / tiền gửi khách hàng là tỷ số phân tích, không đồng nhất LDR theo quy định. Chứng khoán: tỷ trọng doanh thu môi giới và lãi cho vay/phải thu chia doanh thu hoạt động ×100; khoản cho vay tài chính không tự coi là dư nợ margin. Kỳ năm khác 12 tháng hoặc kết thúc sau ngày công bố bị loại, không tự sửa metadata.
 
 Luận điểm tổng hợp mô tả kênh tác động có điều kiện (ví dụ xây dựng → nhu cầu thép), dữ kiện vĩ mô và vị trí doanh nghiệp so với mẫu. Không coi tương quan là quan hệ nhân quả, không phát sinh khuyến nghị mua/bán tự động.
-
-## Bổ sung định giá từ ZIP (09/10/2026)
-
-Phần P/B phía trên là cơ sở phiên bản trước. Hiện có Gordon, P/B trung vị mẫu tự thu thập, P/E lợi nhuận năm quy đổi, DCF FCFF với WACC/equity bridge và bình quân trọng số. Công thức, kiểm tra đầu vào và giới hạn tại [valuation_upgrade.md](valuation_upgrade.md). P/E năm quy đổi không phải P/E TTM. Gemini tùy chọn sử dụng bundle bằng chứng có ngày/kỳ/ngành/nguồn, không tự tạo số liệu.

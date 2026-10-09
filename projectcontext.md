@@ -39,9 +39,3 @@ Ngân hàng có CIR và cho vay/tiền gửi; chứng khoán có cơ cấu doanh
 ## Nguồn tham khảo được tích hợp
 
 Tự lấy Parquet tài chính HSX/HNX và BCTN nhiều mã từ danh mục vn-annual-report-miner/Zenodo. Bản nguồn được chốt theo commit; cache có hash, PDF mirror phải khớp checksum danh mục hoặc tải riêng bằng Range. UI/CSV/PDF có dữ liệu bổ sung và bảng đối chiếu. Không tự dùng Parquet vào định giá vì còn thiếu đơn vị/phạm vi/ngày công bố. VCB/SSI/DGC/REE vẫn giữ kỳ chính hợp lệ 2024, đồng thời có dữ liệu tham khảo/BCTN 2025 để tiếp tục xác minh.
-
-## Cập nhật ZIP và sửa ACB (09/10/2026)
-
-Đã tích hợp định giá đa phương pháp từ ZIP, có chỉnh các cơ sở chưa phù hợp; chi tiết docs/valuation_upgrade.md và provenance bản gốc. Thêm nguồn giá KBS thay cả chuỗi khi Yahoo lỗi, đối chiếu ngược Yahoo, báo phạm vi thực nhận. Ngân hàng có CFO đúng mã, thu nhập lãi/tổng thu nhập hoạt động, tăng trưởng tín dụng và kết luận lợi nhuận độc lập. PDF có sáu nhóm biểu đồ, bảng rủi ro và nguồn tại luận điểm.
-
-76 kiểm thử đạt; dữ liệu thực ACB/HPG/VNM và UI thật ACB. ACB chưa đủ đoạn đầu 2016 và NCI, có P/E năm quy đổi; HPG FCFF âm nên DCF chặn; VNM đủ phương pháp. Gemini tùy chọn từ bundle số liệu/nguồn, key qua Secrets/environment; missing key/API/JSON có fallback. SDK thật đã test HTTP giả lập, chưa test API/deploy thật. Không coi P/E năm là TTM; không coi số ngành cố định ZIP là dữ liệu thị trường. Minh chứng submission/upgrade_acceptance.json.

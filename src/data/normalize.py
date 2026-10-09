@@ -16,7 +16,6 @@ FIELD_IDS["income"].update({4378:"net_profit",4380:"parent_profit",4381:"eps",43
     4590:"revenue",4585:"net_profit",4587:"parent_profit",4588:"eps",4599:"brokerage_revenue",5436:"lending_revenue",4584:"pretax_profit"})
 FIELD_IDS["balance"].update({4375:"assets",4304:"liabilities",4325:"equity",5699:"non_controlling_equity",4348:"customer_loans",4320:"customer_deposits",
     4476:"assets",4477:"liabilities",4478:"equity",4482:"non_controlling_equity",5373:"financial_loans"})
-FIELD_IDS["cashflow"].update({4110:"cfo",2254:"capex_cash",2250:"interest_paid",2263:"borrowings_received",2264:"debt_repaid"})
 
 
 def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: str, issues: list | None=None) -> list[dict]:

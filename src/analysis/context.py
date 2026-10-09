@@ -45,9 +45,6 @@ def analyze_context(macro,industry,financial):
          "credit_growth":"Tín dụng mở rộng ảnh hưởng cầu vốn và thanh khoản; ngân hàng cần kiểm tra chất lượng tài sản, chứng khoán cần kiểm tra thanh khoản giao dịch.",
          "cpi_ytd":"Áp lực giá có thể ảnh hưởng chi phí và sức mua; theo dõi khả năng chuyển giá và biên lợi nhuận.",
          "gdp_ytd":"Nền kinh tế tăng trưởng là bối cảnh cầu; tác động phải được xác nhận bằng kết quả của doanh nghiệp."}.get(key,"Theo dõi kênh truyền dẫn vào doanh nghiệp.")
-        if financial.get("industry_group")=="bank":
-            channel={"credit_growth":"Tín dụng toàn nền kinh tế mở rộng là bối cảnh cầu vay. Tác động tới ngân hàng phải đọc cùng tăng trưởng cho vay, thu nhập lãi và dự phòng; không suy ra chất lượng tín dụng từ tăng trưởng dư nợ.",
-                     "cpi_ytd":"Áp lực lạm phát có thể truyền qua lãi suất huy động, chi phí vốn và khả năng trả nợ của khách hàng. Cần đối chiếu NIM, tái định giá cho vay và nợ xấu trước khi lượng hóa tác động tới lợi nhuận/P/B."}.get(key,channel)
         industry["drivers"].append({"indicator":row,"channel":channel,"interpretation_type":"conditional_inference"})
     industry["structural_risks"]=["Mẫu ưu tiên doanh nghiệp lớn theo tài sản; không đại diện mọi công ty trong nhóm. Khác biệt công ty mẹ/con, sản phẩm và thị trường khiến so sánh cần thận trọng.",
       "Nếu có nguyên liệu/nguồn vốn ngoại tệ, biến động tỷ giá có thể đổi chi phí; nếu có doanh thu ngoại tệ, tác động có thể ngược lại. Chưa lượng hóa vì thiếu cơ cấu ngoại tệ.",
