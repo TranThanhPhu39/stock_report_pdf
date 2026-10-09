@@ -6,10 +6,10 @@ Cập nhật: 09/10/2026. Thư mục gốc dự án: `gk/`.
 
 - Đề gốc: `docs/references/261BFF401101_Dethigiuaky.pdf` (bản sao nguyên trạng từ tài liệu người dùng cung cấp).
 - Hướng triển khai: `docs/references/implementation_proposal.txt` (nội dung người dùng gửi, là đề xuất kỹ thuật).
-- Yêu cầu hiện tại của người dùng: đọc tài liệu, tạo cây thư mục, thêm `projectcontext.md` và `task.md`.
-- Giai đoạn hiện tại: khởi tạo cấu trúc và kế hoạch. Chưa có ứng dụng phân tích chạy hoàn chỉnh, dữ liệu cổ phiếu thật hay PDF đầu ra.
+- Yêu cầu hiện tại: kiểm thử HPG và tự lấy dữ liệu bằng code vì nhóm chưa có dữ liệu; đề xuất dữ liệu trong phiên hay cuối ngày.
+- Giai đoạn hiện tại: đã triển khai bộ lấy dữ liệu giá ngày và tải PDF tài chính cho HPG. Chưa có ứng dụng phân tích hoàn chỉnh hoặc PDF phân tích đầu ra.
 
-Nội dung trong tài liệu là căn cứ xác định bài tập và phương án triển khai; không tự mở rộng yêu cầu hiện tại thành việc thu thập dữ liệu, triển khai Internet hoặc nộp bài.
+Nội dung tài liệu là căn cứ bài tập/phương án. Người dùng đã yêu cầu tự lấy dữ liệu và kiểm thử HPG; chưa có yêu cầu triển khai Internet hoặc nộp bài.
 
 ## Yêu cầu từ đề gốc
 
@@ -131,3 +131,15 @@ MVP được xem là đạt khi có luồng chạy bằng dữ liệu thật có
 - Thông tin nhóm và hình thức nộp; chưa có trong tài liệu được cung cấp.
 
 Tiến độ cụ thể được quản lý trong `task.md`. Chỉ đánh dấu hoàn thành khi có sản phẩm hoặc bằng chứng kiểm tra tương ứng.
+
+## Kiểm thử HPG và lựa chọn tần suất dữ liệu
+
+Đã chạy `python -m scripts.fetch_data --ticker HPG --start 2025-10-09 --as-of 2026-10-09` thành công. Lượt `HPG_20261009_105621_805649` lấy 261 bản ghi từ 09/10/2025 đến 08/10/2026, qua kiểm tra cấu trúc/ngày/OHLC/khối lượng. Giá được lưu trong `data/processed/`, JSON nguồn trong `data/raw/prices/`, log trong `outputs/runs/`. Đây là kiểm thử khả năng thu thập, chưa phải xác nhận độ chính xác độc lập.
+
+Đề xuất bản đầu dùng dữ liệu cuối ngày, cập nhật tự động khi chạy code. Quy tắc hiện tại thận trọng: chỉ lấy ngày trước ngày hiện tại theo UTC+7, dù chạy sau giờ đóng cửa; không coi thanh giá ngày hiện tại là phiên đã hoàn tất. Ngày cuối có thể cũ hơn cutoff nếu nguồn không có dữ liệu. Chưa có lịch cập nhật nền hoặc chế độ realtime.
+
+Nguồn giá thử nghiệm: Yahoo Finance chart, mã HPG.VN, đơn vị VND từ metadata. Cơ sở điều chỉnh OHLC chưa xác minh, nên ghi `yahoo_chart_ohlc_unverified`; chưa dùng để khẳng định lợi suất điều chỉnh/tổng lợi suất hoặc định giá. Cần đối chiếu nguồn thứ hai và sự kiện vốn trước khi sử dụng báo cáo phân tích.
+
+Đã tải từ trang quan hệ cổ đông Hòa Phát: BCTC hợp nhất soát xét 6 tháng 2026 (công bố 28/08/2026, 67 trang) và BCTC hợp nhất quý II/2026 (30/07/2026, 37 trang). Hai tài liệu có kỳ chồng lấp, không được xem như hai kỳ độc lập để cộng TTM. Chưa trích xuất chỉ tiêu tài chính. Bộ tìm PDF hiện chỉ hỗ trợ HPG và trang danh sách đầu tiên; chưa tìm đủ lịch sử cho mọi ngày phân tích.
+
+5 kiểm thử offline đạt: cutoff theo múi giờ, loại phiên hiện tại, metadata giá, dữ liệu lỗi và ngày công bố/phạm vi báo cáo. Xem `docs/hpg_data_check.md` để biết kết quả và phần còn thiếu.

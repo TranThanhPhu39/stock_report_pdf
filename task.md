@@ -83,4 +83,20 @@ Cập nhật: 09/10/2026. `[x]` đã hoàn thành; `[ ]` chưa hoàn thành. Cá
 
 ## Bước tiếp theo
 
-Thực hiện mục 1: chọn mã đầu tiên, xác minh dữ liệu một mã/một kỳ và chốt hợp đồng dữ liệu. Chưa có dữ liệu thị trường được thu thập hoặc kiểm chứng trong bước khởi tạo.
+Chốt hợp đồng dữ liệu, đối chiếu giá HPG và cơ sở điều chỉnh với nguồn thứ hai, trích xuất/kiểm tra chỉ tiêu tài chính từ PDF rồi xây luồng phân tích/PDF. Tiến độ thử nghiệm bên dưới chỉ xác nhận khả năng thu thập dữ liệu.
+
+## Tiến độ bổ sung: kiểm thử HPG
+
+- [x] Chọn HPG làm mã thử đầu tiên theo yêu cầu người dùng.
+- [x] Viết CLI tự lấy giá ngày, loại phiên hiện tại theo UTC+7.
+- [x] Lưu JSON nguồn, CSV giá, ngày lấy dữ liệu và đăng ký nguồn.
+- [x] Lấy 261 bản ghi ngày từ 09/10/2025 đến 08/10/2026; kiểm tra cấu trúc không có lỗi.
+- [x] Tự tìm/tải hai BCTC hợp nhất HPG có ngày công bố phù hợp; kiểm tra PDF mở được.
+- [x] Chạy 5 kiểm thử offline về thời gian, metadata và dữ liệu lỗi.
+- [ ] Đối chiếu giá và cơ sở điều chỉnh với nguồn độc lập.
+- [ ] Trích xuất số liệu tài chính, xác minh đơn vị/kỳ và đối chiếu PDF.
+- [ ] Thu thập thông tin doanh nghiệp và tin tức theo schema.
+- [ ] Bổ sung lịch sử báo cáo từ các trang tiếp theo và quy tắc chọn phiên bản soát xét/kiểm toán.
+- [ ] Hoàn thiện AnalysisResult, phân tích và PDF đầu ra.
+
+Đề xuất tần suất bản đầu: dữ liệu cuối ngày, lấy tự động khi chạy; chưa chạy nền/realtime. Các mục P0/P1 bên trên giữ trạng thái chưa hoàn thành nếu mới chỉ đạt một phần.

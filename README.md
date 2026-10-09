@@ -4,7 +4,7 @@ Khung dự án phân tích cơ hội đầu tư cổ phiếu Việt Nam và tự
 
 ## Trạng thái
 
-Đã tạo cấu trúc, cấu hình và tài liệu. Các mô-đun Python chỉ mô tả trách nhiệm; chưa có ứng dụng phân tích hoàn chỉnh, dữ liệu thị trường hay PDF mẫu.
+Đã có bộ lấy giá ngày tự động và tải BCTC hợp nhất HPG. Đã thử nguồn thật cho HPG và chạy 5 kiểm thử offline. Các mô-đun phân tích/giao diện/PDF còn là khung, chưa có báo cáo phân tích hoàn chỉnh. Giá chưa đối chiếu độc lập; chỉ tiêu tài chính chưa trích xuất.
 
 Đọc `projectcontext.md` để hiểu yêu cầu/kiến trúc và `task.md` để theo dõi tiến độ. Đề gốc và bản đề xuất nằm trong `docs/references/`.
 
@@ -27,4 +27,17 @@ Python + Streamlit + pandas/numpy + matplotlib + ReportLab + PyYAML. `requiremen
 
 Sau khi triển khai P0, lệnh chạy dự kiến: `python -m streamlit run app.py`. Hiện chưa có ứng dụng phân tích để chạy.
 
-Bước tiếp theo: dữ liệu một mã có nguồn, phạm vi ngành và hợp đồng dữ liệu.
+## Tự lấy dữ liệu HPG
+
+Cài dependency cho bộ lấy dữ liệu: `python -m pip install beautifulsoup4`.
+
+```powershell
+python -m scripts.fetch_data --ticker HPG --start 2025-10-09 --as-of 2026-10-09
+python -m unittest discover -s tests -v
+```
+
+Giá được lưu trong `data/processed/`, dữ liệu gốc trong `data/raw/`; log và trạng thái trong `outputs/runs/<run_id>/`. Lỗi từng nguồn được lưu và CLI trả mã lỗi khác 0 nếu có lỗi. Các nguồn công khai có thể thay đổi, chặn hoặc giới hạn truy cập.
+
+Chế độ bản đầu đề xuất: cuối ngày, luôn loại ngày hiện tại theo UTC+7 để tránh phiên chưa hoàn tất. Không có cập nhật nền/realtime. Không dùng cơ sở giá chưa xác minh để khẳng định lợi suất điều chỉnh hay giá mục tiêu. PDF tài chính tải từ nguồn công bố chưa được chuyển thành chỉ tiêu. Bộ tìm báo cáo hiện chỉ hỗ trợ HPG và trang danh sách đầu tiên.
+
+Xem `docs/hpg_data_check.md` để biết kết quả thử nguồn thật và phần cần hoàn thiện.
