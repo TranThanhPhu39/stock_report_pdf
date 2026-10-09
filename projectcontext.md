@@ -46,4 +46,4 @@ Tự lấy Parquet tài chính HSX/HNX và BCTN nhiều mã từ danh mục vn-a
 
 76 kiểm thử đạt; dữ liệu thực ACB/HPG/VNM và UI thật ACB. ACB chưa đủ đoạn đầu 2016 và NCI, có P/E năm quy đổi; HPG FCFF âm nên DCF chặn; VNM đủ phương pháp. Gemini tùy chọn từ bundle số liệu/nguồn, key qua Secrets/environment; missing key/API/JSON có fallback. SDK thật đã test HTTP giả lập, chưa test API/deploy thật. Không coi P/E năm là TTM; không coi số ngành cố định ZIP là dữ liệu thị trường. Minh chứng submission/upgrade_acceptance.json.
 
-Cập nhật NVL: định giá dùng giá mới nhất có bản ghi đúng ngày/giá khớp hai nguồn trong 0,1%; mẫu lịch sử giữ kiểm tra độc lập, chưa khớp thì chặn thống kê chuỗi. 83 kiểm thử đạt; không bỏ kiểm tra tài chính.
+Cập nhật NVL: định giá dùng giá mới nhất có bản ghi đúng ngày/giá khớp hai nguồn trong 0,1%; mẫu lịch sử giữ kiểm tra độc lập, chưa khớp thì chặn thống kê chuỗi. 88 kiểm thử đạt; không bỏ kiểm tra tài chính.

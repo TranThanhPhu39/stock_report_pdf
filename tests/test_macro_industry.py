@@ -1,4 +1,5 @@
 """Macro period semantics, broader industry selection and sector-specific formulas."""
+from __future__ import annotations
 from datetime import date
 from pathlib import Path
 from tempfile import TemporaryDirectory

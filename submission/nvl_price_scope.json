@@ -26,7 +26,7 @@
     "use_ai": false
   },
   "offline_tests": {
-    "passed": 83,
+    "passed": 88,
     "failed": 0
   },
   "ui_test": {
@@ -34,7 +34,9 @@
     "exceptions": 0,
     "latest_price_success": true,
     "history_warning": "7/20",
-    "suppressed_metrics_visible": true
+    "suppressed_metrics_visible": true,
+    "premium_ui_verified": true,
+    "advanced_valuation_controls": 7
   },
   "latest_close_vnd": 10250.0,
   "latest_date": "2026-10-08",
@@ -1300,5 +1302,6 @@
     "Historical sample remains unverified (7/20 matched); no MA, returns, drawdown or annualized volatility.",
     "NVL 2025 KBS period rejected as not 12 months; last valid annual period 2024.",
     "Model financial guards remain: annual parent profit not positive, Gordon conditions not met, base FCFF not positive; no automatic buy/sell recommendation."
-  ]
+  ],
+  "merge_note": "Integrated remote Premium UI/news while preserving ZIP valuation, ACB fallback, Gemini, and latest/history quote checks. Full tests and Premium AppTest passed."
 }

@@ -8,7 +8,7 @@ import subprocess
 
 from src.data.acquisition import acquire, write_json
 from src.data.providers import completed_day_cutoff
-from src.data.research import collect_research
+from src.data.research import collect_research, collect_peer_news
 from src.data.issuer_pdf import extract_hpg_interim
 from src.data.quality import verify_financials
 from src.models import AnalysisRequest
@@ -73,6 +73,13 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     research["sources"].extend(context["sources"])
     research["errors"].extend(context["errors"])
     research["warnings"].extend(context["warnings"])
+    peer_tickers=[peer.get("ticker") for peer in context["industry"].get("peers",[])]
+    if "news" in request.sections:
+        peer_news,peer_sources,peer_errors=collect_peer_news(peer_tickers,as_of,root,acquisition["run_id"])
+        research["news"].extend(peer_news)
+        research["sources"].extend(peer_sources)
+        research["errors"].extend(peer_errors)
+        research["news"].sort(key=lambda item:(item["published_at"],item.get("ticker",ticker)),reverse=True)
     conclusion["integrated_thesis"]=integrated_thesis(context["macro"],context["industry"],financial)
     conclusion["summary"]="Đánh giá kết hợp dữ liệu vĩ mô đã công bố, vị trí trong mẫu doanh nghiệp cùng ngành, kết quả kinh doanh và rủi ro giá. Các kênh truyền dẫn là nhận định có điều kiện, không phải quan hệ nhân quả đã định lượng."
     result = {"request": request.to_dict(),

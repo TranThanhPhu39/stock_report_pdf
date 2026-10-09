@@ -1,4 +1,5 @@
 """Reference sources cannot bypass metadata guards or download entire archives."""
+from __future__ import annotations
 from copy import deepcopy
 from datetime import date
 import io

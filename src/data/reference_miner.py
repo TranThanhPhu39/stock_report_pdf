@@ -3,6 +3,7 @@
 Parquet lacks publication, scope and unit metadata. Never promote it into the
 primary financial/valuation model merely because its numbers look plausible.
 """
+from __future__ import annotations
 import csv
 import hashlib
 import io

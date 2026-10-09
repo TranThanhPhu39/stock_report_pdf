@@ -1,4 +1,5 @@
 """Optional CLI; the Streamlit application acquires data automatically."""
+from __future__ import annotations
 
 import argparse
 from datetime import date, datetime

@@ -1,4 +1,5 @@
 """Collect independent macro and industry sources without manual data entry."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from src.data.macro import collect_macro
 from src.data.industry import collect_industry
