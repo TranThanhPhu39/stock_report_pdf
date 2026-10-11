@@ -113,6 +113,20 @@ class EvidenceValidationTests(unittest.TestCase):
         def fail(*args):raise json.JSONDecodeError('private response','secret content',0)
         with patch('src.analysis.ai_commentary.evidence_bundle',return_value=self.bundle()):out=generate_commentary(result,key='fake',caller=fail)
         self.assertEqual(out['failure_stage'],'validation');self.assertIn('JSON không hợp lệ',out['reason']);self.assertNotIn('secret',out['reason'])
+    def test_service_failure_reports_status_without_leaking_sdk_message(self):
+        result={'request':{'use_ai':True},'industry':{'available':True,'name':'Chứng khoán','code':'8777'}}
+        class ServiceError(Exception):
+            def __init__(self,code):
+                super().__init__('secret credential URL and private response');self.code=code
+        for code in (429,503,504):
+            with self.subTest(code=code):
+                def fail(*args):raise ServiceError(code)
+                with patch('src.analysis.ai_commentary.evidence_bundle',return_value=self.bundle()):
+                    out=generate_commentary(result,key='fake',caller=fail)
+                self.assertEqual(out['status'],'failed');self.assertFalse(out['available'])
+                self.assertEqual(out['failure_stage'],'request');self.assertEqual(out['http_code'],code)
+                self.assertIn(f'HTTP {code}',out['reason']);self.assertNotIn('secret',out['reason'])
+                self.assertEqual(out['sections'],{})
     def test_scope_and_period_exclusions_are_distinct(self):
         target={'year':2025,'period_end':'2025-12-31','scope':'consolidated','business_type':2}
         peer={'year':2025,'period_end':'2025-12-31','scope':'separate','business_type':2,'fields':{}}

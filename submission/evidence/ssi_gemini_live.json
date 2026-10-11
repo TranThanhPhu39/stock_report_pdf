@@ -1,0 +1,58 @@
+{
+  "tested_at": "2026-10-11T23:01:47.455980+07:00",
+  "user_authorized_destination": "Google Gemini API",
+  "user_authorized_payload": "Public SSI financial/macro/industry evidence and bounded public news extracts",
+  "parent_run_id": "SSI_20261011_222135_393293",
+  "model": "gemini-flash-latest",
+  "configured_key_source": "Streamlit Secrets (value not recorded)",
+  "model_metadata_request_succeeded": true,
+  "model_limits": {
+    "input_tokens": 1048576,
+    "output_tokens": 65536
+  },
+  "evidence_count": 69,
+  "source_records": 56,
+  "live_generate_content_invocations": 2,
+  "generation_attempts": [
+    {
+      "run_id": "SSI_20261011_222135_393293_gemini_225308",
+      "client_timeout_ms": 30000,
+      "status": "failed",
+      "exception_type": "ServerError",
+      "http_code": 504
+    },
+    {
+      "run_id": "SSI_20261011_222135_393293_gemini_225816",
+      "client_timeout_ms": 60000,
+      "sdk_attempt_limit": 1,
+      "max_output_tokens": 8192,
+      "status": "failed",
+      "exception_type": "ServerError",
+      "http_code": 503
+    }
+  ],
+  "successful_generation": false,
+  "validated_commentary_count": 0,
+  "new_ai_pdf_generated": false,
+  "existing_pdf_sha256": "bd369095924d0b386771fa9e56128b2904a91e92eb6552ed8a71de1afcb776aa",
+  "cloud_verified": false,
+  "offline_tests": {
+    "passed": 171,
+    "elapsed_seconds": 18.388
+  },
+  "ui_fallback": {
+    "run_id": "SSI_20261011_222135_393293_gemini_225816",
+    "no_exception": true,
+    "service_error_visible": "HTTP 503",
+    "analysis_calls": 1,
+    "google_generation_calls": 0,
+    "pdf_exporter_mocked": true,
+    "download_control_present": true
+  },
+  "limitations": [
+    "Model metadata success does not verify generation success",
+    "No raw SDK errors, credentials or article bodies are committed",
+    "The original PDF remains without Gemini commentary",
+    "No demonstrated cause for the service errors"
+  ]
+}

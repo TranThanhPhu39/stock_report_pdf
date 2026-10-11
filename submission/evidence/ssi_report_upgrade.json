@@ -60,10 +60,12 @@
     "industry": 8
   },
   "tests": {
-    "offline_passed": 170,
-    "sdk_live_call": false,
+    "offline_passed": 171,
+    "sdk_live_call": true,
     "cloud_deployed": false,
-    "reason_live_call_not_run": "Automatic approval review rejected exporting SSI evidence bundle to Google/Gemini without specific authorization."
+    "sdk_live_generation_succeeded": false,
+    "sdk_model_metadata_read_succeeded": true,
+    "live_evidence": "submission/evidence/ssi_gemini_live.json"
   },
   "ui_evidence": "submission/evidence/ssi_ui_upgrade.json",
   "ui_regression_evidence": "submission/evidence/ssi_ui_regression.json",
@@ -79,7 +81,7 @@
     "SSI quarterly/interim 2026 and TTM not integrated",
     "Two-peer sample is not representative of the entire industry",
     "Only selected values cross-checked; not a certification of entire statements",
-    "Gemini live API and Cloud not verified"
+    "Gemini live generation failed with HTTP 504/503; Cloud not verified"
   ],
   "web_health": "ok"
 }

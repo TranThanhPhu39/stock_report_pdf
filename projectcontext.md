@@ -77,8 +77,9 @@ SOTP có engine xác minh bridge/CP/các mảng không trùng; adapter tự đ�
 - [x] Gemini gắn source IDs từ evidence IDs, giữ từng nhận xét hợp lệ, chẩn đoán lỗi riêng/JSON; không xuất khóa hoặc SDK error nhạy cảm.
 - [x] PDF nguồn theo tên đơn vị, biểu đồ/nhãn dễ đọc hơn, loại biểu đồ giá lặp tại tổng quan; kiểm tra toàn bộ trang. OCR Cloud có packages.txt; chưa triển khai Cloud.
 - [ ] SSI BCTC quý/bán niên 2026 và TTM chưa tích hợp; mẫu định giá SSI hiện chỉ hai doanh nghiệp đủ điều kiện.
-- [ ] API Gemini thật chưa kiểm chứng: automatic review từ chối gửi payload SSI tới Google, chờ cho phép cụ thể của người dùng. Đã tiếp tục mọi phần không phụ thuộc API.
+- [x] Người dùng cho phép gửi bằng chứng SSI tới Google; khóa Secrets đọc được thông tin model. Hai lần tạo nhận xét thật trả HTTP 504/503, không có nhận xét để xuất; minh chứng `submission/evidence/ssi_gemini_live.json`.
+- [ ] Xác nhận một phản hồi Gemini thật hợp lệ và xuất PDF có AI khi dịch vụ hoạt động; Streamlit Cloud chưa triển khai/kiểm chứng.
 
 Chi tiết và minh chứng: docs/ssi_report_upgrade.md; submission/evidence/ssi_report_upgrade.json.
 
-Kiểm chứng cuối: 170 kiểm thử offline đạt; AppTest SSI và hồi quy SHS/VNM/REE không ngoại lệ; PDF SSI 17 trang đã render và kiểm tra toàn bộ.
+Kiểm chứng cuối: 171 kiểm thử offline đạt; AppTest SSI hiển thị lỗi HTTP 503, giữ nút tải PDF và không ngoại lệ (API/PDF được giả lập trong AppTest). PDF SSI 17 trang và hồi quy SHS/VNM/REE đã kiểm tra ở đợt trước; PDF được giữ nguyên vì chưa có nhận xét AI thật.

@@ -29,7 +29,9 @@ Lỗi cũ chỉ lưu `ValueError`, không lưu thông báo kiểm tra gốc, nê
 
 Gemini hỗ trợ diễn giải vĩ mô/ngành và kết nối tới doanh thu, chi phí, rủi ro của doanh nghiệp; nhận xét xuất hiện ở các mục tương ứng và PDF nếu bật AI và qua kiểm tra. Chương trình tính tài chính/định giá/khuyến nghị. Kiểm tra dẫn nguồn/định dạng không chứng nhận mọi suy luận đúng. Run kiểm chứng này tắt AI để không đưa phản hồi giả vào báo cáo.
 
-Automatic approval review đã từ chối gửi gói bằng chứng SSI tới Google/Gemini vì chưa có chấp thuận cụ thể cho payload/destination. Không đọc key hoặc gọi API trong bước bị từ chối. Cần người dùng cho phép gửi gói dữ liệu này để kiểm chứng API thật; kiểm thử SDK HTTP giả lập không thay thế kiểm chứng API/Cloud.
+Trước đó, automatic approval review từ chối gửi gói SSI tới Google/Gemini vì chưa có chấp thuận cụ thể. Người dùng sau đó trả lời **có**, cho phép gửi số liệu và trích yếu tin công khai SSI tới Google để kiểm thử API thật. Khóa được đọc từ Secrets, không ghi khóa hoặc thông báo SDK thô vào log/Git. Lệnh đọc thông tin `gemini-flash-latest` thành công; không đồng nghĩa việc tạo nhận xét đã thành công.
+
+Hai lần gọi tạo nhận xét bằng cùng gói 69 bằng chứng trả lần lượt HTTP 504 và 503. Lần thử lại tăng timeout từ 30 lên 60 giây, giới hạn một lần gọi SDK và 8.192 token đầu ra; không tiếp tục gọi tự động sau lỗi dịch vụ. Google mô tả các lỗi dịch vụ là tình trạng có thể thử lại theo [hướng dẫn xử lý lỗi](https://ai.google.dev/gemini-api/docs/troubleshooting); chưa có bằng chứng để kết luận độ dài payload là nguyên nhân. Thông báo ứng dụng nay phân biệt mã HTTP, lỗi JSON và lỗi kiểm tra nội dung, giữ phân tích quy tắc khi API thất bại. Không tạo PDF gắn nhãn AI từ phản hồi giả hoặc phản hồi lỗi; PDF 17 trang trước đó được giữ nguyên.
 
 OCR trên Community Cloud cần các dependency hệ thống trong `packages.txt`, theo [Streamlit Docs](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies). Chưa triển khai hoặc xác nhận Cloud trong phiên này.
 
@@ -37,4 +39,4 @@ OCR trên Community Cloud cần các dependency hệ thống trong `packages.txt
 
 `submission/evidence/ssi_report_upgrade.json` và `ssi_ui_upgrade.json`. Bộ kiểm thử offline, AppTest với kết quả nguồn thực, PDF render toàn bộ và kiểm tra nhãn/phân trang. Đây là kiểm chứng SSI và adapter TVS, không phải toàn thị trường.
 
-Kiểm chứng cuối: 170 kiểm thử offline đạt; AppTest SSI và hồi quy SHS/VNM/REE không ngoại lệ; PDF SSI 17 trang đã render và kiểm tra toàn bộ.
+Kiểm chứng sau thử API: 171 kiểm thử offline đạt. AppTest nạp kết quả HTTP 503 thật đã lưu nhưng giả lập pipeline và xuất PDF để không gọi lại Google: lỗi hiển thị rõ, nút tải vẫn có, không ngoại lệ. Bằng chứng `submission/evidence/ssi_gemini_live.json`. PDF SSI 17 trang và hồi quy SHS/VNM/REE đã kiểm tra ở đợt trước; chưa có PDF Gemini thật thành công hoặc xác nhận deploy Cloud.
