@@ -33,7 +33,7 @@ def build_conclusion(financial, market, valuation, quote_check, interim=None):
         else:
             risks.append("Giá cuối chuỗi chưa đồng thời vượt MA20 và MA50; động lực giá cần được theo dõi thêm.")
     if market and market["max_drawdown_pct"] is not None:
-        basis="giá điều chỉnh" if market.get("adjustment_verified",False) else "đóng cửa nguồn chưa xác minh điều chỉnh quyền"
+        basis="giá điều chỉnh theo nguồn, chưa đối chiếu toàn bộ sự kiện quyền" if market.get("statistics_basis")=="provider_adjusted_close" else "đóng cửa nguồn chưa xác minh điều chỉnh quyền"
         risks.append(f"Chuỗi {basis} có mức sụt giảm lớn nhất {market['max_drawdown_pct']:.1f}% trong giai đoạn chọn; không phải dự báo hoặc tổn thất thực nhận. Cần đọc sự kiện cổ tức/chia tách.")
     if interim and interim.get("valid"):
         fields=interim["fields"];profit=fields["net_profit"];revenue=fields["revenue"]

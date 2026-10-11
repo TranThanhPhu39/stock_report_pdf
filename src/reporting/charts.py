@@ -1,4 +1,4 @@
-"""Charts use the same adjusted series as the analysis."""
+"""Price charts show Close; historical risk calculations retain their own basis."""
 from __future__ import annotations
 from pathlib import Path
 
@@ -12,7 +12,7 @@ def market_chart(result, folder: Path):
     values=pd.Series(result["market"]["chart_prices"])
     plt.rcParams['font.size']=10
     fig,axes=plt.subplots(2,1,figsize=(3.5,3.8),sharex=True,gridspec_kw={"height_ratios":[3,1]})
-    axes[0].plot(dates,values,color="#14566e",label="Giá điều chỉnh" if "adjusted_close" in result["market"]["series_basis"] else "Đóng cửa")
+    axes[0].plot(dates,values,color="#14566e",label="Giá đóng cửa")
     for days,color in [(20,"#d99d32"),(50,"#5a927b")]:
         if result["market"].get("history_indicators_available",True):
             axes[0].plot(dates,values.rolling(days).mean(),color=color,label=f"MA{days}",linewidth=1)

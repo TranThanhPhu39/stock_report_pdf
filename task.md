@@ -94,3 +94,12 @@ Bộ bàn giao: README, projectcontext/task, docs, outputs/pdf và submission. M
 - [x] Bổ sung vnstock 4.0.8 (dòng thư viện trước gọi vnstock3): dự phòng giá KBS/VCI sau HTTP, kiểm tra đơn vị/ngày/schema và lỗi SDK, loại cùng nguồn gốc khi đối chiếu; 119 tests và sáu kết nối thực SHS/VNZ/F88 đều khớp 20/20 phiên.
 
 Minh chứng: submission/exchange_report_acceptance.json; phương pháp và giới hạn: docs/exchange_report_upgrade.md. Đây là kiểm chứng sáu mã, không phải toàn thị trường; API Gemini thật và deploy vẫn chưa được kiểm chứng.
+
+## Close và vnfinancialdata (11/10/2026)
+
+- [x] Biểu đồ/MA/định giá dùng Close; thống kê Adj Close tách riêng với nhãn mức kiểm chứng.
+- [x] Tự lấy SDK vnfinancialdata 0.1.2, ba bảng HSX/HNX, kiểm tra SHA/schema/đơn vị/ánh xạ, xuất CSV đầy đủ và tích hợp UI/PDF.
+- [x] Chẩn đoán rõ kỳ chính, metadata KBS bị loại, chỉ tiêu thiếu và phương pháp không áp dụng.
+- [x] 134 kiểm thử offline đạt; SHS/VNM chạy nguồn thực, BCTC đến 2025, minh chứng riêng trong submission/evidence/*_close_vnfinancialdata.json.
+- [x] AppTest chọn năm/tải CSV không ngoại lệ; PDF bật/tắt phần bổ sung đúng; xem toàn bộ 29 trang hai PDF và khởi động lại web bằng .venv.
+- [ ] Xác minh phạm vi/ngày công bố từng kỳ dataset trước khi dùng tự thay dữ liệu chính; bổ sung nguồn UPCoM có metadata phù hợp.

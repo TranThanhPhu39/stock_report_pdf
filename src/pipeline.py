@@ -12,6 +12,7 @@ from src.data.providers import completed_day_cutoff
 from src.data.research import collect_research, collect_peer_news
 from src.data.issuer_pdf import extract_hpg_interim
 from src.data.shs_issuer import collect_shs_issuer
+from src.data.vnfinancialdata_provider import collect_vnfinancialdata
 from src.data.quality import verify_financials
 from src.models import AnalysisRequest
 from src.analysis.market import analyze_market
@@ -78,6 +79,10 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     if financial_check["status"]=="mismatch":
         research["errors"].append({"stage":"financial_check","message":"Chỉ tiêu không khớp tài liệu gốc; chặn phân tích tài chính và định giá."})
         financial={**financial,"periods":[],"metrics":[]}
+    vnf=collect_vnfinancialdata(ticker,as_of,company,financial,root,acquisition["run_id"])
+    research["sources"].extend(vnf["sources"])
+    # A supplementary dataset failure does not discard valid primary statements.
+    research["warnings"].extend(vnf["warnings"])
     context=collect_context(ticker,as_of,financial,root,acquisition["run_id"])
     benchmark=collect_valuation_peers(context["industry"],as_of,market.get("latest_date") if market else None,root,acquisition["run_id"])
     research["sources"].extend(benchmark["sources"])
@@ -99,13 +104,15 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     result = {"request": request.to_dict(),
               "acquisition": acquisition, "market": market, "price_rows": rows,
               "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],"macro":context["macro"],"industry":context["industry"],
-              "reference":reference,"issuer_financials":issuer,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
+              "reference":reference,"vnfinancialdata":vnf,"issuer_financials":issuer,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
               "errors":acquisition["errors"]+research["errors"],"financial_metrics_status":"analyzed" if financial["metrics"] else "unavailable",
               "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or (acquisition["prices"] and acquisition["prices"].get("coverage",{}).get("start_gap_days",0)>7) or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
     import json
     existing_sources = root / "outputs/runs" / acquisition["run_id"] / "sources.json"
     result["sources"] = json.loads(existing_sources.read_text(encoding="utf-8")) + research["sources"]
     result["recommendation"]=build_recommendation(result)
+    from src.data.financial_status import financial_status
+    result["financial_data_status"]=financial_status(result)
     result["ai_commentary"]=generate_commentary(result,key=ai_key,model=ai_model)
     if interim and interim.get("valid"):
         pages_by_source={}

@@ -177,7 +177,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
                 [market.get("return_label","Biến động trong khoảng chọn"),history_label if history_blocked else formatted(market["return_pct"],"%")],["Sụt giảm tối đa",history_label if history_blocked else formatted(market["max_drawdown_pct"],"%")],
                 ["Biến động năm hóa",history_label if history_blocked else formatted(market["annualized_volatility_pct"],"%")],["MA20 / MA50",history_label if history_blocked else formatted(market["ma20_vnd"],"VND/share")+" / "+formatted(market["ma50_vnd"],"VND/share")],
                 ["Khối lượng bình quân 20 phiên",formatted(market["average_volume_20"],"CP")]], [70*mm,104*mm])
-            panel("market","Diễn biến giá và khối lượng trong khoảng người dùng chọn. MA chỉ hiển thị khi mẫu đối chiếu lịch sử khớp. Giá mới nhất được kiểm tra riêng.")
+            panel("market","Biểu đồ và MA20/MA50 dùng giá đóng cửa (Close) của nguồn. MA chỉ hiển thị khi mẫu đối chiếu lịch sử khớp. Giá đóng cửa mới nhất được kiểm tra riêng để định giá.")
             citations([r["source_id"] for r in result["price_rows"] if r.get("source_id")]+[quality["price_check"].get("source_id")])
             text(market["return_note"],True);text(quality["price_check"].get("note","Không có đối chiếu giá."),True)
             differences=[c for c in quality["price_check"].get("checks",[]) if not c["match"]]
@@ -189,6 +189,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         else:text("Chưa có chuỗi giá hợp lệ; không tính các chỉ tiêu thị trường.")
     if "financial" in selected:
         start_section("financial",SECTION_LABELS["financial"]);metrics=result["financial"]["metrics"]
+        for message in result.get("financial_data_status",{}).get("messages",[]):text(message,True)
         if metrics:
             caption=p(f"Báo cáo năm {metrics[0]['period']}; tăng trưởng so với năm trước cùng phạm vi. Tiền quy đổi: tỷ VND.")
             caption.keepWithNext=True
@@ -223,10 +224,31 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         reference=result.get("reference",{})
         text("Nguồn vn-annual-report-miner cung cấp lịch sử năm và danh mục BCTN. Parquet chưa có metadata chứng nhận đơn vị, phạm vi và ngày công bố; không dùng để thay tài chính/định giá chính.",True)
         citations([s["source_id"] for s in reference.get("sources",[])])
+        vnf=result.get("vnfinancialdata",{})
+        if vnf:
+            heading("BCTC bổ sung: vnfinancialdata")
+            text(vnf.get("reason",""),True)
+            if vnf.get("available"):
+                text(f"Dataset {vnf['dataset']['revision']}; {vnf['row_count']:,} dòng gốc, năm {min(vnf['years'])}–{max(vnf['years'])}. Từ điển khai báo VND cho các dòng tiền được ánh xạ; chưa xác nhận phạm vi/ngày công bố từng kỳ. Không tự thay đầu vào định giá.",True)
+                table(["Bảng tài chính","Năm mới nhất","Số dòng"],[[s["statement"],str(s["latest_year"] or "Chưa có"),str(s["row_count"])] for s in vnf["statements"]])
+                values={}
+                for record in vnf["records"]:values.setdefault(record["year"],{}).update(record["fields"])
+                years=sorted(values,reverse=True)[:(3 if full else 1)]
+                if years:
+                    table(["Năm","Doanh thu (tỷ)","LNST (tỷ)","Tài sản (tỷ)","CFO (tỷ)"],[[str(y)]+[formatted(values[y].get(k,{}).get("value")/1e9) if values[y].get(k,{}).get("value") is not None else "Chưa có" for k in ["revenue","net_profit","assets","cfo"]] for y in years])
+                checks=vnf.get("checks",[])
+                if checks:
+                    latest=max(c["year"] for c in checks);chosen=[c for c in checks if c["year"]==latest]
+                    text(f"Đối chiếu năm {latest}: {sum(c['match'] for c in chosen)}/{len(chosen)} giá trị khớp trong 0,1%. Khớp giá trị không xác nhận độc lập nguồn gốc hoặc phạm vi báo cáo.",True)
+                    for check in chosen:
+                        if not check["match"]:text(f"{check['label']}: nguồn chính {check['primary_vnd']/1e9:,.3f} tỷ VND; vnfinancialdata {check['reference_vnd']/1e9:,.3f} tỷ VND. "+(check.get("note") or "Giá trị lệch; giữ nguyên hai nguồn để kiểm tra."),True)
+            for error in vnf.get("errors",[]):text("vnfinancialdata: "+error["message"],True)
+            citations([s["source_id"] for s in vnf.get("sources",[])])
         grouped={}
         for record in reference.get("records",[]):grouped.setdefault(record["year"],{}).update(record["fields"])
         years=sorted(grouped,reverse=True)[:(5 if full else 2)]
         if years:
+            heading("Bảng bổ sung: vn-annual-report-miner")
             text("Bảng dưới chỉ chia giá trị gốc cho 10^9 để dễ đọc; không tự xác nhận đơn vị tỷ VND.",True)
             table(["Năm","Doanh thu / 10^9","LNST / 10^9","Tài sản / 10^9","CFO / 10^9"],[[str(year)]+[formatted(grouped[year].get(k,{}).get("value")/1e9) if grouped[year].get(k,{}).get("value") is not None else "Chưa có" for k in ["revenue","net_profit","assets","cfo"]] for year in years])
         checks=reference.get("checks",[])
@@ -322,7 +344,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         for item in result["conclusion"]["risks"]:
             if not recommendation or "sụt giảm lớn" in item:text("• "+item)
     start_section("methods","Phương pháp và giới hạn dữ liệu")
-    if "market" in selected:text("Giá dùng phiên trước ngày hiện tại để tránh phiên chưa kết thúc. Chuỗi tính toán dùng Adj Close nếu đầy đủ; nếu không, dùng đóng cửa cùng một nguồn và ghi rõ chưa xác minh điều chỉnh quyền. Biến động = (giá cuối / đầu - 1) × 100; MA dùng cùng chuỗi, chuẩn hóa về giá cuối khi có Adj Close. Drawdown = mức giảm lớn nhất từ đỉnh trước đó; độ biến động năm hóa = độ lệch chuẩn lợi suất log ngày × √252 × 100. Đối chiếu 20 phiên không chứng nhận toàn bộ lịch sử hay tổng lợi nhuận.",True)
+    if "market" in selected:text("Giá dùng phiên trước ngày hiện tại để tránh phiên chưa kết thúc. Biểu đồ và MA luôn dùng Close của nguồn; giá mới nhất cho định giá là Close, không phải Adj Close. Biến động/drawdown/độ biến động dùng Adj Close nếu đầy đủ, nếu không dùng Close có nhãn chưa xác minh điều chỉnh quyền. Biến động = (giá cuối / đầu - 1) × 100; drawdown là mức giảm lớn nhất từ đỉnh trước đó; độ biến động năm hóa = độ lệch chuẩn lợi suất log ngày × √252 × 100. Đối chiếu giá không chứng nhận toàn bộ sự kiện quyền hay tổng lợi nhuận.",True)
     if "macro" in selected:text("Trích vĩ mô theo câu so sánh cụ thể (GDP lũy kế, CPI bình quân, tín dụng so với cuối năm, chỉ số USD cùng tháng); giữ khác biệt giữa YoY, YTD, danh nghĩa và thực. Dữ liệu WDI có null được bỏ, không lấy năm chưa kết thúc.",True)
     if full and "macro" in selected:
         history=[r for r in result.get("macro",{}).get("indicators",[]) if r["key"] in {"gdp_current_usd","lending_annual","fx_annual"}]
@@ -335,7 +357,16 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             if metric["key"] not in {"revenue","net_profit","parent_profit","assets","equity","cfo"}:text(metric["label"]+": "+metric["formula"]+(". "+metric["reason"] if metric["reason"] else ""),True)
     if "valuation" in selected and result["valuation"]["available"]:text(result["valuation"]["formula"],True)
     displayed_warnings=set()
+    vnf_warnings=set(result.get("vnfinancialdata",{}).get("warnings",[]))
+    grouped_vnf={}
+    for warning in sorted(vnf_warnings):
+        period,_,issue=warning.partition("/")
+        if period.isdigit() and issue:grouped_vnf.setdefault(issue,[]).append(period)
+        else:grouped_vnf.setdefault(warning,[])
+    for issue,periods in grouped_vnf.items():
+        text("• vnfinancialdata: "+issue+(" (năm "+", ".join(periods)+")." if periods else ""),True)
     for warning in quality["warnings"]:
+        if warning in vnf_warnings:continue
         if warning.startswith('KBS_') and ': loại kỳ ' in warning:
             warning='BCTC KBS: loại kỳ '+warning.split(': loại kỳ ',1)[1]
         if warning not in displayed_warnings:

@@ -7,8 +7,9 @@
 Python 3.11+; máy kiểm thử dùng Python 3.12.10. Chạy trong thư mục dự án:
 
 ```powershell
-python -m pip install -r requirements.txt
-python -m streamlit run app.py
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
 Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS/Vietcap), chọn khoảng ngày, bản đầy đủ/tóm tắt, phần cần xuất, P/B/P/E giả định và các tỷ lệ Ke/WACC/g/thuế trong mục định giá. Bấm **Phân tích**, sau đó **Tải báo cáo phân tích PDF**. Luồng chính không yêu cầu chạy script lấy dữ liệu riêng.
@@ -28,7 +29,7 @@ Tệp theo lượt chạy nằm tại `outputs/runs/<run_id>/`: request.json, va
 ## Phân tích và nguồn
 
 - Giá cuối ngày: tự thử nguyên chuỗi theo thứ tự **Yahoo → KBS HTTP → Vietcap HTTP → vnstock–KBS → vnstock–VCI** nếu lỗi tải/OHLC. Vnstock là thư viện truy cập các nguồn gốc KBS/VCI, không phải một nguồn gốc độc lập mới. Khi đối chiếu, loại mọi kết nối cùng nguồn gốc với giá chính (ví dụ vnstock–KBS không đối chiếu bằng KBS HTTP). Dùng `vnstock==4.0.8`, tên hiện tại của dòng thư viện trước đây gọi là vnstock3; tự cài qua requirements, không cần nhập CSV. Xem [kết nối và giới hạn](docs/vnstock_fallback.md). Không ghép OHLC khác cơ sở điều chỉnh hoặc tự sửa giá nguồn. Định giá kiểm tra riêng giá đóng cửa mới nhất: đúng ngày, đúng giá sử dụng, khớp nguồn thứ hai trong 0,1%. Mẫu lịch sử tối đa 20 phiên có trạng thái riêng; nếu chưa khớp đầy đủ thì giữ biểu đồ đóng cửa nhưng không tính MA/lợi suất/drawdown/biến động năm hóa. Ghi phạm vi thực nhận và khoảng đầu kỳ thiếu. Truy vấn KBS có đệm hai ngày để tránh bỏ phiên cuối, nhưng luôn lọc lại đến ngày chốt; bỏ ngày hiện tại theo UTC+7, kể cả sau giờ giao dịch.
-- Biến động, MA20/MA50, drawdown, độ biến động năm hóa và khối lượng. Ưu tiên Adj Close đầy đủ; nếu thiếu, dùng đóng cửa cùng nguồn với nhãn chưa xác minh điều chỉnh quyền. Không coi là tổng lợi nhuận hoặc tổn thất thực nhận.
+- Biểu đồ và MA20/MA50 dùng Close; định giá dùng giá đóng cửa mới nhất đã đối chiếu. Biến động/drawdown/độ biến động ưu tiên Adj Close đầy đủ từ nguồn; nếu thiếu, dùng Close cùng nguồn và ghi hạn chế điều chỉnh quyền. Có Adj Close không đồng nghĩa đã xác minh toàn bộ sự kiện quyền; không coi thống kê giá là tổng lợi nhuận hoặc tổn thất thực nhận.
 - Báo cáo năm qua KBS: doanh thu thuần, LNST, tài sản, vốn, CFO, tăng trưởng, ROE hợp nhất, biên lợi nhuận và nợ vay/vốn khi phù hợp. Bán niên HPG được đọc trực tiếp từ PDF soát xét của doanh nghiệp bằng OCR.
 - Vĩ mô: tự đọc NSO (GDP lũy kế, CPI bình quân, IIP, tín dụng, bán lẻ thực, xuất khẩu…) và World Bank cho lịch sử năm. Lãi suất cho vay và tỷ giá World Bank là số lịch sử, không phải giá hiện tại.
 - Ngành: phân loại ICB từ Vietcap, chọn tối đa bốn doanh nghiệp theo tài sản, cùng ngày cuối kỳ/phạm vi báo cáo; so với trung vị mẫu, loại mã đang phân tích. Nếu ngành hẹp không đủ mẫu, mở rộng cấp ICB và ghi rõ. Phân loại khoảng 1.582 mã không có nghĩa đã phân tích/kiểm chứng toàn bộ.
@@ -58,6 +59,12 @@ Mỗi lượt phân tích tự lấy Parquet tài chính HSX/HNX và tra danh m�
 Tab Tài chính có mục nguồn bổ sung, bảng giá trị gốc, đối chiếu cùng năm và nút tải CSV/BCTN gốc. Phần PDF `reference` có thể chọn riêng. Nguồn gốc và ngày truy xuất được lưu trong analysis.json/sources.json; source_file/source_sheet/item_code được giữ cho từng giá trị.
 
 **Parquet chưa có metadata xác minh đơn vị, phạm vi và ngày công bố.** Đây là nguồn bổ sung, chưa tự thay kỳ 2024 hay đầu vào định giá. Khớp giá trị không chứng nhận nguồn độc lập/phạm vi. Phiên bản nguồn sau ngày phân tích bị loại; ngày commit không được coi là ngày công bố BCTC. Các báo cáo scan được thông báo cần OCR thêm. Xem `docs/reference_data.md`.
+
+## Nguồn vnfinancialdata
+
+Ứng dụng tự lấy ba bảng BCTC qua `vnfinancialdata==0.1.2`, bản dữ liệu cố định v1.0.0 cho HSX/HNX đến năm 2025; không cần API key. Tab Tài chính có chọn năm, bảng số liệu gốc, đối chiếu cùng năm và tải toàn bộ CSV. PDF mục “Dữ liệu báo cáo bổ sung” có bảng và nguồn này. SHS lấy được 4.581 dòng, VNM 2.801 dòng; 134 kiểm thử offline đạt.
+
+Nguồn mới chưa có đủ metadata phạm vi/ngày công bố từng kỳ để tự thay đầu vào định giá; chưa có UPCoM trong snapshot. Đối chiếu khớp số không chứng nhận nguồn gốc độc lập. Xem [cách sử dụng và minh chứng](docs/vnfinancialdata_upgrade.md).
 
 ## Gemini tùy chọn và Streamlit Cloud
 

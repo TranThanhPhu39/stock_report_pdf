@@ -1,0 +1,35 @@
+{
+  "package_version": "0.1.2",
+  "repository": "thanhnp-uel/vietnam-listed-companies-financial-statements",
+  "revision": "v1.0.0",
+  "commit": "a86d37d960c74890d39299d3e400802f832cc789",
+  "available_at": "2026-08-17T14:43:52Z",
+  "schema_version": "1.0",
+  "dictionary_sha256": "363d2326586a38527fefe21b777f38e8f607f6a289e7e0ca0a3005f04a47949b",
+  "files": {
+    "balance_sheet/HNX": {
+      "sha256": "fbf6c8a2d97b134f942383950ff3598fb778a65fd146b963dfe61d76d83906f7",
+      "size": 1704136
+    },
+    "balance_sheet/HSX": {
+      "sha256": "993f7ff6678e078e53c295310157dabc9a36d44f503ddd27f85d6180dea24bae",
+      "size": 2367119
+    },
+    "cash_flow/HNX": {
+      "sha256": "044f8140a717bd71cd0e721747eda3a6cbf952860c9276ef559680f429e3cca6",
+      "size": 863880
+    },
+    "cash_flow/HSX": {
+      "sha256": "8aa3a9997eae1bd5078dce5387033ef283b80cebb7e0635d0b47005edd217a5a",
+      "size": 1305256
+    },
+    "income_statement/HNX": {
+      "sha256": "5fbb62aac5150fb1b8d63d1384adf1f46fd1eca215ad5fa4748399096aba7341",
+      "size": 788402
+    },
+    "income_statement/HSX": {
+      "sha256": "32b5681bacccd42f046100cca835c046a7ad56bc4b73fb8ad444a81d20f15011",
+      "size": 1102948
+    }
+  }
+}

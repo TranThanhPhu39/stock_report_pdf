@@ -245,6 +245,7 @@ if result:
         prices=pd.DataFrame(result["price_rows"])
         chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),market["series_basis"]:market["chart_prices"]}).set_index("Ngày")
         st.line_chart(chart)
+        st.caption(market.get("chart_note","Biểu đồ thể hiện giá đóng cửa từ nguồn."))
         st.caption(market["return_note"])
     context_tabs=st.tabs(["Tổng quan vĩ mô","Phân tích ngành"])
     with context_tabs[0]:
@@ -273,6 +274,8 @@ if result:
         else:st.warning("Nguồn chưa xác nhận phân ngành của mã này; không tự gán ngành.")
     tabs=st.tabs(["Tài chính","Định giá đa phương pháp","Cơ hội và rủi ro","Tin tức","Nguồn dữ liệu"])
     with tabs[0]:
+        diagnostics=result.get("financial_data_status",{})
+        for message in diagnostics.get("messages",[]):st.caption(message)
         if result["financial"]["metrics"]:
             st.caption(f"Báo cáo năm {result['financial']['metrics'][0]['period']}; không phải số liệu TTM.")
             st.dataframe(pd.DataFrame([{"Chỉ tiêu":m["label"],"Giá trị":formatted(m["value"],m["unit"])} for m in result["financial"]["metrics"]]),hide_index=True,width="stretch")
@@ -281,6 +284,25 @@ if result:
         if interim and interim["valid"]:
             st.write(f"**Bán niên HPG đến {interim['period_end']}**")
             st.dataframe(pd.DataFrame([{"Chỉ tiêu":label,"Hiện tại":formatted(interim["fields"][key]["value"],"VND"),"6 tháng cùng kỳ":formatted(interim["fields"][key]["previous"],"VND"),"Trang PDF":interim["fields"][key]["page"]} for key,label in [("revenue","Doanh thu thuần"),("net_profit","LNST"),("cfo","Dòng tiền kinh doanh")]]),hide_index=True,width="stretch")
+        vnf=result.get("vnfinancialdata",{})
+        if vnf:
+            with st.expander("BCTC bổ sung: vnfinancialdata",expanded=True):
+                st.caption(vnf.get("reason",""))
+                if vnf.get("available"):
+                    st.write(f"{vnf['row_count']:,} dòng chỉ tiêu · Năm {min(vnf['years'])}–{max(vnf['years'])} · Dataset {vnf['dataset']['revision']}")
+                    st.dataframe(pd.DataFrame([{"Bảng":s["statement"],"Năm mới nhất":s["latest_year"],"Số dòng":s["row_count"]} for s in vnf["statements"]]),hide_index=True,width="stretch")
+                    csv_path=ROOT/vnf["csv"]
+                    if csv_path.exists():
+                        raw_frame=pd.read_csv(csv_path)
+                        year=st.selectbox("Năm BCTC vnfinancialdata",sorted(vnf["years"],reverse=True),key="vnf_year")
+                        st.dataframe(raw_frame[raw_frame.year.eq(year)][["statement","item_code","item_name","value","source_file","source_sheet"]],hide_index=True,width="stretch")
+                        st.download_button("Tải toàn bộ BCTC vnfinancialdata CSV",csv_path.read_bytes(),file_name=f"{request['ticker']}_vnfinancialdata.csv",mime="text/csv")
+                    checks=vnf.get("checks",[])
+                    if checks:
+                        latest=max(c["year"] for c in checks)
+                        st.write(f"Đối chiếu giá trị năm {latest}; chưa chứng nhận cùng phạm vi hoặc độc lập nguồn gốc")
+                        st.dataframe(pd.DataFrame([{"Chỉ tiêu":c["label"],"Nguồn chính (VND)":c["primary_vnd"],"vnfinancialdata (VND)":c["reference_vnd"],"Kết quả":"Khác quy ước dấu" if c.get("status")=="different_sign_convention" else "Khớp giá trị" if c["match"] else "Lệch","Ghi chú":c.get("note","")} for c in checks if c["year"]==latest]),hide_index=True,width="stretch")
+                for error in vnf.get("errors",[]):st.warning(error["message"])
         reference=result.get("reference",{})
         with st.expander("Nguồn bổ sung: Parquet và báo cáo thường niên",expanded=True):
             st.caption("Giá trị Parquet là giá trị gốc; đơn vị, phạm vi và ngày công bố chưa được chứng nhận. Không dùng để tự thay tài chính/định giá chính.")

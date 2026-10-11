@@ -9,3 +9,5 @@ beautifulsoup4==4.14.2
 PyMuPDF==1.28.2
 google-genai==2.29.0
 vnstock==4.0.8
+vnfinancialdata==0.1.2
+huggingface-hub==1.0.1
