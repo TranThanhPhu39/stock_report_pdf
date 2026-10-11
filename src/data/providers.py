@@ -17,6 +17,11 @@ class DataSourceError(RuntimeError):
     """A source could not provide usable data; callers must not invent a fallback."""
 
 
+def price_source_family(provider: str) -> str:
+    """SDK and direct HTTP connectors do not create independent upstream data."""
+    return {"Vnstock-KBS": "KBS", "Vnstock-VCI": "Vietcap"}.get(provider, provider)
+
+
 def download(url: str, timeout: int = 30) -> bytes:
     request = Request(url, headers={"User-Agent": "Mozilla/5.0 StockInsight/0.1"})
     try:

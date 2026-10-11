@@ -9,7 +9,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from src.data.providers import (DataSourceError, HPG_REPORTS_URL, VN_TIME,
-                                discover_hpg_reports, download, fetch_daily_prices, fetch_kbs_prices, fetch_vietcap_prices)
+                                discover_hpg_reports, download, fetch_daily_prices, fetch_kbs_prices, fetch_vietcap_prices, price_source_family)
+from src.data.vnstock_provider import fetch_vnstock_kbs_prices, fetch_vnstock_vci_prices
 from src.data.validate import validate_prices
 
 
@@ -51,18 +52,22 @@ def acquire(ticker: str, start: date, as_of: date, root: Path, report_limit: int
                "financial_metrics_status": "not_extracted", "errors": errors}
     try:
         prices = None
-        for provider, fetch in [("Yahoo", fetch_daily_prices), ("KBS", fetch_kbs_prices), ("Vietcap",fetch_vietcap_prices)]:
+        for provider, fetch in [("Yahoo", fetch_daily_prices), ("KBS", fetch_kbs_prices), ("Vietcap",fetch_vietcap_prices),
+                                ("Vnstock-KBS", fetch_vnstock_kbs_prices), ("Vnstock-VCI", fetch_vnstock_vci_prices)]:
             try:
                 candidate = fetch(ticker, start, as_of)
                 raw_path = root / "data/raw/prices" / f"{run_id}_{provider.lower()}.json"
                 raw_path.parent.mkdir(parents=True, exist_ok=True)
                 raw_path.write_bytes(candidate["raw"])
                 validation = validate_prices(candidate["rows"], ticker, start, date.fromisoformat(candidate["cutoff"]))
-                attempt = {"provider":provider, "validation":validation, "raw_file":raw_path.relative_to(root).as_posix()}
+                attempt = {"provider":provider, "upstream_source":price_source_family(provider),
+                           "validation":validation, "raw_file":raw_path.relative_to(root).as_posix(),
+                           "snapshot_kind":candidate.get("snapshot_kind", "raw_http"),
+                           "library_version":candidate.get("library_version")}
                 summary["price_attempts"].append(attempt)
                 sources.append({"source_id": f"{provider.upper()}_{run_id}", "url_or_file":candidate["url"],
                                 "retrieved_at":candidate["retrieved_at"], "page_or_table":"daily OHLCV",
-                                "notes":f"Raw snapshot: {attempt['raw_file']}; VND; adjustment unverified; valid={validation['valid']}; request={candidate.get('request_payload',{})}"})
+                                "notes":f"Snapshot: {attempt['raw_file']}; kind={attempt['snapshot_kind']}; upstream={price_source_family(provider)}; library={attempt['library_version']}; VND; adjustment unverified; valid={validation['valid']}; request={candidate.get('request_payload',{})}"})
                 if not validation["valid"]:
                     continue
                 prices = candidate
@@ -70,11 +75,11 @@ def acquire(ticker: str, start: date, as_of: date, root: Path, report_limit: int
                 source_id = f"{provider.upper()}_{run_id}"
                 break
             except (DataSourceError, ValueError, TypeError) as exc:
-                summary["price_attempts"].append({"provider":provider, "error":str(exc)})
+                summary["price_attempts"].append({"provider":provider, "upstream_source":price_source_family(provider), "error":str(exc)})
         if prices is None:
             summary["warnings"].extend(f"{attempt['provider']}: {attempt.get('error') or attempt.get('validation',{}).get('errors')}" for attempt in summary["price_attempts"])
             write_json(run_dir / "validation.json", {"valid":False,"attempts":summary["price_attempts"]})
-            raise DataSourceError("Không có chuỗi giá hợp lệ từ Yahoo, KBS hoặc Vietcap; xem price_attempts trong acquisition.json.")
+            raise DataSourceError("Không có chuỗi giá hợp lệ từ Yahoo, KBS, Vietcap hoặc kết nối vnstock; xem price_attempts trong acquisition.json.")
         write_json(run_dir / "validation.json", validation)
         if provider != "Yahoo":
             summary["warnings"].append(f"Giá lấy từ {provider}; nguồn ưu tiên không có chuỗi hợp lệ. Chi tiết lần thử nguồn được lưu trong acquisition.json; mẫu giá được đối chiếu riêng.")
@@ -92,7 +97,8 @@ def acquire(ticker: str, start: date, as_of: date, root: Path, report_limit: int
                              "last": prices["rows"][-1]["date"], "last_close_vnd": prices["rows"][-1]["close"],
                              "cutoff": prices["cutoff"], "csv": output.relative_to(root).as_posix(),
                              "company_name": prices["meta"].get("longName"), "validation": validation,
-                             "provider":provider, "coverage":coverage, "fallback_used":provider!="Yahoo"}
+                             "provider":provider, "upstream_source":price_source_family(provider),
+                             "coverage":coverage, "fallback_used":provider!="Yahoo"}
     except (DataSourceError, ValueError) as exc:
         errors.append({"stage": "prices", "message": str(exc)})
     if ticker == "HPG" and report_limit:

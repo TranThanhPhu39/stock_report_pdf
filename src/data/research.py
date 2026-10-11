@@ -9,6 +9,8 @@ from urllib.parse import urlencode, urljoin
 from bs4 import BeautifulSoup
 
 from src.data.providers import DataSourceError, VN_TIME, completed_day_cutoff, download, fetch_daily_prices, fetch_kbs_prices, fetch_vietcap_prices
+from src.data.providers import price_source_family
+from src.data.vnstock_provider import fetch_vnstock_kbs_prices, fetch_vnstock_vci_prices
 from src.data.validate import validate_prices
 from src.data.normalize import parse_annual_financials
 from src.analysis.price_quality import PRICE_TOLERANCE
@@ -130,7 +132,10 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
     def retrieve(kind, url):
         if kind == "price_check" and primary:
             main = primary[0].get("price_provider","Yahoo")
-            candidates = [("Yahoo",fetch_daily_prices),("Vietcap",fetch_vietcap_prices)] if main=="KBS" else [("KBS",fetch_kbs_prices),("Yahoo",fetch_daily_prices)] if main=="Vietcap" else [("KBS",fetch_kbs_prices),("Vietcap",fetch_vietcap_prices)]
+            family = price_source_family(main)
+            candidates = [("Yahoo",fetch_daily_prices),("Vietcap",fetch_vietcap_prices)] if family=="KBS" else [("KBS",fetch_kbs_prices),("Yahoo",fetch_daily_prices)] if family=="Vietcap" else [("KBS",fetch_kbs_prices),("Vietcap",fetch_vietcap_prices)]
+            candidates += [("Vnstock-KBS",fetch_vnstock_kbs_prices),("Vnstock-VCI",fetch_vnstock_vci_prices)]
+            candidates = [(provider,fetch) for provider,fetch in candidates if price_source_family(provider) != family]
             attempts=[];best=None
             for provider, fetch in candidates:
                 try:
@@ -140,14 +145,17 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
                     valid=validate_prices(response["rows"],ticker,cutoff-timedelta(days=45),cutoff)
                     if not valid["valid"]:raise DataSourceError(f"{provider} quote validation failed: {valid['errors'][:3]}")
                     data={"symbol":ticker,"data_day":[{"t":r["date"],"c":r["close"]} for r in response["rows"]],
-                          "_reference_provider":provider,"_request_payload":response.get("request_payload",{})}
+                          "_reference_provider":provider,"_reference_upstream":price_source_family(provider),
+                          "_snapshot_kind":response.get("snapshot_kind","raw_http"),
+                          "_library_version":response.get("library_version"),
+                          "_request_payload":response.get("request_payload",{})}
                     check=compare_prices(primary,data,cutoff)
-                    attempts.append({"provider":provider,"latest_match":check["latest_match"],"matched_count":check["matched_count"],
+                    attempts.append({"provider":provider,"upstream_source":price_source_family(provider),"latest_match":check["latest_match"],"matched_count":check["matched_count"],
                                      "raw_file":str(raw_file.relative_to(root)),"request_payload":response.get("request_payload",{})})
                     best=(kind,response["url"],response["raw"],data)
                     if check["latest_match"]:break
                 except (DataSourceError,ValueError,TypeError) as exc:
-                    attempts.append({"provider":provider,"error":str(exc)})
+                    attempts.append({"provider":provider,"upstream_source":price_source_family(provider),"error":str(exc)})
             if best:
                 best[3]["_attempts"]=attempts
                 return best
@@ -165,7 +173,7 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
                 (folder / f"{run_id}_{kind}.json").write_bytes(raw)
                 result["sources"].append({"source_id": source_id, "url_or_file": url,
                     "retrieved_at": datetime.now(VN_TIME).isoformat(), "page_or_table": kind,
-                    "notes": "Financial monetary values requested in thousand VND; EPS in VND/share" if kind in {"income", "balance", "cashflow"} else "Public source snapshot; request="+str(data.get("_request_payload",{})) if isinstance(data,dict) else "Public source snapshot"})
+                    "notes": "Financial monetary values requested in thousand VND; EPS in VND/share" if kind in {"income", "balance", "cashflow"} else "Public source snapshot; upstream="+str(data.get("_reference_upstream","KBS"))+"; kind="+str(data.get("_snapshot_kind","raw_http"))+"; library="+str(data.get("_library_version"))+"; request="+str(data.get("_request_payload",{})) if isinstance(data,dict) else "Public source snapshot"})
                 if kind in {"income", "balance", "cashflow"}:
                     parsed = parse_annual_financials(data, kind, as_of, source_id,result["warnings"])
                     result["financial_records"].extend({**period, "kind": kind} for period in parsed)
@@ -182,10 +190,12 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
                     check=compare_prices(primary, data, cutoff)
                     check["primary_provider"] = primary[0].get("price_provider","Yahoo") if primary else "Yahoo"
                     check["reference_provider"] = data.get("_reference_provider","KBS")
+                    check["primary_upstream"] = price_source_family(check["primary_provider"])
+                    check["reference_upstream"] = price_source_family(check["reference_provider"])
                     check["attempts"] = data.get("_attempts",[])
                     for c in check["checks"]:
                         c["primary_close"]=c["yahoo_close"];c["reference_close"]=c["kbs_close"]
-                        if check["primary_provider"]=="KBS": c["yahoo_close"],c["kbs_close"]=c["kbs_close"],c["yahoo_close"]
+                        if check["primary_upstream"]=="KBS": c["yahoo_close"],c["kbs_close"]=c["kbs_close"],c["yahoo_close"]
                     result["quote_check"] = {**check, "source_id": source_id}
                 elif kind == "news":
                     result["news"].extend(parse_company_news(data,ticker,source_id,as_of))

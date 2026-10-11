@@ -26,6 +26,9 @@ class AutomaticPipelineTests(unittest.TestCase):
         fallback.start();self.addCleanup(fallback.stop)
         vci=patch("src.data.acquisition.fetch_vietcap_prices",side_effect=DataSourceError("Fixture Vietcap offline"))
         vci.start();self.addCleanup(vci.stop)
+        for name in ("fetch_vnstock_kbs_prices", "fetch_vnstock_vci_prices"):
+            sdk=patch("src.data.acquisition."+name,side_effect=DataSourceError("Fixture vnstock offline"))
+            sdk.start();self.addCleanup(sdk.stop)
         mock=patch("src.pipeline.collect_research",return_value={"company":{},"financial_records":[],"news":[],"quote_check":{"status":"unverified"},"sources":[],"errors":[],"warnings":[]})
         mock.start()
         self.addCleanup(mock.stop)
