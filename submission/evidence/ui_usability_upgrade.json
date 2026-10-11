@@ -1,0 +1,46 @@
+{
+  "preview": {
+    "collapsed_articles": 3,
+    "expanded_articles": 6,
+    "collapse_ok": true
+  },
+  "results": [
+    {
+      "ticker": "VNM",
+      "no_exception": true,
+      "no_json_ui": true,
+      "company_news_count": 12,
+      "news_toggle_ok": true,
+      "industry_scope_toggle_ok": true,
+      "analysis_calls_after_news_clicks": 1,
+      "sample_labels_vietnamese": true,
+      "new_analysis_collapses_news": true
+    },
+    {
+      "ticker": "SHS",
+      "no_exception": true,
+      "no_json_ui": true,
+      "company_news_count": 12,
+      "news_toggle_ok": true,
+      "industry_scope_toggle_ok": true,
+      "analysis_calls_after_news_clicks": 1,
+      "sample_labels_vietnamese": true,
+      "new_analysis_collapses_news": true
+    },
+    {
+      "ticker": "REE",
+      "no_exception": true,
+      "no_json_ui": true,
+      "company_news_count": 12,
+      "news_toggle_ok": true,
+      "industry_scope_toggle_ok": true,
+      "analysis_calls_after_news_clicks": 1,
+      "sample_labels_vietnamese": true,
+      "new_analysis_collapses_news": true
+    }
+  ],
+  "empty_news": {
+    "no_articles": true,
+    "no_expand_button": true
+  }
+}

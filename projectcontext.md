@@ -1,5 +1,7 @@
 # Project context — StockInsight
 
+Cập nhật giao diện 11/10/2026: một nhóm tab phân tích, khuyến nghị và định giá ở đầu; mẫu so sánh/lý do loại bằng tiếng Việt thay JSON. Tin tức mặc định 3 bài, nút mở toàn bộ/thu gọn, thao tác không chạy lại phân tích. Chi tiết `docs/ui_usability_upgrade.md`.
+
 Cập nhật 09/10/2026. Mục tiêu: ứng dụng nhận mã cổ phiếu và nhu cầu nội dung, tự lấy dữ liệu, phân tích cơ hội/rủi ro, tạo báo cáo PDF tiếng Việt có nguồn và phương pháp rõ ràng.
 
 ## Yêu cầu và phạm vi

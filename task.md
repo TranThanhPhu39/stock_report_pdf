@@ -4,6 +4,8 @@ Cập nhật 09/10/2026. Các yêu cầu chính đã có luồng chạy thực; 
 
 ## Đã hoàn thành
 
+- [x] Sửa UX web: bỏ JSON mẫu ngành, thêm bảng lý do loại bằng tiếng Việt, thống nhất tab, đưa khuyến nghị lên đầu; tin mặc định 3 bài với nút mở/thu gọn. AppTest SHS/VNM/REE, màn hình ban đầu và nguồn không có tin đạt; chưa kiểm tra trực quan bằng trình duyệt trong phiên này.
+
 - [x] Đọc đề PDF và đề xuất, phân biệt yêu cầu người dùng với nội dung tài liệu.
 - [x] Tạo cây thư mục, context/task và repository GitHub.
 - [x] UI nhận mã, khoảng ngày, ngày phân tích, mức chi tiết, phần PDF, P/B giả định.

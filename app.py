@@ -28,17 +28,97 @@ def fetch_news_preview(ticker: str, as_of: date) -> list[dict]:
 
 def show_research_notes(result,section):
     for item in result.get("research_narrative",{}).get(section,[]):
-        with st.expander(item["title"],expanded=True):
+        with st.expander(item["title"]):
             st.write(item["evidence"]);st.write(item["interpretation"])
             st.caption("Theo dõi: "+item["monitor"])
             st.caption("Kỳ/ngày nguồn "+item["period"]+" · "+", ".join(item["source_ids"]))
+
+
+def readable_reason(message):
+    """Explain source failures without exposing transport errors in the main UI."""
+    text=str(message or "")
+    lowered=text.lower()
+    if any(word in lowered for word in ("timeout", "timed out")):
+        return "Nguồn dữ liệu phản hồi quá chậm. Có thể thử lại sau."
+    if "404" in lowered:
+        return "Nguồn này chưa cung cấp dữ liệu cho mã hoặc kỳ đang chọn."
+    if any(word in lowered for word in ("403", "429", "rate limit")):
+        return "Nguồn đang giới hạn truy cập. Có thể thử lại sau."
+    if any(word in lowered for word in ("unable to retrieve", "connection", "getaddrinfo", "http error", "json", "ssl")):
+        return "Chưa tải hoặc đọc được dữ liệu từ nguồn."
+    return text or "Chưa đủ dữ liệu để đưa vào mẫu so sánh."
+
+
+def show_news(items, *, key, title="Tin tức tài chính"):
+    digest=build_news_digest(items,limit=max(3,len(items)))
+    articles=[item for group in digest["groups"] for item in group["articles"]]
+    expanded=st.session_state.get(key,False)
+    visible=articles if expanded else articles[:3]
+    st.subheader(title)
+    if not articles:
+        st.info("Chưa có tin phù hợp từ nguồn cho phạm vi này.")
+        return
+    st.caption(f"Hiển thị {len(visible)}/{len(articles)} tin · Mới nhất trước · Bấm tiêu đề để đọc bài gốc")
+    rows=[]
+    for item in visible:
+        headline=html.escape(item["title"])
+        if item.get("news_scope")=="industry_peer" and item.get("ticker"):
+            headline=html.escape(item["ticker"])+" · "+headline
+        url=item.get("url","")
+        if url.startswith(("https://","http://")):
+            headline=f'<a href="{html.escape(url,quote=True)}" target="_blank" rel="noopener noreferrer">{headline}</a>'
+        day=date.fromisoformat(item["published_at"]).strftime("%d/%m/%Y")
+        excerpt=html.escape(item.get("summary") or "Nguồn chỉ cung cấp tiêu đề. Mở bài gốc để đọc nội dung.")
+        rows.append(f'<article class="news-digest__article"><div class="news-digest__source">{day}</div>'
+                    f'<div>{headline}</div><p class="news-digest__excerpt">{excerpt}</p></article>')
+    st.markdown('<section class="news-digest">'+"".join(rows)+'</section>',unsafe_allow_html=True)
+    if len(articles)>3:
+        label="Thu gọn còn 3 tin" if expanded else f"Xem tất cả {len(articles)} tin"
+        if st.button(label,key=key+"_button"):
+            st.session_state[key]=not expanded
+            st.rerun()
+    st.caption("Trích yếu theo nguồn tin; tiêu đề không đủ để kết luận tác động đến giá cổ phiếu.")
+
+
+def show_industry_sample(industry):
+    coverage=industry.get("coverage") or {}
+    selected=[peer["ticker"] for peer in industry.get("peers",[])]
+    excluded=industry.get("excluded") or []
+    eligible=industry.get("eligible_candidates")
+    cols=st.columns(3)
+    cols[0].metric("Doanh nghiệp cùng nhóm",len(industry.get("members",[])))
+    cols[1].metric("Đủ điều kiện xét chọn",eligible if eligible is not None else "Chưa xác định")
+    cols[2].metric("Đã chọn để so sánh",len(selected))
+    st.write("**Mã trong mẫu:** "+(", ".join(selected) or "Chưa có mã đủ điều kiện."))
+    scope={"consolidated":"Hợp nhất","separate":"Riêng lẻ","standalone":"Riêng lẻ","parent":"Công ty mẹ"}.get(industry.get("scope"),"Chưa xác định")
+    st.caption(f"Ngày cuối kỳ: {industry.get('period_end') or 'Chưa xác định'} · Báo cáo: {scope}")
+    st.caption("Mẫu được chọn trong các doanh nghiệp đủ dữ liệu cùng kỳ và phạm vi báo cáo. Mã đủ điều kiện có thể không được chọn vì giới hạn tối đa 4 doanh nghiệp; không đồng nghĩa bị loại do dữ liệu lỗi.")
+    if excluded:
+        st.write(f"**{len(excluded)} mã chưa đủ điều kiện dữ liệu**")
+        st.dataframe(pd.DataFrame([{"Mã cổ phiếu":row.get("ticker","—"),"Lý do chưa đưa vào mẫu":readable_reason(row.get("reason"))} for row in excluded]),hide_index=True,width="stretch")
+    else:
+        st.caption("Không ghi nhận mã bị loại do thiếu dữ liệu trong lần xét chọn này.")
+    if coverage:
+        complete=coverage.get("classification_complete")
+        status="Đã tải đủ danh mục của nguồn" if complete else "Danh mục phân ngành tải được một phần" if complete is False else "Chưa xác định độ đầy đủ của danh mục"
+        st.caption(f"Nguồn phân ngành bao phủ {coverage.get('symbols',0)} mã trong {coverage.get('groups',0)} nhóm · {status}. Đây là phạm vi của nguồn, không phải số mã trong mẫu so sánh.")
+
+
+def show_valuation_table(rows):
+    labels={"method":"Phương pháp","label":"Kịch bản","multiple":"Bội số (lần)",
+            "target_price_vnd":"Giá trị / CP (VND)","reference_price_vnd":"Giá trị / CP (VND)",
+            "difference_pct":"Chênh với giá (%)","target_pe":"P/E giả định (lần)",
+            "target_pb":"P/B giả định (lần)","weight_pct":"Trọng số (%)","contribution_vnd":"Đóng góp / CP (VND)"}
+    frame=pd.DataFrame(rows)
+    columns=[column for column in labels if column in frame.columns]
+    st.dataframe(frame[columns].rename(columns=labels),hide_index=True,width="stretch")
 
 
 st.set_page_config(page_title="StockInsight",layout="wide",initial_sidebar_state="collapsed")
 st.markdown("""
 <style>
 :root { --ink:#173532; --ink-soft:#37544e; --jade:#087e72; --brass:#c7a96b; --paper:#eef4f1; --line:#d9e4df; }
-.stApp { background-color:var(--paper); background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(23,53,50,.022) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(23,53,50,.022) 40px); }
+.stApp { background-color:var(--paper); }
 [data-testid="stHeader"] { background:transparent; }
 .block-container { max-width:1320px; padding-top:1.6rem; padding-bottom:4rem; }
 .masthead { position:relative; overflow:hidden; padding:23px 32px 21px; margin:0 0 26px; color:var(--ink); background:rgba(255,255,255,.64); border:1px solid rgba(255,255,255,.95); border-top:2px solid var(--brass); border-radius:4px; box-shadow:0 14px 38px rgba(34,67,61,.08); backdrop-filter:blur(18px); }
@@ -85,12 +165,18 @@ st.markdown("""
 [data-testid="stMetric"] { background:rgba(255,255,255,.88); border:1px solid var(--line); border-top:2px solid var(--jade); padding:16px 18px; }
 [data-testid="stMetricLabel"] { color:#536963; }
 [data-testid="stMetricValue"] { color:var(--ink); }
+[data-baseweb="tab-list"] { flex-wrap:wrap; gap:6px; margin:18px 0; }
+[data-baseweb="tab"] { padding:10px 14px; height:auto; border-radius:6px; font-weight:600; }
+[data-baseweb="tab"][aria-selected="true"] { background:#dbeee6; color:#066b60; }
+[data-baseweb="tab-highlight"], [data-baseweb="tab-border"] { display:none; }
+[data-testid="stExpander"] { background:rgba(255,255,255,.65); border-radius:8px; }
+[data-testid="stButton"] button { min-height:42px; }
 @media(max-width:700px) { .block-container{padding:1rem 1rem 3rem}.masthead{padding:20px 19px;margin-bottom:20px}.masthead__eyebrow,.masthead__footer{align-items:flex-start;flex-direction:column;gap:6px}.masthead__title{font-size:42px}.step-heading__title{font-size:18px}.brief-panel{margin-top:10px;padding:23px 20px}.brief-ticker{font-size:42px}.news-digest{padding:19px 17px}.news-digest__item{align-items:flex-start;flex-direction:column;gap:4px}.news-digest__date{flex:auto} }
 </style>
 """,unsafe_allow_html=True)
 st.markdown(f"""
 <header class="masthead">
-    <div class="masthead__eyebrow"><strong>VIETNAM EQUITY RESEARCH</strong><span>RESEARCH DESK · 01</span></div>
+    <div class="masthead__eyebrow"><strong>PHÂN TÍCH CỔ PHIẾU VIỆT NAM</strong><span>Dữ liệu cuối ngày · Báo cáo PDF</span></div>
     <div class="masthead__title">StockInsight</div>
     <div class="masthead__footer"><span>BÁO CÁO CƠ HỘI ĐẦU TƯ CỔ PHIẾU</span><span>Ngày báo cáo · {today.strftime('%d/%m/%Y')}</span></div>
 </header>
@@ -111,9 +197,9 @@ with request_column:
         for index,(section,label) in enumerate(SECTION_LABELS.items()):
             if section_cols[index%len(section_cols)].checkbox(label,value=True,key=f"pdf_section_{section}"):
                 sections.append(section)
-    with st.expander("Tuỳ chọn nâng cao"):
+    with st.expander("Giả định định giá cá nhân (không bắt buộc)"):
+        st.caption("Chỉ dùng để thử các kịch bản trong phụ lục. Bạn có thể giữ nguyên để dùng định giá chính từ mẫu doanh nghiệp so sánh.")
         target_pb=st.number_input("P/B cơ sở giả định",min_value=0.1,max_value=20.0,value=1.5,step=0.1,help="Chỉ dùng trong phụ lục độ nhạy; không thay đổi định giá chính hoặc khuyến nghị.")
-    with st.expander("Giả định định giá: P/E, Gordon và DCF"):
         vc=st.columns(3)
         target_pe=vc[0].number_input("P/E năm giả định",min_value=.1,max_value=100.,value=12.,step=.5)
         cost_of_equity=vc[1].number_input("Chi phí vốn chủ Ke (%)",min_value=.1,max_value=99.,value=11.5,step=.5)/100
@@ -139,7 +225,7 @@ with brief_column:
     mode_label="Đầy đủ" if mode=="Đầy đủ" else "Tóm tắt"
     st.markdown(f"""
     <aside class="brief-panel">
-    <div class="brief-kicker"><span class="brief-pip"></span>REPORT BRIEF · PREVIEW</div>
+    <div class="brief-kicker"><span class="brief-pip"></span>BÁO CÁO BẠN SẮP TẠO</div>
       <div class="brief-ticker">{html.escape(ticker.strip().upper() or "—")}</div>
       <div class="brief-company">Báo cáo cơ hội đầu tư · Việt Nam</div>
       <div class="brief-period">
@@ -156,6 +242,8 @@ current_signature=(ticker.strip().upper(),start.isoformat(),as_of.isoformat(),mo
 if submitted:
     st.session_state.pop("analysis_result",None)
     st.session_state.pop("report_path",None)
+    for news_scope in ("company","industry"):
+        st.session_state.pop(f"news_expanded_{ticker.strip().upper()}_{as_of.isoformat()}_{news_scope}",None)
     if not sections:
         st.error("Hãy chọn ít nhất một nội dung cho báo cáo PDF.")
     else:
@@ -184,79 +272,51 @@ if result:
     if st.session_state.get("report_path"):
         path=Path(st.session_state["report_path"])
         st.download_button("Tải báo cáo phân tích PDF",path.read_bytes(),file_name=path.name,mime="application/pdf",type="primary")
-    news_items=result.get("news",[])
-    company_news=[item for item in news_items if item.get("news_scope","company")=="company"]
-    peer_news=[item for item in news_items if item.get("news_scope")=="industry_peer"]
-    selected_news=company_news
-    if peer_news:
-        company_label=f"Mã {request['ticker']} ({len(company_news)})"
-        sector_name=result.get("industry",{}).get("name") or "cùng ngành"
-        peer_label=f"Mẫu {sector_name} ({len(peer_news)})"
-        news_scope=st.radio("Phạm vi tin",[company_label,peer_label],horizontal=True,
-                            key=f"news_scope_{request['ticker']}",label_visibility="collapsed")
-        if news_scope==peer_label:
-            selected_news=peer_news
-    digest=build_news_digest(selected_news)
-    news_groups=[]
-    for group in digest["groups"]:
-        article_rows=[]
-        for item in group["articles"]:
-            title=html.escape(item["title"])
-            if item.get("news_scope")=="industry_peer" and item.get("ticker"):
-                title=f"{html.escape(item['ticker'])} · {title}"
-            url=item.get("url","")
-            if url.startswith(("https://","http://")):
-                title_markup=f'<a href="{html.escape(url,quote=True)}" target="_blank" rel="noopener noreferrer">{title}</a>'
-            else:
-                title_markup=title
-            excerpt=html.escape(item.get("summary") or "Feed chưa cung cấp trích yếu cho tin này.")
-            source_label="TRÍCH YẾU KBS" if item.get("summary") else "CHỈ CÓ TIÊU ĐỀ"
-            if item.get("news_scope")=="industry_peer":
-                source_label=f"TIN PEER · {source_label}"
-            article_rows.append(
-                f'<article class="news-digest__article"><div>{title_markup}</div>'
-                f'<p class="news-digest__excerpt">{excerpt}</p>'
-                f'<div class="news-digest__source">{source_label}</div></article>'
-            )
-        group_date=html.escape(group["date"])
-        news_groups.append(
-            f'<div class="news-digest__group"><div class="news-digest__day">'
-            f'<span>{group_date}</span><span>{len(group["articles"])} tin</span></div>'
-            f'{"".join(article_rows)}</div>'
-        )
-    news_markup="".join(news_groups) or '<div class="news-digest__item">Chưa có tin phù hợp trong dữ liệu nguồn.</div>'
-    st.markdown(f"""
-    <section class="news-digest">
-    <div class="news-digest__kicker">TIN TỨC DOANH NGHIỆP · NHÓM THEO NGÀY</div>
-      <h3 class="news-digest__title">Tổng hợp tin tức tài chính</h3>
-      <p class="news-digest__summary">{html.escape(digest["summary"])}</p>
-      {news_markup}
-    <div class="news-digest__note">Trích yếu lấy từ feed KBS khi có; mở tiêu đề để đọc bài gốc. Đây không phải đánh giá tác động giá.</div>
-    </section>
-    """,unsafe_allow_html=True)
-    for error in result["errors"]:st.warning(f"Dữ liệu chưa đủ ({error['stage']}): {error['message']}")
-    for warning in acquisition.get("warnings",[]):st.warning(warning)
+    recommendation=result.get("recommendation",{})
+    primary=result.get("valuation",{}).get("primary",{})
+    with st.container(border=True):
+        st.subheader(recommendation.get("stance","Kết quả phân tích"))
+        st.write(recommendation.get("reason","Xem các mục bên dưới để đánh giá dữ liệu và cơ hội đầu tư."))
+        summary_cols=st.columns(3)
+        summary_cols[0].metric("Giá đóng cửa",formatted(result.get("market",{}).get("latest_close_vnd") if result.get("market") else None,"VND/share"))
+        summary_cols[1].metric("Giá tham chiếu định giá",formatted(primary.get("target_price_vnd") if primary.get("available") else None,"VND/share"))
+        summary_cols[2].metric("Chênh lệch so với giá",formatted(primary.get("upside_pct") if primary.get("available") else None,"%"))
+        st.caption("Giá tham chiếu phụ thuộc phương pháp và dữ liệu đủ điều kiện; chênh lệch giá không đồng nghĩa với khuyến nghị mua.")
     ai=result.get("ai_commentary",{})
-    if request.get("use_ai") and not ai.get("available"):st.info(ai.get("reason","AI chưa có nhận xét hợp lệ."))
-    market=result.get("market")
-    if market:
-        cols=st.columns(4)
-        for col,label,key,unit in zip(cols,["Giá đóng cửa",market.get("return_label","Biến động khoảng chọn"),"Sụt giảm tối đa","MA20"],["latest_close_vnd","return_pct","max_drawdown_pct","ma20_vnd"],["VND/share","%","%","VND/share"]):
-            display="Không tính" if key!="latest_close_vnd" and not market.get("history_indicators_available",True) else formatted(market[key],unit)
-            col.metric(label,display)
-            if display=="Không tính":col.caption("Lịch sử chưa khớp")
-        price_check=result["quality"]["price_check"]
-        if latest_price_matches(price_check,market):st.success(f"Giá đóng cửa mới nhất {market['latest_close_vnd']:,.0f} VND ngày {market['latest_date']} đã khớp hai nguồn để đối chiếu định giá.")
-        else:st.warning("Giá đóng cửa mới nhất chưa khớp nguồn thứ hai đúng ngày; định giá bị chặn.")
-        if price_check["status"]=="matched":st.caption(f"Mẫu lịch sử: khớp {len(price_check['checks'])}/{price_check.get('expected_count',len(price_check['checks']))} phiên; không xác nhận toàn bộ lịch sử điều chỉnh.")
-        else:st.warning(f"Mẫu lịch sử chưa khớp đầy đủ: {price_check.get('matched_count',sum(c['match'] for c in price_check.get('checks',[])))}/{price_check.get('expected_count',20)} phiên khớp. Hạn chế MA, lợi suất, drawdown và biến động năm hóa; kiểm tra giá mới nhất được tách riêng.")
-        prices=pd.DataFrame(result["price_rows"])
-        chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),market["series_basis"]:market["chart_prices"]}).set_index("Ngày")
-        st.line_chart(chart)
-        st.caption(market.get("chart_note","Biểu đồ thể hiện giá đóng cửa từ nguồn."))
-        st.caption(market["return_note"])
-    context_tabs=st.tabs(["Tổng quan vĩ mô","Phân tích ngành"])
-    with context_tabs[0]:
+    if request.get("use_ai") and not ai.get("available"):
+        st.info(ai.get("reason","Gemini chưa có nhận xét hợp lệ; báo cáo vẫn dùng phân tích từ dữ liệu."))
+    issues=result.get("errors",[])
+    warnings=acquisition.get("warnings",[])
+    if issues or warnings:
+        with st.expander(f"Tình trạng thu thập dữ liệu · {len(issues)+len(warnings)} lưu ý"):
+            st.caption("Một nguồn không truy cập được có thể đã được thay bằng nguồn dự phòng. Xem điều kiện sử dụng dữ liệu trong từng mục phân tích.")
+            stages={"prices":"Giá giao dịch","financial":"Tài chính","news":"Tin tức","industry_peers":"Mẫu so sánh ngành","industry_classification":"Phân ngành","macro":"Vĩ mô"}
+            for error in issues:
+                st.write(stages.get(error.get("stage"),"Nguồn dữ liệu")+": "+readable_reason(error.get("message")))
+            for warning in warnings:st.write(warning)
+    st.caption("Chọn mục để xem chi tiết. Tin tức mặc định hiển thị 3 bài; giả định cá nhân nằm trong mục Định giá.")
+    tabs=st.tabs(["Tổng quan","Vĩ mô","Ngành","Tài chính","Định giá","Cơ hội và rủi ro","Tin tức","Nguồn dữ liệu"])
+    with tabs[0]:
+        market=result.get("market")
+        if market:
+            cols=st.columns(4)
+            for col,label,key,unit in zip(cols,["Giá đóng cửa",market.get("return_label","Biến động khoảng chọn"),"Sụt giảm tối đa","MA20"],["latest_close_vnd","return_pct","max_drawdown_pct","ma20_vnd"],["VND/share","%","%","VND/share"]):
+                display="Không tính" if key!="latest_close_vnd" and not market.get("history_indicators_available",True) else formatted(market[key],unit)
+                col.metric(label,display)
+                if display=="Không tính":col.caption("Lịch sử chưa khớp")
+            price_check=result["quality"]["price_check"]
+            if latest_price_matches(price_check,market):st.success(f"Giá đóng cửa mới nhất {market['latest_close_vnd']:,.0f} VND ngày {market['latest_date']} đã khớp hai nguồn để đối chiếu định giá.")
+            else:st.warning("Giá đóng cửa mới nhất chưa khớp nguồn thứ hai đúng ngày; định giá bị chặn.")
+            if price_check["status"]=="matched":st.caption(f"Mẫu lịch sử: khớp {len(price_check['checks'])}/{price_check.get('expected_count',len(price_check['checks']))} phiên; không xác nhận toàn bộ lịch sử điều chỉnh.")
+            else:st.warning(f"Mẫu lịch sử chưa khớp đầy đủ: {price_check.get('matched_count',sum(c['match'] for c in price_check.get('checks',[])))}/{price_check.get('expected_count',20)} phiên khớp. Hạn chế MA, lợi suất, drawdown và biến động năm hóa; kiểm tra giá mới nhất được tách riêng.")
+            prices=pd.DataFrame(result["price_rows"])
+            chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),market["series_basis"]:market["chart_prices"]}).set_index("Ngày")
+            st.line_chart(chart)
+            st.caption(market.get("chart_note","Biểu đồ thể hiện giá đóng cửa từ nguồn."))
+            st.caption(market["return_note"])
+        else:
+            st.info("Chưa có chuỗi giá hợp lệ. Bạn vẫn có thể xem dữ liệu tài chính và các phần phân tích đã thu thập được.")
+    with tabs[1]:
         macro=result.get("macro",{})
         rows=macro.get("indicators",[])
         if rows:
@@ -267,8 +327,11 @@ if result:
         show_research_notes(result,"macro")
         with st.expander("Phạm vi nguồn tin và thị trường"):
             st.caption(result.get("context_news",{}).get("note",""))
-            st.json({"news_errors":result.get("context_news",{}).get("errors",[]),"market_context_errors":result.get("market_context",{}).get("errors",[])})
-    with context_tabs[1]:
+            context_errors=result.get("context_news",{}).get("errors",[])+result.get("market_context",{}).get("errors",[])
+            if context_errors:
+                for error in context_errors:st.write(readable_reason(error.get("message") if isinstance(error,dict) else error))
+            else:st.caption("Không ghi nhận lỗi tải tin vĩ mô/ngành hoặc dữ liệu thị trường trong lần phân tích này.")
+    with tabs[2]:
         industry=result.get("industry",{})
         if industry.get("available"):
             st.write(f"**{industry['name']}** · {industry.get('taxonomy','KBS')}")
@@ -281,12 +344,12 @@ if result:
             for driver in industry.get("drivers",[]):
                 row=driver["indicator"];st.write(f"• {row['label']}: {row['value']:.2f}% ({row['period']}). "+driver["channel"])
             for risk in industry.get("structural_risks",[]):st.caption(risk)
-            with st.expander("Phạm vi mẫu và mã bị loại"):
-                st.json({"coverage":industry.get("coverage"),"excluded":industry.get("excluded"),"eligible_candidates":industry.get("eligible_candidates")})
+            with st.expander("Mẫu so sánh: mã được chọn và lý do loại"):
+                show_industry_sample(industry)
+            st.caption("Trung vị là giá trị ở giữa các doanh nghiệp trong mẫu; không phải bình quân của toàn bộ ngành.")
         else:st.warning("Nguồn chưa xác nhận phân ngành của mã này; không tự gán ngành.")
         show_research_notes(result,"industry")
-    tabs=st.tabs(["Tài chính","Định giá đa phương pháp","Cơ hội và rủi ro","Tin tức","Nguồn dữ liệu"])
-    with tabs[0]:
+    with tabs[3]:
         diagnostics=result.get("financial_data_status",{})
         for message in diagnostics.get("messages",[]):st.caption(message)
         if result["financial"]["metrics"]:
@@ -299,7 +362,7 @@ if result:
             st.dataframe(pd.DataFrame([{"Chỉ tiêu":label,"Hiện tại":formatted(interim["fields"][key]["value"],"VND"),"6 tháng cùng kỳ":formatted(interim["fields"][key]["previous"],"VND"),"Trang PDF":interim["fields"][key]["page"]} for key,label in [("revenue","Doanh thu thuần"),("net_profit","LNST"),("cfo","Dòng tiền kinh doanh")]]),hide_index=True,width="stretch")
         vnf=result.get("vnfinancialdata",{})
         if vnf:
-            with st.expander("BCTC bổ sung: vnfinancialdata",expanded=True):
+            with st.expander("Báo cáo tài chính bổ sung từ vnfinancialdata"):
                 st.caption(vnf.get("reason",""))
                 if vnf.get("available"):
                     st.write(f"{vnf['row_count']:,} dòng chỉ tiêu · Năm {min(vnf['years'])}–{max(vnf['years'])} · Dataset {vnf['dataset']['revision']}")
@@ -308,7 +371,7 @@ if result:
                     if csv_path.exists():
                         raw_frame=pd.read_csv(csv_path)
                         year=st.selectbox("Năm BCTC vnfinancialdata",sorted(vnf["years"],reverse=True),key="vnf_year")
-                        st.dataframe(raw_frame[raw_frame.year.eq(year)][["statement","item_code","item_name","value","source_file","source_sheet"]],hide_index=True,width="stretch")
+                        st.dataframe(raw_frame[raw_frame.year.eq(year)][["statement","item_name","value"]].rename(columns={"statement":"Bảng báo cáo","item_name":"Chỉ tiêu","value":"Giá trị gốc"}),hide_index=True,width="stretch")
                         st.download_button("Tải toàn bộ BCTC vnfinancialdata CSV",csv_path.read_bytes(),file_name=f"{request['ticker']}_vnfinancialdata.csv",mime="text/csv")
                     checks=vnf.get("checks",[])
                     if checks:
@@ -317,7 +380,7 @@ if result:
                         st.dataframe(pd.DataFrame([{"Chỉ tiêu":c["label"],"Nguồn chính (VND)":c["primary_vnd"],"vnfinancialdata (VND)":c["reference_vnd"],"Kết quả":"Khác quy ước dấu" if c.get("status")=="different_sign_convention" else "Khớp giá trị" if c["match"] else "Lệch","Ghi chú":c.get("note","")} for c in checks if c["year"]==latest]),hide_index=True,width="stretch")
                 for error in vnf.get("errors",[]):st.warning(error["message"])
         reference=result.get("reference",{})
-        with st.expander("Nguồn bổ sung: Parquet và báo cáo thường niên",expanded=True):
+        with st.expander("Dữ liệu tham khảo và báo cáo thường niên gốc"):
             st.caption("Giá trị Parquet là giá trị gốc; đơn vị, phạm vi và ngày công bố chưa được chứng nhận. Không dùng để tự thay tài chính/định giá chính.")
             reference_rows=[{"Năm":record["year"],"Chỉ tiêu":field["source_label"],"Giá trị gốc":field["value"],"Đơn vị":"Chưa xác minh","Phạm vi":record["scope"],"Nguồn":field["source_id"],"Mã chỉ tiêu":field["source_field"],"File gốc":field["source_file"],"Sheet gốc":field["source_sheet"]} for record in reference.get("records",[]) for field in record["fields"].values()]
             if reference_rows:
@@ -337,7 +400,7 @@ if result:
                     if report["inspection"]["status"]!="text_available":st.caption("Báo cáo chứa nhiều trang scan; cần OCR thêm trước khi tự trích/kiểm chứng số liệu.")
             for error in reference.get("errors",[]):st.warning(error["message"])
             if not reference.get("available"):st.info("Chưa có dữ liệu bổ sung đủ điều kiện theo phiên bản nguồn/ngày phân tích/sàn.")
-    with tabs[1]:
+    with tabs[4]:
         val=result["valuation"];primary=val.get("primary",{});benchmark=val.get("benchmark",{})
         st.subheader("Định giá chính từ dữ liệu so sánh")
         if primary.get("available"):
@@ -358,7 +421,7 @@ if result:
             st.write(sotp.get("reason","Chưa có dữ liệu từng mảng có nguồn."))
             if sotp.get("available"):
                 st.caption(f"Mô hình {sotp.get('provider')}; ngày {sotp['published_at']}; CP theo báo cáo nguồn.")
-                st.dataframe(pd.DataFrame(sotp["components"]),hide_index=True,width="stretch")
+                st.dataframe(pd.DataFrame([{"Mảng kinh doanh":part["label"],"Giá trị (VND)":part["value_vnd"],"Phương pháp":part["method"],"Trang nguồn":part.get("page")} for part in sotp["components"]]),hide_index=True,width="stretch")
                 st.metric("Giá SOTP tính lại theo báo cáo nguồn",formatted(sotp["target_price_vnd"],"VND/share"))
                 st.caption(sotp["basis"])
         with st.expander("Phụ lục: giả định cá nhân và kiểm tra độ nhạy",expanded=False):
@@ -366,21 +429,21 @@ if result:
             if val["available"]:
                 if val.get("price_warning"):st.warning(val["price_warning"])
                 if val.get("book_value_per_share") is not None:st.caption(f"BVPS mẹ {formatted(val['book_value_per_share'],'VND/share')} · P/B tham chiếu {val['reference_pb']:.2f} lần")
-                if val.get("pb_methods"):st.dataframe(pd.DataFrame(val["pb_methods"]),hide_index=True,width="stretch")
+                if val.get("pb_methods"):show_valuation_table(val["pb_methods"])
                 if val.get("scenarios"):st.dataframe(pd.DataFrame([{"Kịch bản":s["label"],"P/B giả định":s["target_pb"],"Giá trị quy đổi":formatted(s["reference_price_vnd"],"VND/share"),"Chênh lệch":formatted(s["difference_pct"],"%")} for s in val["scenarios"]]),hide_index=True,width="stretch")
                 for method,label in [("gordon","P/B Gordon"),("industry","P/B mẫu ngành"),("pe","P/E lợi nhuận năm quy đổi"),("dcf","DCF FCFF"),("weighted_average","Bình quân trọng số")]:
                     data=val.get(method,{})
                     with st.expander(label,expanded=bool(data.get("available"))):
                         if data.get("available"):
-                            if data.get("scenarios"):st.dataframe(pd.DataFrame(data["scenarios"]),hide_index=True,width="stretch")
-                            if data.get("components"):st.dataframe(pd.DataFrame(data["components"]),hide_index=True,width="stretch")
+                            if data.get("scenarios"):show_valuation_table(data["scenarios"])
+                            if data.get("components"):show_valuation_table(data["components"])
                             target=data.get("target_price_vnd",data.get("base_price_vnd",data.get("per_share_price_vnd")))
                             if target is not None:st.metric("Giá trị kịch bản / CP",formatted(target,"VND/share"))
                             st.caption(data.get("eps_basis") or data.get("explanation") or data.get("formula") or data.get("note", ""))
                         else:st.info(data.get("reason","Chưa đủ đầu vào."))
                 st.info(val["assumption"])
             else:st.info(val["reason"])
-    with tabs[2]:
+    with tabs[5]:
         recommendation=result.get("recommendation",{})
         if recommendation:
             st.subheader("Khuyến nghị nghiên cứu: "+recommendation["stance"])
@@ -415,48 +478,42 @@ if result:
                         detail="Bài công khai; ngày bài không thay kỳ của số liệu" if e.get("evidence_type")=="news_article" else f"{e.get('value',e.get('company_value'))} {e.get('unit','')}"
                         st.caption(f"{e['label']} · Kỳ {e['period']} · {detail}")
                     st.caption("Nguồn: "+", ".join(item["source_ids"])+f" · Chốt {ai['as_of']} · {ai['model']}")
-    with tabs[3]:
-        for item in result["news"]:st.markdown(f"{item['published_at']} · [{item['title']}]({item['url']})")
-        if not result["news"]:st.info("Chưa có tin phù hợp từ nguồn.")
-        st.caption("Danh sách công bố/sự kiện để tra cứu. Chưa suy diễn tác động từ tiêu đề tin.")
-    with tabs[4]:
+    with tabs[6]:
+        company_news=[item for item in result.get("news",[]) if item.get("news_scope","company")=="company"]
+        peer_news=[item for item in result.get("news",[]) if item.get("news_scope")=="industry_peer"]
+        selected_news=company_news
+        scope="company"
+        if peer_news:
+            chosen_scope=st.radio("Bạn muốn đọc tin về",["Doanh nghiệp đang phân tích","Các doanh nghiệp trong mẫu cùng ngành"],horizontal=True,key=f"news_scope_{request['ticker']}")
+            if chosen_scope=="Các doanh nghiệp trong mẫu cùng ngành":
+                selected_news=peer_news
+                scope="industry"
+        show_news(selected_news,key=f"news_expanded_{request['ticker']}_{request['as_of']}_{scope}")
+    with tabs[7]:
         st.write(result["quality"]["financial_check"]["note"])
         checks=result["quality"]["financial_check"]["checks"]
-        if checks:st.dataframe(pd.DataFrame(checks),hide_index=True,width="stretch")
+        if checks:
+            metric_labels={"net_profit":"Lợi nhuận sau thuế","revenue":"Doanh thu thuần","equity":"Vốn chủ sở hữu","assets":"Tổng tài sản"}
+            st.dataframe(pd.DataFrame([{"Chỉ tiêu":metric_labels.get(check["metric"],"Chỉ tiêu tài chính"),"Kỳ":check["period"],"Nguồn chính (tỷ VND)":check["actual_billion_vnd"],"Báo cáo đối chiếu (tỷ VND)":check["reference_billion_vnd"],"Kết quả":"Khớp" if check["match"] else "Chưa khớp","Vị trí trong báo cáo":check.get("locator","")} for check in checks]),hide_index=True,width="stretch")
         for warning in result["quality"]["warnings"]:st.caption(warning)
         for source in result["sources"]:
             st.markdown(f"[{source['source_id']}]({source.get('url_or_file','')})")
-        with st.expander("Công thức và đầu vào chỉ tiêu"):
-            st.json(result["financial"]["metrics"])
+        with st.expander("Cách tính các chỉ tiêu tài chính"):
+            for metric in result["financial"]["metrics"]:
+                st.write("**"+metric["label"]+":** "+formatted(metric.get("value"),metric["unit"]))
+                st.caption("Công thức: "+metric.get("formula","Chưa có")+" · Kỳ "+metric.get("period","Chưa có"))
+                if metric.get("reason"):st.caption(metric["reason"])
+                if metric.get("inputs"):
+                    st.dataframe(pd.DataFrame([{"Đầu vào":item.get("source_label","Chỉ tiêu nguồn"),"Giá trị":formatted(item.get("value"),item.get("unit","")),"Kỳ":item.get("period",""),"Ngày công bố":item.get("published_at","")} for item in metric["inputs"]]),hide_index=True,width="stretch")
+            if not result["financial"]["metrics"]:st.info("Chưa có chỉ tiêu đủ dữ liệu để trình bày công thức.")
         if acquisition["prices"]:
             st.download_button("Tải dữ liệu giá CSV",(ROOT/acquisition["prices"]["csv"]).read_bytes(),file_name=f"{request['ticker']}_prices.csv",mime="text/csv")
         for i,report in enumerate(acquisition["financial_documents"]):
             st.download_button("Tải PDF gốc: "+report["title"],(ROOT/report["file"]).read_bytes(),file_name=Path(report["file"]).name,mime="application/pdf",key=f"raw_pdf_{i}")
 else:
-    st.info("Không cần chuẩn bị CSV hoặc nhập số liệu tài chính. Bấm Phân tích để hệ thống tự lấy dữ liệu.")
+    st.info("Nhập mã cổ phiếu và bấm Phân tích và tạo PDF. Hệ thống tự lấy dữ liệu, bạn không cần chuẩn bị CSV.")
     try:
         preview_news=fetch_news_preview(ticker.strip().upper(),as_of)
-        preview_digest=build_news_digest(preview_news)
-        preview_rows=[]
-        for item in preview_digest["headlines"]:
-            title=html.escape(item["title"])
-            url=item.get("url","")
-            if url.startswith(("https://","http://")):
-                title=f'<a href="{html.escape(url,quote=True)}" target="_blank" rel="noopener noreferrer">{title}</a>'
-            excerpt=html.escape(item.get("summary") or "Nguồn chỉ cung cấp tiêu đề cho tin này.")
-            preview_rows.append(
-                f'<article class="news-digest__article"><div><span class="news-digest__date">{html.escape(item["published_at"])}</span> {title}</div>'
-                f'<p class="news-digest__excerpt">{excerpt}</p></article>'
-            )
-        preview_markup="".join(preview_rows) or '<div class="news-digest__item">KBS hiện chưa trả tin phù hợp cho mã này.</div>'
-        st.markdown(f"""
-        <section class="news-digest">
-          <div class="news-digest__kicker">KBS · TIN CỦA MÃ {html.escape(ticker.strip().upper())}</div>
-          <h3 class="news-digest__title">Tổng hợp tin tức tài chính</h3>
-          <p class="news-digest__summary">{html.escape(preview_digest["summary"])}</p>
-          {preview_markup}
-          <div class="news-digest__note">Tin được tải trực tiếp từ feed KBS và cache tối đa 5 phút. Sau khi phân tích, có thể chuyển sang tin từ mẫu peer cùng ngành.</div>
-        </section>
-        """,unsafe_allow_html=True)
+        show_news(preview_news,key=f"news_preview_expanded_{ticker.strip().upper()}_{as_of.isoformat()}",title=f"Tin mới về {ticker.strip().upper()}")
     except Exception:
-        st.warning("Chưa kết nối được feed tin của mã này. Thử lại sau hoặc bấm Phân tích để kiểm tra nguồn và lưu trạng thái.")
+        st.warning("Chưa kết nối được nguồn tin của mã này. Có thể thử lại sau hoặc tiếp tục phân tích với các nguồn dữ liệu khác.")
