@@ -60,8 +60,8 @@ class DataRegressionTests(unittest.TestCase):
             self.assertTrue((Path(d)/out["price_attempts"][0]["raw_file"]).exists())
             self.assertFalse(out["errors"]);self.assertGreater(out["prices"]["coverage"]["start_gap_days"],0)
     def test_all_providers_fail_keeps_prices_unavailable(self):
-        with TemporaryDirectory() as d,patch("src.data.acquisition.fetch_daily_prices",side_effect=DataSourceError("offline")),patch("src.data.acquisition.fetch_kbs_prices",side_effect=DataSourceError("offline")):
-            out=acquire("ACB",date(2025,1,1),NOW,Path(d));self.assertIsNone(out["prices"]);self.assertEqual(len(out["price_attempts"]),2)
+        with TemporaryDirectory() as d,patch("src.data.acquisition.fetch_daily_prices",side_effect=DataSourceError("offline")),patch("src.data.acquisition.fetch_kbs_prices",side_effect=DataSourceError("offline")),patch("src.data.acquisition.fetch_vietcap_prices",side_effect=DataSourceError("offline")):
+            out=acquire("ACB",date(2025,1,1),NOW,Path(d));self.assertIsNone(out["prices"]);self.assertEqual(len(out["price_attempts"]),3)
     def test_bank_cfo_alias_is_not_pre_working_capital_subtotal(self):
         p=payload();p["Content"]={"cashflow":[{"ReportNormID":4110,"Name":"CFO ngân hàng","Value1":28160074000},{"ReportNormID":4109,"Name":"Trước vốn lưu động","Value1":18097000000}]}
         parsed=parse_annual_financials(p,"cashflow",NOW,"fixture");self.assertEqual(parsed[0]["fields"]["cfo"]["value"],28160074000000)
@@ -182,7 +182,7 @@ class AiRegressionTests(unittest.TestCase):
                 for item in images:
                     x0,y0,x1,y1=item["bbox"]
                     self.assertAlmostEqual((x1-x0)/(y1-y0),1300/480,places=5)
-                    self.assertLessEqual(x1,(18+115)*72/25.4+1)
+                    self.assertLessEqual(x1,(18+56)*72/25.4+1)
 
 
 if __name__=="__main__":unittest.main()

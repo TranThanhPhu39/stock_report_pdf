@@ -1,4 +1,5 @@
 """Acquire financial tables, company profile, news and an independent price check."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta
 import json
@@ -7,7 +8,8 @@ from urllib.parse import urlencode, urljoin
 
 from bs4 import BeautifulSoup
 
-from src.data.providers import DataSourceError, VN_TIME, completed_day_cutoff, download, fetch_daily_prices
+from src.data.providers import DataSourceError, VN_TIME, completed_day_cutoff, download, fetch_daily_prices, fetch_kbs_prices, fetch_vietcap_prices
+from src.data.validate import validate_prices
 from src.data.normalize import parse_annual_financials
 from src.analysis.price_quality import PRICE_TOLERANCE
 
@@ -118,7 +120,7 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
     common = {"page": 1, "pageSize": 4, "unit": 1000, "termtype": 1}
     jobs = {"profile": f"{KBS_BASE}/stockinfo/profile/{ticker}?l=1",
             "news": company_news_url(ticker),
-            "price_check": f"{KBS_BASE}/stocks/{ticker}/data_day?{urlencode({'sdate': (cutoff-timedelta(days=45)).strftime('%d-%m-%Y'), 'edate':cutoff.strftime('%d-%m-%Y')})}"}
+            "price_check": f"{KBS_BASE}/stocks/{ticker}/data_day?{urlencode({'sdate': (cutoff-timedelta(days=45)).strftime('%d-%m-%Y'), 'edate':(cutoff+timedelta(days=2)).strftime('%d-%m-%Y')})}"}
     for kind, code in [("income", "KQKD"), ("balance", "CDKT"), ("cashflow", "LCTT")]:
         jobs[kind] = financial_url(ticker,kind)
     result = {"company": {}, "financial_records": [], "news": [], "quote_check": {"status": "unverified"},
@@ -126,10 +128,30 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
     folder = root / "data/raw/financials"
     folder.mkdir(parents=True, exist_ok=True)
     def retrieve(kind, url):
-        if kind == "price_check" and primary and primary[0].get("price_provider") == "KBS":
-            response = fetch_daily_prices(ticker, cutoff-timedelta(days=45), as_of)
-            data = {"symbol":ticker, "data_day":[{"t":r["date"],"c":r["close"]} for r in response["rows"]]}
-            return kind, response["url"], json.dumps(data).encode(), data
+        if kind == "price_check" and primary:
+            main = primary[0].get("price_provider","Yahoo")
+            candidates = [("Yahoo",fetch_daily_prices),("Vietcap",fetch_vietcap_prices)] if main=="KBS" else [("KBS",fetch_kbs_prices),("Yahoo",fetch_daily_prices)] if main=="Vietcap" else [("KBS",fetch_kbs_prices),("Vietcap",fetch_vietcap_prices)]
+            attempts=[];best=None
+            for provider, fetch in candidates:
+                try:
+                    response=fetch(ticker,cutoff-timedelta(days=45),as_of)
+                    raw_file=folder/f"{run_id}_quote_attempt_{provider.lower()}.json"
+                    raw_file.write_bytes(response["raw"])
+                    valid=validate_prices(response["rows"],ticker,cutoff-timedelta(days=45),cutoff)
+                    if not valid["valid"]:raise DataSourceError(f"{provider} quote validation failed: {valid['errors'][:3]}")
+                    data={"symbol":ticker,"data_day":[{"t":r["date"],"c":r["close"]} for r in response["rows"]],
+                          "_reference_provider":provider,"_request_payload":response.get("request_payload",{})}
+                    check=compare_prices(primary,data,cutoff)
+                    attempts.append({"provider":provider,"latest_match":check["latest_match"],"matched_count":check["matched_count"],
+                                     "raw_file":str(raw_file.relative_to(root)),"request_payload":response.get("request_payload",{})})
+                    best=(kind,response["url"],response["raw"],data)
+                    if check["latest_match"]:break
+                except (DataSourceError,ValueError,TypeError) as exc:
+                    attempts.append({"provider":provider,"error":str(exc)})
+            if best:
+                best[3]["_attempts"]=attempts
+                return best
+            raise DataSourceError("Không có nguồn giá độc lập phù hợp: "+str(attempts))
         raw = download(url, timeout=20)
         return kind, url, raw, json.loads(raw)
     with ThreadPoolExecutor(max_workers=3) as executor:
@@ -138,12 +160,12 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
             kind = futures[future]
             try:
                 kind, url, raw, data = future.result()
-                provider="YAHOO" if kind=="price_check" and primary and primary[0].get("price_provider")=="KBS" else "KBS"
+                provider=data.get("_reference_provider","KBS").upper() if kind=="price_check" else "KBS"
                 source_id = f"{provider}_{kind}_{run_id}"
                 (folder / f"{run_id}_{kind}.json").write_bytes(raw)
                 result["sources"].append({"source_id": source_id, "url_or_file": url,
                     "retrieved_at": datetime.now(VN_TIME).isoformat(), "page_or_table": kind,
-                    "notes": "Financial monetary values requested in thousand VND; EPS in VND/share" if kind in {"income", "balance", "cashflow"} else "Public source snapshot"})
+                    "notes": "Financial monetary values requested in thousand VND; EPS in VND/share" if kind in {"income", "balance", "cashflow"} else "Public source snapshot; request="+str(data.get("_request_payload",{})) if isinstance(data,dict) else "Public source snapshot"})
                 if kind in {"income", "balance", "cashflow"}:
                     parsed = parse_annual_financials(data, kind, as_of, source_id,result["warnings"])
                     result["financial_records"].extend({**period, "kind": kind} for period in parsed)
@@ -158,8 +180,9 @@ def collect_research(ticker: str, as_of: date, primary: list[dict], root: Path, 
                     if data.get("symbol") != ticker:
                         raise DataSourceError("Cross-check symbol mismatch")
                     check=compare_prices(primary, data, cutoff)
-                    check["primary_provider"] = "KBS" if primary and primary[0].get("price_provider")=="KBS" else "Yahoo"
-                    check["reference_provider"] = "Yahoo" if check["primary_provider"]=="KBS" else "KBS"
+                    check["primary_provider"] = primary[0].get("price_provider","Yahoo") if primary else "Yahoo"
+                    check["reference_provider"] = data.get("_reference_provider","KBS")
+                    check["attempts"] = data.get("_attempts",[])
                     for c in check["checks"]:
                         c["primary_close"]=c["yahoo_close"];c["reference_close"]=c["kbs_close"]
                         if check["primary_provider"]=="KBS": c["yahoo_close"],c["kbs_close"]=c["kbs_close"],c["yahoo_close"]

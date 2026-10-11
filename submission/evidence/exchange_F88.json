@@ -1,0 +1,2248 @@
+{
+  "run_id": "F88_20261011_151619_289804",
+  "request": {
+    "ticker": "F88",
+    "start": "2025-10-11",
+    "as_of": "2026-10-11",
+    "mode": "full",
+    "sections": [
+      "overview",
+      "industry",
+      "financial",
+      "valuation",
+      "risks"
+    ],
+    "target_pb": 1.5,
+    "target_pe": 12.0,
+    "cost_of_equity": 0.115,
+    "terminal_growth": 0.035,
+    "forecast_growth": 0.07,
+    "wacc": 0.1,
+    "tax_rate": 0.2,
+    "use_ai": false
+  },
+  "company": {
+    "ticker": "F88",
+    "website": "https://nhadautu.f88.vn/",
+    "exchange": "UPCoM",
+    "business": "- Cung cấp khoản vay cầm cố. - Phân phối các sản phẩm tài chính đa dạng khác như các gói bảo hiểm phi nhân thọ, hỗ trợ thanh toán hoá đơn điện, nước, điện thoại… . - Dịch vụ tài chính tiện ích khác.",
+    "outstanding_shares": 231265102,
+    "source_id": "KBS_profile_F88_20261011_151619_289804",
+    "snapshot_at": "2026-10-11",
+    "name": null
+  },
+  "acquisition": {
+    "ticker": "F88",
+    "run_id": "F88_20261011_151619_289804",
+    "prices": {
+      "row_count": 247,
+      "first": "2025-10-13",
+      "last": "2026-10-09",
+      "last_close_vnd": 46900,
+      "cutoff": "2026-10-10",
+      "csv": "data/processed/F88_20261011_151619_289804_prices.csv",
+      "company_name": null,
+      "validation": {
+        "valid": true,
+        "row_count": 247,
+        "errors": [],
+        "warnings": [
+          "Prices have not been cross-checked against an independent source.",
+          "Provider OHLC adjustment basis is not yet verified; do not describe it as raw/adjusted or total return.",
+          "All current-day observations are excluded conservatively, including after market close."
+        ]
+      },
+      "provider": "KBS",
+      "coverage": {
+        "requested_start": "2025-10-11",
+        "actual_start": "2025-10-13",
+        "actual_end": "2026-10-09",
+        "start_gap_days": 2
+      },
+      "fallback_used": true
+    },
+    "financial_documents": [],
+    "warnings": [
+      "Yahoo: Unable to retrieve https://query1.finance.yahoo.com/v8/finance/chart/F88.VN?period1=1760115600&period2=1791651600&interval=1d&events=div%2Csplits: HTTP Error 404: Not Found"
+    ],
+    "price_attempts": [
+      {
+        "provider": "Yahoo",
+        "error": "Unable to retrieve https://query1.finance.yahoo.com/v8/finance/chart/F88.VN?period1=1760115600&period2=1791651600&interval=1d&events=div%2Csplits: HTTP Error 404: Not Found"
+      },
+      {
+        "provider": "KBS",
+        "validation": {
+          "valid": true,
+          "row_count": 247,
+          "errors": [],
+          "warnings": [
+            "Prices have not been cross-checked against an independent source.",
+            "Provider OHLC adjustment basis is not yet verified; do not describe it as raw/adjusted or total return.",
+            "All current-day observations are excluded conservatively, including after market close."
+          ]
+        },
+        "raw_file": "data/raw/prices/F88_20261011_151619_289804_kbs.json"
+      }
+    ],
+    "financial_metrics_status": "issuer_provider_not_implemented_for_this_ticker",
+    "errors": []
+  },
+  "market": {
+    "latest_close_vnd": 46900.0,
+    "source_id": "KBS_F88_20261011_151619_289804",
+    "first_date": "2025-10-13",
+    "row_count": 247,
+    "latest_date": "2026-10-09",
+    "latest_volume": 96500,
+    "ma20_vnd": 53795.0,
+    "ma50_vnd": 60946.0,
+    "return_pct": null,
+    "max_drawdown_pct": null,
+    "annualized_volatility_pct": null,
+    "average_volume_20": 149610.0,
+    "history_indicators_available": true,
+    "chart_prices": [
+      41067.0,
+      41259.0,
+      40609.0,
+      40948.0,
+      40832.0,
+      40375.0,
+      40874.0,
+      40375.0,
+      41105.0,
+      41759.0,
+      41297.0,
+      41528.0,
+      41336.0,
+      41374.0,
+      41528.0,
+      41340.0,
+      41413.0,
+      41336.0,
+      41301.0,
+      41336.0,
+      41297.0,
+      41297.0,
+      41336.0,
+      41605.0,
+      41574.0,
+      41951.0,
+      41644.0,
+      41720.0,
+      42259.0,
+      42297.0,
+      43066.0,
+      42816.0,
+      42874.0,
+      43566.0,
+      45258.0,
+      44989.0,
+      44989.0,
+      44604.0,
+      44947.0,
+      44604.0,
+      44912.0,
+      44797.0,
+      45412.0,
+      46719.0,
+      46527.0,
+      46723.0,
+      47296.0,
+      46911.0,
+      47104.0,
+      46758.0,
+      46719.0,
+      46761.0,
+      46835.0,
+      46142.0,
+      46527.0,
+      46527.0,
+      46761.0,
+      46954.0,
+      47115.0,
+      48450.0,
+      47757.0,
+      49757.0,
+      49834.0,
+      54794.0,
+      58947.0,
+      59178.0,
+      58639.0,
+      58409.0,
+      61523.0,
+      70750.0,
+      81350.0,
+      93550.0,
+      105900.0,
+      121200.0,
+      138000.0,
+      117500.0,
+      104950.0,
+      107500.0,
+      104550.0,
+      101600.0,
+      94500.0,
+      90000.0,
+      83000.0,
+      95500.0,
+      96500.0,
+      89000.0,
+      89500.0,
+      92550.0,
+      93500.0,
+      93800.0,
+      94000.0,
+      93050.0,
+      92000.0,
+      86000.0,
+      85500.0,
+      82500.0,
+      70050.0,
+      65500.0,
+      62350.0,
+      64850.0,
+      71500.0,
+      72000.0,
+      69000.0,
+      70600.0,
+      70100.0,
+      69750.0,
+      69000.0,
+      67350.0,
+      62650.0,
+      64500.0,
+      66750.0,
+      67000.0,
+      67700.0,
+      67650.0,
+      67100.0,
+      67300.0,
+      67000.0,
+      65600.0,
+      65000.0,
+      64700.0,
+      66250.0,
+      65050.0,
+      65850.0,
+      65300.0,
+      65900.0,
+      66500.0,
+      67000.0,
+      75000.0,
+      80000.0,
+      81400.0,
+      80150.0,
+      79950.0,
+      80000.0,
+      83450.0,
+      82000.0,
+      76850.0,
+      75400.0,
+      77450.0,
+      77250.0,
+      79000.0,
+      75500.0,
+      75000.0,
+      73600.0,
+      74500.0,
+      73950.0,
+      73500.0,
+      73500.0,
+      74400.0,
+      74050.0,
+      73400.0,
+      77950.0,
+      78000.0,
+      78100.0,
+      79500.0,
+      81050.0,
+      86000.0,
+      87450.0,
+      81900.0,
+      79450.0,
+      80950.0,
+      83700.0,
+      82000.0,
+      82500.0,
+      79900.0,
+      82200.0,
+      82900.0,
+      80200.0,
+      78300.0,
+      77500.0,
+      79300.0,
+      80200.0,
+      78100.0,
+      79300.0,
+      78500.0,
+      77200.0,
+      78300.0,
+      77900.0,
+      80300.0,
+      79500.0,
+      79000.0,
+      78700.0,
+      78000.0,
+      78100.0,
+      77900.0,
+      77600.0,
+      76900.0,
+      75900.0,
+      74700.0,
+      74900.0,
+      74000.0,
+      71900.0,
+      73100.0,
+      74100.0,
+      74000.0,
+      75500.0,
+      73000.0,
+      72400.0,
+      72600.0,
+      72400.0,
+      71800.0,
+      71900.0,
+      71700.0,
+      71800.0,
+      67000.0,
+      66600.0,
+      65500.0,
+      66600.0,
+      67300.0,
+      66800.0,
+      65700.0,
+      65300.0,
+      65200.0,
+      64500.0,
+      64000.0,
+      63400.0,
+      60000.0,
+      60000.0,
+      61000.0,
+      65800.0,
+      66800.0,
+      64400.0,
+      63900.0,
+      61900.0,
+      62800.0,
+      62100.0,
+      61600.0,
+      61000.0,
+      59700.0,
+      60700.0,
+      60800.0,
+      60900.0,
+      60300.0,
+      59000.0,
+      58600.0,
+      57000.0,
+      54300.0,
+      52500.0,
+      54500.0,
+      53900.0,
+      51300.0,
+      50000.0,
+      49600.0,
+      46200.0,
+      46300.0,
+      46700.0,
+      46700.0,
+      46900.0
+    ],
+    "series_basis": "KBS close; adjustment/history unverified",
+    "return_note": "Thiếu chuỗi Adj Close đầy đủ; không tính lợi suất/drawdown."
+  },
+  "financial": {
+    "periods": [
+      {
+        "year": 2024,
+        "fields": {
+          "revenue": {
+            "value": 2280507766000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2216,
+            "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+            "source_value": 2280507766.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "cost_of_sales": {
+            "value": 1653539791000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2207,
+            "source_label": "4. Giá vốn hàng bán ",
+            "source_value": 1653539791.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "gross_profit": {
+            "value": 626967976000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2217,
+            "source_label": "5. Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
+            "source_value": 626967976.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "interest_expense": {
+            "value": 369348408000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2223,
+            "source_label": "   Trong đó: Chi phí đi vay",
+            "source_value": 369348408.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "net_profit": {
+            "value": 351292289000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": 351292289.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "parent_profit": {
+            "value": 351257699000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2214,
+            "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+            "source_value": 351257699.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "interest_paid": {
+            "value": -364788440000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2250,
+            "source_label": "Chi phí đi vay đã trả",
+            "source_value": -364788440.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "cfo": {
+            "value": -603625241000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2234,
+            "source_label": "Lưu chuyển tiền thuần từ hoạt động kinh doanh",
+            "source_value": -603625241.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "capex_cash": {
+            "value": -6429247000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2254,
+            "source_label": "1. Tiền chi để mua sắm, xây dựng TSCĐ và các tài sản dài hạn khác",
+            "source_value": -6429247.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "borrowings_received": {
+            "value": 1780208454000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2263,
+            "source_label": "3. Tiền thu từ đi vay",
+            "source_value": 1780208454.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "debt_repaid": {
+            "value": -1181729250000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2264,
+            "source_label": "4. Tiền trả nợ gốc vay",
+            "source_value": -1181729250.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "current_assets": {
+            "value": 4090728770000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3000,
+            "source_label": "A. TÀI SẢN NGẮN HẠN",
+            "source_value": 4090728770.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "cash": {
+            "value": 630485608000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3003,
+            "source_label": "I. Tiền và các khoản tương đương tiền",
+            "source_value": 630485608.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "assets": {
+            "value": 5036358587000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2996,
+            "source_label": "TỔNG CỘNG TÀI SẢN",
+            "source_value": 5036358587.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "liabilities": {
+            "value": 3308543922000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2997,
+            "source_label": "C. NỢ PHẢI TRẢ",
+            "source_value": 3308543922.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "short_debt": {
+            "value": 1456760078000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3077,
+            "source_label": "11. Vay và nợ thuê tài chính ngắn hạn",
+            "source_value": 1456760078.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "long_debt": {
+            "value": 1449527079000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3078,
+            "source_label": "9. Vay và nợ thuê tài chính dài hạn",
+            "source_value": 1449527079.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "equity": {
+            "value": 1727814664000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2998,
+            "source_label": "D. VỐN CHỦ SỞ HỮU",
+            "source_value": 1727814664.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "non_controlling_equity": {
+            "value": 171653000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 5320,
+            "source_label": "13. Lợi ích cổ đông không kiểm soát",
+            "source_value": 171653.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        },
+        "business_type": 1,
+        "period_end": "2024-12-31",
+        "scope": "consolidated"
+      },
+      {
+        "year": 2023,
+        "fields": {
+          "revenue": {
+            "value": 2081600989000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2216,
+            "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+            "source_value": 2081600989.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "cost_of_sales": {
+            "value": 2322658361000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2207,
+            "source_label": "4. Giá vốn hàng bán ",
+            "source_value": 2322658361.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "gross_profit": {
+            "value": -241057371000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2217,
+            "source_label": "5. Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
+            "source_value": -241057371.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "interest_expense": {
+            "value": 336647965000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2223,
+            "source_label": "   Trong đó: Chi phí đi vay",
+            "source_value": 336647965.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "net_profit": {
+            "value": -545401511000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": -545401511.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "parent_profit": {
+            "value": -545346793000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2214,
+            "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+            "source_value": -545346793.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "interest_paid": {
+            "value": -351131913000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2250,
+            "source_label": "Chi phí đi vay đã trả",
+            "source_value": -351131913.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "cfo": {
+            "value": -728774770000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2234,
+            "source_label": "Lưu chuyển tiền thuần từ hoạt động kinh doanh",
+            "source_value": -728774770.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "capex_cash": {
+            "value": -6914076000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2254,
+            "source_label": "1. Tiền chi để mua sắm, xây dựng TSCĐ và các tài sản dài hạn khác",
+            "source_value": -6914076.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "borrowings_received": {
+            "value": 1831218076000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2263,
+            "source_label": "3. Tiền thu từ đi vay",
+            "source_value": 1831218076.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "debt_repaid": {
+            "value": -2711620783000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2264,
+            "source_label": "4. Tiền trả nợ gốc vay",
+            "source_value": -2711620783.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "current_assets": {
+            "value": 3285468378000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3000,
+            "source_label": "A. TÀI SẢN NGẮN HẠN",
+            "source_value": 3285468378.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "cash": {
+            "value": 217359447000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3003,
+            "source_label": "I. Tiền và các khoản tương đương tiền",
+            "source_value": 217359447.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "assets": {
+            "value": 3952401130000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2996,
+            "source_label": "TỔNG CỘNG TÀI SẢN",
+            "source_value": 3952401130.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "liabilities": {
+            "value": 2575879554000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2997,
+            "source_label": "C. NỢ PHẢI TRẢ",
+            "source_value": 2575879554.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "short_debt": {
+            "value": 981258111000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3077,
+            "source_label": "11. Vay và nợ thuê tài chính ngắn hạn",
+            "source_value": 981258111.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "long_debt": {
+            "value": 1306690288000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3078,
+            "source_label": "9. Vay và nợ thuê tài chính dài hạn",
+            "source_value": 1306690288.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "equity": {
+            "value": 1376521576000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2998,
+            "source_label": "D. VỐN CHỦ SỞ HỮU",
+            "source_value": 1376521576.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          "non_controlling_equity": {
+            "value": 136264000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 5320,
+            "source_label": "13. Lợi ích cổ đông không kiểm soát",
+            "source_value": 136264.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        },
+        "business_type": 1,
+        "period_end": "2023-12-31",
+        "scope": "consolidated"
+      }
+    ],
+    "metrics": [
+      {
+        "key": "revenue",
+        "label": "Doanh thu thuần",
+        "value": 2280507766000.0,
+        "unit": "VND",
+        "period": "2024",
+        "formula": "Số liệu báo cáo năm",
+        "inputs": [
+          {
+            "value": 2280507766000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2216,
+            "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+            "source_value": 2280507766.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "net_profit",
+        "label": "LNST hợp nhất",
+        "value": 351292289000.0,
+        "unit": "VND",
+        "period": "2024",
+        "formula": "Số liệu báo cáo năm",
+        "inputs": [
+          {
+            "value": 351292289000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": 351292289.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "parent_profit",
+        "label": "LNST cổ đông công ty mẹ",
+        "value": 351257699000.0,
+        "unit": "VND",
+        "period": "2024",
+        "formula": "Số liệu báo cáo năm",
+        "inputs": [
+          {
+            "value": 351257699000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2214,
+            "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+            "source_value": 351257699.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "assets",
+        "label": "Tổng tài sản",
+        "value": 5036358587000.0,
+        "unit": "VND",
+        "period": "2024",
+        "formula": "Số liệu báo cáo năm",
+        "inputs": [
+          {
+            "value": 5036358587000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2996,
+            "source_label": "TỔNG CỘNG TÀI SẢN",
+            "source_value": 5036358587.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "equity",
+        "label": "Vốn chủ sở hữu",
+        "value": 1727814664000.0,
+        "unit": "VND",
+        "period": "2024",
+        "formula": "Số liệu báo cáo năm",
+        "inputs": [
+          {
+            "value": 1727814664000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2998,
+            "source_label": "D. VỐN CHỦ SỞ HỮU",
+            "source_value": 1727814664.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "cfo",
+        "label": "Dòng tiền kinh doanh",
+        "value": -603625241000.0,
+        "unit": "VND",
+        "period": "2024",
+        "formula": "Số liệu báo cáo năm",
+        "inputs": [
+          {
+            "value": -603625241000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2234,
+            "source_label": "Lưu chuyển tiền thuần từ hoạt động kinh doanh",
+            "source_value": -603625241.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "revenue_growth",
+        "label": "Tăng trưởng doanh thu",
+        "value": 9.555470911625319,
+        "unit": "%",
+        "period": "2024",
+        "formula": "(Kỳ hiện tại / cùng kỳ năm trước - 1) × 100",
+        "inputs": [
+          {
+            "value": 2280507766000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2216,
+            "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+            "source_value": 2280507766.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 2081600989000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2216,
+            "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+            "source_value": 2081600989.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "net_profit_growth",
+        "label": "Tăng trưởng LNST",
+        "value": null,
+        "unit": "%",
+        "period": "2024",
+        "formula": "(Kỳ hiện tại / cùng kỳ năm trước - 1) × 100",
+        "inputs": [
+          {
+            "value": 351292289000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": 351292289.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": -545401511000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": -545401511.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": "Thiếu cùng kỳ hoặc kỳ gốc không phù hợp"
+      },
+      {
+        "key": "roe",
+        "label": "ROE hợp nhất năm",
+        "value": 22.632360790917417,
+        "unit": "%",
+        "period": "2024",
+        "formula": "LNST hợp nhất / VCSH hợp nhất bình quân × 100",
+        "inputs": [
+          {
+            "value": 351292289000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": 351292289.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 1727814664000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2998,
+            "source_label": "D. VỐN CHỦ SỞ HỮU",
+            "source_value": 1727814664.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 1376521576000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2998,
+            "source_label": "D. VỐN CHỦ SỞ HỮU",
+            "source_value": 1376521576.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "roa",
+        "label": "ROA hợp nhất năm",
+        "value": 7.8162571936508245,
+        "unit": "%",
+        "period": "2024",
+        "formula": "LNST hợp nhất / tổng tài sản bình quân × 100",
+        "inputs": [
+          {
+            "value": 351292289000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": 351292289.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 5036358587000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2996,
+            "source_label": "TỔNG CỘNG TÀI SẢN",
+            "source_value": 5036358587.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 3952401130000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2996,
+            "source_label": "TỔNG CỘNG TÀI SẢN",
+            "source_value": 3952401130.0,
+            "unit_multiplier": 1000,
+            "period": "2023",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "gross_margin",
+        "label": "Biên lợi nhuận gộp",
+        "value": 27.492472744335306,
+        "unit": "%",
+        "period": "2024",
+        "formula": "gross_profit / revenue × 100",
+        "inputs": [
+          {
+            "value": 626967976000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2217,
+            "source_label": "5. Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
+            "source_value": 626967976.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 2280507766000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2216,
+            "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+            "source_value": 2280507766.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "net_margin",
+        "label": "Biên lợi nhuận ròng",
+        "value": 15.404125968672542,
+        "unit": "%",
+        "period": "2024",
+        "formula": "net_profit / revenue × 100",
+        "inputs": [
+          {
+            "value": 351292289000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": 351292289.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 2280507766000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2216,
+            "source_label": "3. Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+            "source_value": 2280507766.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "cash_conversion",
+        "label": "CFO / LNST",
+        "value": -1.718299148319763,
+        "unit": "lần",
+        "period": "2024",
+        "formula": "cfo / net_profit",
+        "inputs": [
+          {
+            "value": -603625241000.0,
+            "unit": "VND",
+            "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+            "source_field": 2234,
+            "source_label": "Lưu chuyển tiền thuần từ hoạt động kinh doanh",
+            "source_value": -603625241.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 351292289000.0,
+            "unit": "VND",
+            "source_id": "KBS_income_F88_20261011_151619_289804",
+            "source_field": 2212,
+            "source_label": "18. Lợi nhuận sau thuế thu nhập doanh nghiệp",
+            "source_value": 351292289.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      },
+      {
+        "key": "debt_equity",
+        "label": "Nợ vay / vốn chủ",
+        "value": 1.6820595504565066,
+        "unit": "lần",
+        "period": "2024",
+        "formula": "(Nợ vay ngắn + dài hạn) / VCSH",
+        "inputs": [
+          {
+            "value": 1456760078000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3077,
+            "source_label": "11. Vay và nợ thuê tài chính ngắn hạn",
+            "source_value": 1456760078.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 1449527079000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 3078,
+            "source_label": "9. Vay và nợ thuê tài chính dài hạn",
+            "source_value": 1449527079.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          },
+          {
+            "value": 1727814664000.0,
+            "unit": "VND",
+            "source_id": "KBS_balance_F88_20261011_151619_289804",
+            "source_field": 2998,
+            "source_label": "D. VỐN CHỦ SỞ HỮU",
+            "source_value": 1727814664.0,
+            "unit_multiplier": 1000,
+            "period": "2024",
+            "published_at": "2025-05-08",
+            "statement_scope": "consolidated"
+          }
+        ],
+        "reason": null
+      }
+    ],
+    "errors": [],
+    "industry_group": "nonfinancial"
+  },
+  "quote_check": {
+    "status": "matched",
+    "checks": [
+      {
+        "date": "2026-09-14",
+        "yahoo_close": 59700,
+        "kbs_close": 59700.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 59700.0,
+        "reference_close": 59700
+      },
+      {
+        "date": "2026-09-15",
+        "yahoo_close": 60700,
+        "kbs_close": 60700.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 60700.0,
+        "reference_close": 60700
+      },
+      {
+        "date": "2026-09-16",
+        "yahoo_close": 60800,
+        "kbs_close": 60800.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 60800.0,
+        "reference_close": 60800
+      },
+      {
+        "date": "2026-09-17",
+        "yahoo_close": 60900,
+        "kbs_close": 60900.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 60900.0,
+        "reference_close": 60900
+      },
+      {
+        "date": "2026-09-18",
+        "yahoo_close": 60300,
+        "kbs_close": 60300.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 60300.0,
+        "reference_close": 60300
+      },
+      {
+        "date": "2026-09-21",
+        "yahoo_close": 59000,
+        "kbs_close": 59000.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 59000.0,
+        "reference_close": 59000
+      },
+      {
+        "date": "2026-09-22",
+        "yahoo_close": 58600,
+        "kbs_close": 58600.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 58600.0,
+        "reference_close": 58600
+      },
+      {
+        "date": "2026-09-23",
+        "yahoo_close": 57000,
+        "kbs_close": 57000.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 57000.0,
+        "reference_close": 57000
+      },
+      {
+        "date": "2026-09-24",
+        "yahoo_close": 54300,
+        "kbs_close": 54300.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 54300.0,
+        "reference_close": 54300
+      },
+      {
+        "date": "2026-09-25",
+        "yahoo_close": 52500,
+        "kbs_close": 52500.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 52500.0,
+        "reference_close": 52500
+      },
+      {
+        "date": "2026-09-28",
+        "yahoo_close": 54500,
+        "kbs_close": 54500.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 54500.0,
+        "reference_close": 54500
+      },
+      {
+        "date": "2026-09-29",
+        "yahoo_close": 53900,
+        "kbs_close": 53900.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 53900.0,
+        "reference_close": 53900
+      },
+      {
+        "date": "2026-09-30",
+        "yahoo_close": 51300,
+        "kbs_close": 51300.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 51300.0,
+        "reference_close": 51300
+      },
+      {
+        "date": "2026-10-01",
+        "yahoo_close": 50000,
+        "kbs_close": 50000.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 50000.0,
+        "reference_close": 50000
+      },
+      {
+        "date": "2026-10-02",
+        "yahoo_close": 49600,
+        "kbs_close": 49600.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 49600.0,
+        "reference_close": 49600
+      },
+      {
+        "date": "2026-10-05",
+        "yahoo_close": 46200,
+        "kbs_close": 46200.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 46200.0,
+        "reference_close": 46200
+      },
+      {
+        "date": "2026-10-06",
+        "yahoo_close": 46300,
+        "kbs_close": 46300.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 46300.0,
+        "reference_close": 46300
+      },
+      {
+        "date": "2026-10-07",
+        "yahoo_close": 46700,
+        "kbs_close": 46700.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 46700.0,
+        "reference_close": 46700
+      },
+      {
+        "date": "2026-10-08",
+        "yahoo_close": 46700,
+        "kbs_close": 46700.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 46700.0,
+        "reference_close": 46700
+      },
+      {
+        "date": "2026-10-09",
+        "yahoo_close": 46900,
+        "kbs_close": 46900.0,
+        "relative_difference": 0.0,
+        "match": true,
+        "primary_close": 46900.0,
+        "reference_close": 46900
+      }
+    ],
+    "latest_match": true,
+    "latest_status": "matched",
+    "latest_date": "2026-10-09",
+    "expected_count": 20,
+    "matched_count": 20,
+    "mismatch_count": 0,
+    "missing_count": 0,
+    "note": "Đối chiếu giá đóng cửa tối đa 20 ngày gần nhất, sai lệch cho phép 0,1%; không xác nhận toàn bộ lịch sử điều chỉnh.",
+    "primary_provider": "KBS",
+    "reference_provider": "Vietcap",
+    "attempts": [
+      {
+        "provider": "Yahoo",
+        "error": "Unable to retrieve https://query1.finance.yahoo.com/v8/finance/chart/F88.VN?period1=1787677200&period2=1791651600&interval=1d&events=div%2Csplits: HTTP Error 404: Not Found"
+      },
+      {
+        "provider": "Vietcap",
+        "latest_match": true,
+        "matched_count": 20,
+        "raw_file": "data\\raw\\financials\\F88_20261011_151619_289804_quote_attempt_vietcap.json",
+        "request_payload": {
+          "timeFrame": "ONE_DAY",
+          "symbols": [
+            "F88"
+          ],
+          "to": 1791651600,
+          "countBack": 55
+        }
+      }
+    ],
+    "source_id": "VIETCAP_price_check_F88_20261011_151619_289804"
+  },
+  "financial_check": {
+    "status": "not_independently_checked",
+    "checks": [],
+    "note": "Chỉ đối chiếu các chỉ tiêu được liệt kê; không chứng nhận mọi số liệu hay toàn bộ lịch sử."
+  },
+  "valuation": {
+    "available": true,
+    "reason": "Đã tính phương pháp đủ đầu vào; xem giới hạn từng phương pháp.",
+    "blocked_reasons": [],
+    "scenarios": [
+      {
+        "label": "Thận trọng",
+        "target_pb": 1.2000000000000002,
+        "reference_price_vnd": 8964.48100154774,
+        "difference_pct": -80.88596801375748
+      },
+      {
+        "label": "Cơ sở",
+        "target_pb": 1.5,
+        "reference_price_vnd": 11205.601251934673,
+        "difference_pct": -76.10746001719686
+      },
+      {
+        "label": "Thuận lợi",
+        "target_pb": 1.7999999999999998,
+        "reference_price_vnd": 13446.721502321607,
+        "difference_pct": -71.32895202063622
+      }
+    ],
+    "pb_methods": [
+      {
+        "method": "P/B giả định người dùng",
+        "multiple": 1.5,
+        "target_price_vnd": 11205.601251934673,
+        "difference_pct": -76.10746001719686
+      },
+      {
+        "method": "P/B Gordon theo ROE mẹ",
+        "multiple": 2.391547148162894,
+        "target_price_vnd": 17865.815811676617,
+        "difference_pct": -61.90657609450615
+      }
+    ],
+    "book_value_per_share": 7470.400834623116,
+    "reference_pb": 6.278110243112025,
+    "inputs": [
+      {
+        "value": 1727814664000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_F88_20261011_151619_289804",
+        "source_field": 2998,
+        "source_label": "D. VỐN CHỦ SỞ HỮU",
+        "source_value": 1727814664.0,
+        "unit_multiplier": 1000,
+        "period": "2024",
+        "published_at": "2025-05-08",
+        "statement_scope": "consolidated"
+      },
+      {
+        "value": 171653000.0,
+        "unit": "VND",
+        "source_id": "KBS_balance_F88_20261011_151619_289804",
+        "source_field": 5320,
+        "source_label": "13. Lợi ích cổ đông không kiểm soát",
+        "source_value": 171653.0,
+        "unit_multiplier": 1000,
+        "period": "2024",
+        "published_at": "2025-05-08",
+        "statement_scope": "consolidated"
+      },
+      {
+        "source_id": "KBS_profile_F88_20261011_151619_289804",
+        "value": 231265102,
+        "unit": "shares",
+        "period": "2026-10-11"
+      },
+      {
+        "source_id": "KBS_F88_20261011_151619_289804",
+        "value": 46900.0,
+        "unit": "VND/share",
+        "period": "2026-10-09"
+      },
+      {
+        "source_id": "VIETCAP_price_check_F88_20261011_151619_289804",
+        "value": 46900.0,
+        "unit": "VND/share",
+        "period": "2026-10-09",
+        "role": "independently matched closing price"
+      }
+    ],
+    "assumptions": {
+      "target_pb": 1.5,
+      "target_pe": 12.0,
+      "cost_of_equity": 0.115,
+      "terminal_growth": 0.035,
+      "forecast_growth": 0.07,
+      "wacc": 0.1,
+      "tax_rate": 0.2
+    },
+    "assumption": "Kịch bản giả định, không phải khuyến nghị mua/bán. Vốn/lợi nhuận cuối năm quy đổi trên CP snapshot; giả định không đổi vốn, cần xem phát hành/cổ tức sau cuối kỳ.",
+    "formula": "BVPS = vốn mẹ / CP; Gordon P/B = (ROE mẹ - g)/(Ke - g); EPS quy đổi = LNST mẹ năm / CP snapshot; FCFF = CFO + lãi đã trả × (1-thuế) - CAPEX; vốn = PV(FCFF) + tiền - nợ vay - NCI.",
+    "pe_status": "Lợi nhuận năm 2024 / CP tại 2026-10-11; không phải P/E TTM.",
+    "gordon": {
+      "available": true,
+      "roe_pct": 22.632377185303152,
+      "cost_of_equity_pct": 11.5,
+      "growth_rate_pct": 3.5000000000000004,
+      "justified_pb": 2.391547148162894,
+      "target_price_vnd": 17865.815811676617,
+      "difference_pct": -61.90657609450615,
+      "formula": "P/B = (ROE cổ đông mẹ - g)/(Ke - g)",
+      "explanation": "Giả định ROE năm bền vững, g < ROE và g < Ke; không ép bội số vào khoảng tùy ý.",
+      "inputs": [
+        {
+          "value": 351257699000.0,
+          "unit": "VND",
+          "source_id": "KBS_income_F88_20261011_151619_289804",
+          "source_field": 2214,
+          "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+          "source_value": 351257699.0,
+          "unit_multiplier": 1000,
+          "period": "2024",
+          "published_at": "2025-05-08",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 1727814664000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_F88_20261011_151619_289804",
+          "source_field": 2998,
+          "source_label": "D. VỐN CHỦ SỞ HỮU",
+          "source_value": 1727814664.0,
+          "unit_multiplier": 1000,
+          "period": "2024",
+          "published_at": "2025-05-08",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 171653000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_F88_20261011_151619_289804",
+          "source_field": 5320,
+          "source_label": "13. Lợi ích cổ đông không kiểm soát",
+          "source_value": 171653.0,
+          "unit_multiplier": 1000,
+          "period": "2024",
+          "published_at": "2025-05-08",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 1376521576000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_F88_20261011_151619_289804",
+          "source_field": 2998,
+          "source_label": "D. VỐN CHỦ SỞ HỮU",
+          "source_value": 1376521576.0,
+          "unit_multiplier": 1000,
+          "period": "2023",
+          "published_at": "2025-05-08",
+          "statement_scope": "consolidated"
+        },
+        {
+          "value": 136264000.0,
+          "unit": "VND",
+          "source_id": "KBS_balance_F88_20261011_151619_289804",
+          "source_field": 5320,
+          "source_label": "13. Lợi ích cổ đông không kiểm soát",
+          "source_value": 136264.0,
+          "unit_multiplier": 1000,
+          "period": "2023",
+          "published_at": "2025-05-08",
+          "statement_scope": "consolidated"
+        }
+      ]
+    },
+    "industry": {
+      "available": false,
+      "reason": "Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot."
+    },
+    "pe": {
+      "available": true,
+      "eps": 1518.853021758553,
+      "eps_basis": "LNST mẹ năm / CP snapshot: EPS quy đổi giả định, không phải EPS công bố hoặc TTM",
+      "reference_pe": 30.878563842667546,
+      "target_pe": 12.0,
+      "base_price_vnd": 18226.236261102636,
+      "inputs": [
+        {
+          "value": 351257699000.0,
+          "unit": "VND",
+          "source_id": "KBS_income_F88_20261011_151619_289804",
+          "source_field": 2214,
+          "source_label": "Lợi nhuận sau thuế của cổ đông của Công ty mẹ",
+          "source_value": 351257699.0,
+          "unit_multiplier": 1000,
+          "period": "2024",
+          "published_at": "2025-05-08",
+          "statement_scope": "consolidated"
+        }
+      ],
+      "formula": "EPS quy đổi năm = LNST mẹ năm / CP snapshot; giá kịch bản = EPS quy đổi × P/E giả định",
+      "scenarios": [
+        {
+          "label": "Thận trọng",
+          "target_pe": 9.600000000000001,
+          "reference_price_vnd": 14580.98900888211,
+          "difference_pct": -68.9104711964134
+        },
+        {
+          "label": "Cơ sở",
+          "target_pe": 12.0,
+          "reference_price_vnd": 18226.236261102636,
+          "difference_pct": -61.13808899551676
+        },
+        {
+          "label": "Thuận lợi",
+          "target_pe": 14.399999999999999,
+          "reference_price_vnd": 21871.483513323165,
+          "difference_pct": -53.36570679462012
+        }
+      ]
+    },
+    "dcf": {
+      "available": false,
+      "reason": "FCFF năm gốc không dương; chưa có dự báo phục hồi được chứng minh."
+    },
+    "weighted_average": {
+      "available": true,
+      "target_price_vnd": 18046.026036389627,
+      "difference_pct": -61.52233254501145,
+      "components": [
+        {
+          "method": "P/B tổng hợp",
+          "target_price_vnd": 17865.815811676617,
+          "weight_pct": 50.0,
+          "contribution_vnd": 8932.907905838309
+        },
+        {
+          "method": "P/E lợi nhuận năm quy đổi",
+          "target_price_vnd": 18226.236261102636,
+          "weight_pct": 50.0,
+          "contribution_vnd": 9113.118130551318
+        }
+      ],
+      "recommendation": "Kết quả kịch bản, chưa tự chuyển thành khuyến nghị đầu tư.",
+      "note": "Trọng số giả định 35/35/30 hoặc người dùng chỉnh, chuẩn hóa trên phương pháp đủ dữ liệu; các phương pháp dùng chung đầu vào không phải bằng chứng độc lập."
+    },
+    "price_warning": "",
+    "equity_period": "2024",
+    "shares": 231265102,
+    "shares_snapshot": "2026-10-11",
+    "price_date": "2026-10-09"
+  },
+  "recommendation": {
+    "stance": "CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ",
+    "reason": "Tài chính mới nhất 2024, cần bổ sung kỳ 2025 hoặc mới hơn.",
+    "as_of": "2026-10-11",
+    "horizon": "Theo dõi 6-12 tháng; đánh giá lại khi có BCTC mới hoặc sự kiện trọng yếu",
+    "confidence": "Thấp",
+    "confidence_note": "Tài chính chưa đối chiếu độc lập; mức tin cậy thấp.",
+    "target_price_vnd": 18046.026036389627,
+    "upside_pct": -61.52233254501145,
+    "model_low_vnd": 17865.815811676617,
+    "model_high_vnd": 18226.236261102636,
+    "model_spread_pct": 2.017374707235353,
+    "entry_ceiling_vnd": null,
+    "opportunities": [],
+    "blockers": [
+      "Tài chính mới nhất 2024, cần bổ sung kỳ 2025 hoặc mới hơn."
+    ],
+    "source_ids": [
+      "KBS_F88_20261011_151619_289804",
+      "KBS_balance_F88_20261011_151619_289804",
+      "KBS_cashflow_F88_20261011_151619_289804",
+      "KBS_income_F88_20261011_151619_289804",
+      "KBS_profile_F88_20261011_151619_289804",
+      "VIETCAP_price_check_F88_20261011_151619_289804"
+    ],
+    "methodology": "Ngưỡng nghiên cứu: chênh ≥15% để xem xét tích lũy; ≤-15% ưu tiên rủi ro; phân tán max/min-1 ≤60%. Cần ≥2 nhóm mô hình, giá ≤7 ngày, tài chính từ năm trước. Tích lũy còn yêu cầu LNST tăng, CFO không âm nếu có, đối chiếu tài chính và mọi mô hình ≥giá. Các ngưỡng là quy tắc của đề tài, không phải chuẩn thị trường.",
+    "conditions": [
+      "Kiểm tra BCTC kỳ mới, cổ tức/phát hành và số CP trước khi sử dụng mức tham chiếu.",
+      "Cập nhật kịch bản khi lợi nhuận/dòng tiền suy giảm, chi phí vốn thay đổi hoặc giá không còn biên chênh lệch.",
+      "Đọc toàn văn công bố trọng yếu; tin tiêu đề và kênh vĩ mô có điều kiện chưa xác nhận chất xúc tác."
+    ]
+  },
+  "industry": {
+    "name": "Dịch vụ tài chính",
+    "code": "8700",
+    "taxonomy": "Vietcap ICB",
+    "period_end": "2024-12-31",
+    "scope": "consolidated",
+    "comparisons": [],
+    "excluded": [
+      {
+        "ticker": "AAS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "ABW",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "AGR",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "APG",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "APS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "ART",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "BMS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "BSI",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "BVS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "CSI",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "CTS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "DCV",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "DSC",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "DSE",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "E1VFVN30",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "EVF",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "EVS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FTS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUCTVGF4",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUCTVGF5",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUCVREIT",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUEABVND",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEBFVND",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEDCMID",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUEFCV50",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEIP100",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUEKIV30",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUEKIVFS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "FUEKIVND",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEMAV30",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEMAVND",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEMITEC",
+        "reason": "Nguồn không có metadata kỳ tài chính"
+      },
+      {
+        "ticker": "FUESSV30",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUESSV50",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUESSVFL",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUETCC50",
+        "reason": "Nguồn không có metadata kỳ tài chính"
+      },
+      {
+        "ticker": "FUETPVND",
+        "reason": "Nguồn không có metadata kỳ tài chính"
+      },
+      {
+        "ticker": "FUEVFVND",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEVN100",
+        "reason": "Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu"
+      },
+      {
+        "ticker": "FUEVN50G",
+        "reason": "Nguồn không có metadata kỳ tài chính"
+      },
+      {
+        "ticker": "HAC",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "HBS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "HCM",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "HVA",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "IVS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "KAI",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "LPS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "MBS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "ORS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "PHS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "PSI",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "SBS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "SHS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "SSI",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "TCI",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "TCX",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "TIN",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "TVB",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "TVS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "UPS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VCI",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VCK",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VDS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VFS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VIG",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VIX",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VND",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VPX",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "VUA",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      },
+      {
+        "ticker": "WSS",
+        "reason": "Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"
+      }
+    ]
+  },
+  "quality_warnings": [
+    "Yahoo: Unable to retrieve https://query1.finance.yahoo.com/v8/finance/chart/F88.VN?period1=1760115600&period2=1791651600&interval=1d&events=div%2Csplits: HTTP Error 404: Not Found",
+    "Phân tích tài chính dùng báo cáo năm đã công bố; không sử dụng API quý có ánh xạ kỳ không rõ ràng.",
+    "KBS_income_F88_20261011_151619_289804: nguồn chỉ có ba kỳ năm; Value4 trống, chỉ dùng kỳ có metadata.",
+    "KBS_income_F88_20261011_151619_289804: loại kỳ 2025, metadata 202501–202612 không phải 12 tháng đã kết thúc trước công bố",
+    "KBS_balance_F88_20261011_151619_289804: nguồn chỉ có ba kỳ năm; Value4 trống, chỉ dùng kỳ có metadata.",
+    "KBS_balance_F88_20261011_151619_289804: loại kỳ 2025, metadata 202501–202612 không phải 12 tháng đã kết thúc trước công bố",
+    "KBS_cashflow_F88_20261011_151619_289804: nguồn chỉ có ba kỳ năm; Value4 trống, chỉ dùng kỳ có metadata.",
+    "KBS_cashflow_F88_20261011_151619_289804: loại kỳ 2025, metadata 202501–202612 không phải 12 tháng đã kết thúc trước công bố",
+    "Parquet tham khảo chưa có ngày công bố, đơn vị và phạm vi báo cáo; không tự thay số liệu phân tích/định giá. Khớp giá trị không chứng nhận nguồn độc lập hay phạm vi.",
+    "Parquet tài chính chỉ có HSX/HNX; không tự gán dữ liệu sàn khác.",
+    "Năm trong danh mục không phải ngày công bố. PDF kiểm tra checksum và khả năng đọc text; chưa tự chứng nhận số liệu/kỳ/phạm vi. Báo cáo lịch sử chưa bao gồm cập nhật 2026.",
+    "NSO: kỳ và ngày công bố riêng cho từng chỉ tiêu; số liệu ước tính có thể được điều chỉnh. WDI là nền năm, không thay số liệu tháng hoặc lãi suất/tỷ giá hiện tại.",
+    "Có chỉ tiêu WDI cũ hơn hai năm; chỉ dùng tham khảo lịch sử, không suy luận điều kiện hiện tại.",
+    "Phân ngành theo Vietcap ICB; khác biệt mô hình kinh doanh/chu kỳ vẫn có thể lớn. Trung vị mẫu không phải chỉ số của toàn ngành.",
+    "Không đủ mẫu cùng kỳ trong Tài chính cá nhân; mở rộng mẫu lên ICB cấp 2: Dịch vụ tài chính. So sánh nhóm rộng hơn, không coi là các đối thủ có sản phẩm giống nhau.",
+    "Số liệu mẫu so sánh lấy một nguồn KBS và kiểm tra cấu trúc/kỳ/bảng cân đối; chưa đối chiếu độc lập tất cả tài liệu gốc của từng doanh nghiệp."
+  ],
+  "errors": [
+    {
+      "stage": "industry_peers",
+      "message": "Chưa đủ hai doanh nghiệp so sánh có kỳ phù hợp; không tính trung vị mẫu."
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "KBS_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/F88/data_day?sdate=11-10-2025&edate=12-10-2026",
+      "retrieved_at": "2026-10-11T15:16:19.915244+07:00",
+      "page_or_table": "daily OHLCV",
+      "notes": "Raw snapshot: data/raw/prices/F88_20261011_151619_289804_kbs.json; VND; adjustment unverified; valid=True; request={}"
+    },
+    {
+      "source_id": "KBS_balance_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/F88?page=1&pageSize=4&unit=1000&termtype=1&type=CDKT&languageid=1",
+      "retrieved_at": "2026-10-11T15:16:20.900201+07:00",
+      "page_or_table": "balance",
+      "notes": "Financial monetary values requested in thousand VND; EPS in VND/share"
+    },
+    {
+      "source_id": "KBS_cashflow_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/F88?page=1&pageSize=4&unit=1000&termtype=1&type=LCTT&termType=1&code=F88",
+      "retrieved_at": "2026-10-11T15:16:21.041458+07:00",
+      "page_or_table": "cashflow",
+      "notes": "Financial monetary values requested in thousand VND; EPS in VND/share"
+    },
+    {
+      "source_id": "KBS_income_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/F88?page=1&pageSize=4&unit=1000&termtype=1&type=KQKD&languageid=1",
+      "retrieved_at": "2026-10-11T15:16:20.642124+07:00",
+      "page_or_table": "income",
+      "notes": "Financial monetary values requested in thousand VND; EPS in VND/share"
+    },
+    {
+      "source_id": "KBS_news_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/news/F88?l=1&p=12&s=1",
+      "retrieved_at": "2026-10-11T15:16:20.261563+07:00",
+      "page_or_table": "news",
+      "notes": "Public source snapshot"
+    },
+    {
+      "source_id": "KBS_profile_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/profile/F88?l=1",
+      "retrieved_at": "2026-10-11T15:16:20.261563+07:00",
+      "page_or_table": "profile",
+      "notes": "Public source snapshot; request={}"
+    },
+    {
+      "source_id": "VIETCAP_price_check_F88_20261011_151619_289804",
+      "url_or_file": "https://trading.vietcap.com.vn/api/chart/OHLCChart/gap-chart",
+      "retrieved_at": "2026-10-11T15:16:20.718007+07:00",
+      "page_or_table": "price_check",
+      "notes": "Public source snapshot; request={'timeFrame': 'ONE_DAY', 'symbols': ['F88'], 'to': 1791651600, 'countBack': 55}"
+    },
+    {
+      "source_id": "MINER_catalog_F88_20261011_151619_289804",
+      "url_or_file": "https://raw.githubusercontent.com/Tumiqa/vn-annual-report-miner/afa208bcf8c24a2b7eb5a1fd446084e376e8838a/data/zenodo_catalog/file_index_full.csv",
+      "retrieved_at": "2026-10-11T15:06:37.019382+07:00",
+      "page_or_table": "Annual-report catalog: F88; original catalog release 2026-06-27",
+      "notes": "Pinned afa208bcf8c24a2b7eb5a1fd446084e376e8838a; SHA256 9d9d469900c5c9657c636d8785b1308eb5e650585f169e4716eb1415f55bfd7c; reference only; publication/unit/scope not certified"
+    },
+    {
+      "source_id": "VAL_PROFILE_TVC_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stockinfo/profile/TVC?l=1",
+      "retrieved_at": "2026-10-11T15:16:37.288445+07:00",
+      "page_or_table": "profile.KLCPLH",
+      "notes": "Current shares; annual equity held constant as an explicit scenario assumption"
+    },
+    {
+      "source_id": "VAL_VIETCAP_TVC_F88_20261011_151619_289804",
+      "url_or_file": "https://trading.vietcap.com.vn/api/chart/OHLCChart/gap-chart",
+      "retrieved_at": "2026-10-11T15:16:38.266564+07:00",
+      "page_or_table": "2026-10-09",
+      "notes": "Only closing price on this date cross-checked; not full adjustment history; request={'timeFrame': 'ONE_DAY', 'symbols': ['TVC'], 'to': 1791651600, 'countBack': 54}"
+    },
+    {
+      "source_id": "VAL_KBS_TVC_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/TVC/data_day?sdate=27-08-2026&edate=12-10-2026",
+      "retrieved_at": "2026-10-11T15:16:38.480747+07:00",
+      "page_or_table": "2026-10-09",
+      "notes": "Only closing price on this date cross-checked; not full adjustment history; request={}"
+    },
+    {
+      "source_id": "NSO_F88_20261011_151619_289804_0",
+      "url_or_file": "https://www.nso.gov.vn/bai-top/2026/10/bao-cao-tinh-hinh-kinh-te-xa-hoi-quy-iii-va-9-thang-nam-2026/",
+      "retrieved_at": "2026-10-11T15:16:23.519462+07:00",
+      "page_or_table": "Báo cáo tình hình kinh tế - xã hội quý III và 9 tháng năm 2026",
+      "notes": "NSO; published 2026-10-03; reference 9/2026; raw NSO_F88_20261011_151619_289804_0.html"
+    },
+    {
+      "source_id": "WDI_cpi_annual_F88_20261011_151619_289804",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/FP.CPI.TOTL.ZG?format=json&per_page=20",
+      "retrieved_at": "2026-10-11T15:16:23.736203+07:00",
+      "page_or_table": "cpi_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "WDI_fx_annual_F88_20261011_151619_289804",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/PA.NUS.FCRF?format=json&per_page=20",
+      "retrieved_at": "2026-10-11T15:16:23.761379+07:00",
+      "page_or_table": "fx_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "WDI_gdp_annual_F88_20261011_151619_289804",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/NY.GDP.MKTP.KD.ZG?format=json&per_page=20",
+      "retrieved_at": "2026-10-11T15:16:23.811580+07:00",
+      "page_or_table": "gdp_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "WDI_lending_annual_F88_20261011_151619_289804",
+      "url_or_file": "https://api.worldbank.org/v2/country/VNM/indicator/FR.INR.LEND?format=json&per_page=20",
+      "retrieved_at": "2026-10-11T15:16:23.740275+07:00",
+      "page_or_table": "lending_annual",
+      "notes": "World Bank WDI annual; lastupdated not first release; historical/stale observations labeled"
+    },
+    {
+      "source_id": "SECTOR_8773_F88_20261011_151619_289804",
+      "url_or_file": "https://iq.vietcap.com.vn/api/iq-insight-service/v2/company/search-bar?language=1",
+      "retrieved_at": "2026-10-11T15:06:41.930645+07:00",
+      "page_or_table": "Vietcap ICB; level 2; code 8700; Dịch vụ tài chính",
+      "notes": "Vietcap ICB; cache_under_1h; current classification; ratings/targets/intraday quote fields excluded"
+    },
+    {
+      "source_id": "PEER_TVC_balance_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/TVC?page=1&pageSize=4&unit=1000&termtype=1&type=CDKT&languageid=1",
+      "retrieved_at": "2026-10-11T15:16:29.019389+07:00",
+      "page_or_table": "TVC balance",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_TVC_income_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/TVC?page=1&pageSize=4&unit=1000&termtype=1&type=KQKD&languageid=1",
+      "retrieved_at": "2026-10-11T15:16:36.976915+07:00",
+      "page_or_table": "TVC income",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    },
+    {
+      "source_id": "PEER_TVC_cashflow_F88_20261011_151619_289804",
+      "url_or_file": "https://kbbuddywts.kbsec.com.vn/iis-server/investment/stock/finance-info/TVC?page=1&pageSize=4&unit=1000&termtype=1&type=LCTT&termType=1&code=TVC",
+      "retrieved_at": "2026-10-11T15:16:37.000602+07:00",
+      "page_or_table": "TVC cashflow",
+      "notes": "KBS annual peer snapshot; period and scope checked; not independently verified"
+    }
+  ]
+}

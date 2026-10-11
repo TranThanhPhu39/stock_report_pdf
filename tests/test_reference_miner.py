@@ -134,7 +134,7 @@ class ReferenceTests(unittest.TestCase):
                 "errors":[],"status":"partial","sources":[],"reference":{"available":True,"records":parse_parquet(pd.DataFrame([row(value=123e9)]),"HPG","income",date(2026,10,9),"s")}}
         with TemporaryDirectory() as folder:
             pdf=generate_report(result,Path(folder)/"reference.pdf")
-            with pymupdf.open(pdf) as doc:text="".join(p.get_text() for p in doc)
+            with pymupdf.open(pdf) as doc:text=" ".join(" ".join(p.get_text().split()) for p in doc)
         self.assertIn("123.00",text);self.assertIn("không tự xác nhận đơn vị tỷ VND",text)
         self.assertNotIn("Giá và giao dịch",text)
 

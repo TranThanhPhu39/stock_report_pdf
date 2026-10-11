@@ -1,4 +1,5 @@
 """Application pipeline: always acquire source data before displaying a new result."""
+from __future__ import annotations
 
 import csv
 from datetime import date
@@ -16,6 +17,7 @@ from src.analysis.market import analyze_market
 from src.analysis.financial import analyze_financials
 from src.analysis.valuation import analyze_valuation
 from src.analysis.conclusion import build_conclusion
+from src.analysis.recommendation import build_recommendation
 from src.data.context import collect_context
 from src.data.reference_miner import collect_reference
 from src.analysis.context import integrated_thesis
@@ -91,6 +93,7 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     import json
     existing_sources = root / "outputs/runs" / acquisition["run_id"] / "sources.json"
     result["sources"] = json.loads(existing_sources.read_text(encoding="utf-8")) + research["sources"]
+    result["recommendation"]=build_recommendation(result)
     result["ai_commentary"]=generate_commentary(result,key=ai_key,model=ai_model)
     if interim and interim.get("valid"):
         pages_by_source={}

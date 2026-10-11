@@ -1,4 +1,5 @@
 """Evidence-based links from macro conditions through industry to the company."""
+from __future__ import annotations
 import statistics
 
 SECTOR_SIGNALS={"21":["construction_growth","industrial_growth","investment_growth"],"24":["construction_growth","investment_growth"],
@@ -54,6 +55,9 @@ def analyze_context(macro,industry,financial):
       "Chu kỳ đầu vào, cạnh tranh và khả năng chuyển giá có thể khiến lợi nhuận khác xu hướng vĩ mô; kiểm tra thuyết minh và kết quả kỳ tiếp theo."]
     if financial["industry_group"]=="bank":industry["structural_risks"].append("Ngân hàng: tăng tín dụng không chứng minh chất lượng tín dụng; cần NPL, dự phòng, NIM và CAR trước khi kết luận về an toàn vốn.")
     if financial["industry_group"]=="securities":industry["structural_risks"].append("Chứng khoán: môi giới nhạy với thanh khoản thị trường; cho vay và tự doanh chịu rủi ro giá tài sản, tài sản bảo đảm và chi phí vốn.")
+    for driver in industry["drivers"]:
+        if driver["indicator"]["key"]=="credit_growth" and financial.get("industry_group")=="nonfinancial":
+            driver["channel"]="Tín dụng là bối cảnh khả năng tiếp cận vốn và sức mua. Với doanh nghiệp này, cần đối chiếu nợ vay, lãi vay và nhu cầu khách hàng; chưa lượng hóa tác động khi thiếu cơ cấu nguồn vốn và độ nhạy doanh thu."
     return macro,industry
 
 def integrated_thesis(macro,industry,financial):

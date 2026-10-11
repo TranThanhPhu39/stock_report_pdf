@@ -322,10 +322,27 @@ if result:
             st.info(val["assumption"])
         else:st.info(val["reason"])
     with tabs[2]:
+        recommendation=result.get("recommendation",{})
+        if recommendation:
+            st.subheader("Khuyến nghị nghiên cứu: "+recommendation["stance"])
+            st.write(recommendation["reason"])
+            st.caption(f"Ngày {recommendation['as_of']} · {recommendation['horizon']} · Tin cậy {recommendation['confidence']}")
+            if recommendation.get("target_price_vnd"):
+                st.write(f"Giá trị kịch bản tổng hợp: {recommendation['target_price_vnd']:,.0f} VND/CP · Chênh lệch "+formatted(recommendation.get('upside_pct'),'%'))
+            for thesis in recommendation["opportunities"]:
+                with st.expander(thesis["title"]):
+                    st.write(thesis["evidence"]);st.write(thesis["implication"])
+                    st.write("Điều kiện xác nhận: "+thesis["catalyst"])
+                    st.write("Luận điểm không còn đúng khi: "+thesis["invalidation"])
+                    st.caption("Kỳ "+thesis["period"]+" · Nguồn: "+", ".join(thesis["source_ids"]))
+            with st.expander("Quy tắc khuyến nghị và điều kiện đánh giá lại"):
+                st.write(recommendation["methodology"]);st.write(recommendation["confidence_note"])
+                for condition in recommendation["conditions"]:st.write("• "+condition)
         st.write("**Luận điểm vĩ mô → ngành → doanh nghiệp**")
         for item in result["conclusion"].get("integrated_thesis",[]):st.write("• "+item)
-        st.write("**Cơ hội / điều kiện theo dõi**")
-        for item in result["conclusion"]["opportunities"]:st.write("• "+item)
+        if not recommendation:
+            st.write("**Cơ hội / điều kiện theo dõi**")
+            for item in result["conclusion"]["opportunities"]:st.write("• "+item)
         st.write("**Rủi ro**")
         if result["conclusion"].get("risk_matrix"):
             st.dataframe(pd.DataFrame([{ "Bằng chứng":r["evidence"],"Tác động":r["impact"],"Theo dõi":r["monitor"]} for r in result["conclusion"]["risk_matrix"]]),hide_index=True,width="stretch")

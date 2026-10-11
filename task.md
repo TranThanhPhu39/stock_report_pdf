@@ -78,3 +78,15 @@ Bộ bàn giao: README, projectcontext/task, docs, outputs/pdf và submission. M
 - [ ] Xác minh NCI ACB từ tài liệu gốc trước khi mở P/B, và nguồn lịch sử đầu 2016.
 
 - [x] Tách kiểm tra giá mới nhất cho định giá khỏi mẫu lịch sử; UI/PDF, cảnh báo và thống kê chuỗi đồng bộ; 88 kiểm thử đạt.
+
+## Sửa theo phản hồi bố cục, HNX/UPCoM, khuyến nghị (11/10/2026)
+
+- [x] Đối chiếu mẫu CFO; chuyển toàn bộ các phần phân tích sang frame cố định chữ bên phải, biểu đồ/bảng tóm tắt bên trái. Phụ lục toàn chiều rộng.
+- [x] Thêm Vietcap dự phòng cả chuỗi và đối chiếu bằng nhà cung cấp khác; kiểm tra mã/mảng/giá/ngày, lưu snapshot và tham số POST.
+- [x] Đệm ngày kết thúc KBS và lọc lại ngày chốt, không dùng phiên tương lai/hiện tại.
+- [x] Cho phép ba Head khi Value4 trống, giữ chặn ánh xạ không rõ/24 tháng; bổ sung CFO chứng khoán 4735.
+- [x] Khuyến nghị nghiên cứu, mức tin cậy, kỳ/horizon và quy tắc công khai; luận điểm có bằng chứng/nguồn/điều kiện xác nhận/bác bỏ.
+- [x] 101 tests đạt; nguồn thực sáu mã gồm HNX/UPCoM; UI AppTest SHS/VNZ từ kết quả thực không ngoại lệ; render tất cả trang ba PDF mới.
+- [ ] Xác minh kỳ 2025 SHS/F88 từ tài liệu có đơn vị/phạm vi/ngày công bố; bổ sung đầu vào QNS và mẫu peer F88. Không thay metadata lỗi hoặc NCI null bằng giả định số liệu.
+
+Minh chứng: submission/exchange_report_acceptance.json; phương pháp và giới hạn: docs/exchange_report_upgrade.md. Đây là kiểm chứng sáu mã, không phải toàn thị trường; API Gemini thật và deploy vẫn chưa được kiểm chứng.

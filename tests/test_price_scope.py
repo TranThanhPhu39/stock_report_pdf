@@ -78,7 +78,7 @@ class PriceScopeTests(unittest.TestCase):
         r["quality"]["price_check"]=self.quote
         with TemporaryDirectory() as d:
             path=generate_report(r,Path(d)/"scope.pdf")
-            with pymupdf.open(path) as doc:text="\n".join(p.get_text() for p in doc)
+            with pymupdf.open(path) as doc:text=" ".join(" ".join(p.get_text().split()) for p in doc)
         self.assertIn("Đã khớp đúng ngày",text);self.assertIn("Khớp 19/20 phiên",text)
         self.assertIn("mẫu lịch sử chưa khớp đầy đủ",text)
 

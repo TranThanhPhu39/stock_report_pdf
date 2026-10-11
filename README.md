@@ -11,7 +11,7 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS), chọn khoảng ngày, bản đầy đủ/tóm tắt, phần cần xuất, P/B/P/E giả định và các tỷ lệ Ke/WACC/g/thuế trong mục định giá. Bấm **Phân tích**, sau đó **Tải báo cáo phân tích PDF**. Luồng chính không yêu cầu chạy script lấy dữ liệu riêng.
+Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS/Vietcap), chọn khoảng ngày, bản đầy đủ/tóm tắt, phần cần xuất, P/B/P/E giả định và các tỷ lệ Ke/WACC/g/thuế trong mục định giá. Bấm **Phân tích**, sau đó **Tải báo cáo phân tích PDF**. Luồng chính không yêu cầu chạy script lấy dữ liệu riêng.
 
 Để đọc PDF scan bán niên HPG tự động, cài Tesseract OCR có gói `vie` và `eng`, thêm `tesseract` vào PATH. Windows cũng nhận đường dẫn `C:/Program Files/Tesseract-OCR/tesseract.exe`. Thiếu OCR: hệ thống báo thiếu phần bán niên và vẫn dùng số liệu năm hợp lệ. Tệp PDF gốc tải lần đầu có thể mất vài phút; bản lưu được kiểm tra SHA-256 và thời hạn 24 giờ trước khi dùng lại. Giá, tài chính và danh sách công bố vẫn được truy cập mới mỗi lượt.
 
@@ -27,7 +27,7 @@ Tệp theo lượt chạy nằm tại `outputs/runs/<run_id>/`: request.json, va
 
 ## Phân tích và nguồn
 
-- Giá cuối ngày Yahoo Finance; nếu lỗi tải/OHLC, tự thử toàn chuỗi KBS và đối chiếu ngược bằng Yahoo. Không ghép OHLC khác cơ sở điều chỉnh hoặc tự sửa giá nguồn. Định giá kiểm tra riêng giá đóng cửa mới nhất: đúng ngày, đúng giá sử dụng, khớp nguồn thứ hai trong 0,1%. Mẫu lịch sử tối đa 20 phiên có trạng thái riêng; nếu chưa khớp đầy đủ thì giữ biểu đồ đóng cửa nhưng không tính MA/lợi suất/drawdown/biến động năm hóa. Ghi phạm vi thực nhận và khoảng đầu kỳ thiếu. Luôn bỏ ngày hiện tại theo UTC+7, kể cả sau giờ giao dịch.
+- Giá cuối ngày Yahoo Finance; nếu lỗi tải/OHLC, tự thử toàn chuỗi KBS rồi Vietcap. Đối chiếu bằng nhà cung cấp khác; KBS chính thử Yahoo rồi Vietcap, Yahoo chính thử KBS rồi Vietcap. Không ghép OHLC khác cơ sở điều chỉnh hoặc tự sửa giá nguồn. Định giá kiểm tra riêng giá đóng cửa mới nhất: đúng ngày, đúng giá sử dụng, khớp nguồn thứ hai trong 0,1%. Mẫu lịch sử tối đa 20 phiên có trạng thái riêng; nếu chưa khớp đầy đủ thì giữ biểu đồ đóng cửa nhưng không tính MA/lợi suất/drawdown/biến động năm hóa. Ghi phạm vi thực nhận và khoảng đầu kỳ thiếu. Truy vấn KBS có đệm hai ngày để tránh bỏ phiên cuối, nhưng luôn lọc lại đến ngày chốt; bỏ ngày hiện tại theo UTC+7, kể cả sau giờ giao dịch.
 - Lợi suất theo Yahoo Adj Close, MA20/MA50, drawdown, biến động năm hóa và khối lượng. Chuỗi điều chỉnh không đồng nghĩa lợi nhuận thực nhận sau phí/thuế.
 - Báo cáo năm qua KBS: doanh thu thuần, LNST, tài sản, vốn, CFO, tăng trưởng, ROE hợp nhất, biên lợi nhuận và nợ vay/vốn khi phù hợp. Bán niên HPG được đọc trực tiếp từ PDF soát xét của doanh nghiệp bằng OCR.
 - Vĩ mô: tự đọc NSO (GDP lũy kế, CPI bình quân, IIP, tín dụng, bán lẻ thực, xuất khẩu…) và World Bank cho lịch sử năm. Lãi suất cho vay và tỷ giá World Bank là số lịch sử, không phải giá hiện tại.
@@ -75,3 +75,9 @@ Key cũng có thể đặt trong `[gemini]` với tên `api_key`. Model có th�
 ## Sửa điều kiện giá NVL (09/10/2026)
 
 88 kiểm thử đạt. Giá mới nhất được kiểm tra bằng bản ghi đối chiếu thực tế, không chỉ bằng cờ trạng thái. Lệch/thiếu các phiên lịch sử không chặn giá mới nhất đã khớp; giá mới nhất sai/thiếu/cũ, giá sử dụng khác bản ghi hoặc sai lệch >0,1% vẫn chặn định giá. UI/PDF tách hai trạng thái. Khi mẫu lịch sử chưa khớp, không tính MA20/50, lợi suất, drawdown hoặc biến động năm hóa; vẫn hiển thị chuỗi đóng cửa có cảnh báo. Các kiểm tra tài chính/NCI/phạm vi/CP snapshot vẫn giữ. Bấm **Phân tích** lại để thay kết quả cũ trong phiên giao diện. Chứng cứ chạy NVL: `submission/nvl_price_scope.json`.
+
+## PDF hai cột và HNX/UPCoM (11/10/2026)
+
+PDF đã chuyển sang biểu đồ ở cột trái, phân tích ở cột phải xuyên suốt từng phần; phụ lục phương pháp/nguồn dùng toàn chiều rộng. Có khuyến nghị nghiên cứu ngay trang đầu và luận điểm đầu tư kèm bằng chứng, điều kiện xác nhận/bác bỏ, kỳ và nguồn. Khuyến nghị được tính bằng quy tắc, không cần API Gemini. Sau cập nhật hãy khởi động lại ứng dụng và bấm **Phân tích và tạo PDF** để tạo báo cáo mới.
+
+Đã sửa đối chiếu Yahoo thiếu mã bằng Vietcap, ngày kết thúc truy vấn KBS, bộ đọc ba kỳ của F88 và CFO chứng khoán. **101 kiểm thử đạt**, sáu mã nguồn thực VNM/SHS/VNZ/PVS/QNS/F88 khớp 20/20 phiên gần nhất, giá ngày 09/10. PDF mới tại `outputs/pdf/VNM_report.pdf`, `SHS_report.pdf`, `VNZ_report.pdf`. SHS/F88 còn thiếu kỳ 2025 hợp lệ; QNS chưa đủ hai nhóm định giá; không gọi các trường hợp này là đã đủ toàn bộ dữ liệu. Chi tiết: [bố cục, phương pháp và giới hạn](docs/exchange_report_upgrade.md), `submission/exchange_report_acceptance.json`.

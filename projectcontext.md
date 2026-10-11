@@ -47,3 +47,9 @@ Tự lấy Parquet tài chính HSX/HNX và BCTN nhiều mã từ danh mục vn-a
 76 kiểm thử đạt; dữ liệu thực ACB/HPG/VNM và UI thật ACB. ACB chưa đủ đoạn đầu 2016 và NCI, có P/E năm quy đổi; HPG FCFF âm nên DCF chặn; VNM đủ phương pháp. Gemini tùy chọn từ bundle số liệu/nguồn, key qua Secrets/environment; missing key/API/JSON có fallback. SDK thật đã test HTTP giả lập, chưa test API/deploy thật. Không coi P/E năm là TTM; không coi số ngành cố định ZIP là dữ liệu thị trường. Minh chứng submission/upgrade_acceptance.json.
 
 Cập nhật NVL: định giá dùng giá mới nhất có bản ghi đúng ngày/giá khớp hai nguồn trong 0,1%; mẫu lịch sử giữ kiểm tra độc lập, chưa khớp thì chặn thống kê chuỗi. 88 kiểm thử đạt; không bỏ kiểm tra tài chính.
+
+## Bố cục và khuyến nghị (11/10/2026)
+
+Phản hồi mới của người dùng yêu cầu cột trái là biểu đồ, cột phải là nội dung phân tích, giống bố cục mẫu CFO. Bản mới dùng frame phải 112 mm và vùng biểu đồ trái 56 mm cho các phần phân tích, không chỉ đặt biểu đồ cạnh chú thích ngắn. Phụ lục phương pháp/nguồn toàn chiều rộng. PDF, UI và analysis.json dùng chung recommendation: stance, căn cứ, thời gian theo dõi, mức tin cậy, kịch bản tham chiếu, luận điểm có nguồn/điều kiện xác nhận/bác bỏ.
+
+Nguồn tự lấy mở rộng Vietcap gap-chart cho HNX/UPCoM khi Yahoo không có mã. KBS có đệm truy vấn cuối kỳ nhưng lọc lại <= ngày chốt; không ghép chuỗi khác nguồn. Bộ đọc ba kỳ chỉ nhận khi Head liên tiếp và Value4 trống; CFO chứng khoán dùng mã 4735. Phân tích sáu mã thực, 101 kiểm thử đạt, ba PDF VNM/SHS/VNZ được render và kiểm tra. SHS/F88 thiếu kỳ 2025 hợp lệ, QNS thiếu đầu vào tổng hợp, F88 thiếu peer cùng kỳ: giữ cảnh báo và không tự tạo dữ liệu. Xem docs/exchange_report_upgrade.md và submission/exchange_report_acceptance.json.

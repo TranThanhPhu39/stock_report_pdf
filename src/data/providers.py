@@ -1,4 +1,5 @@
 """Public-source acquisition. No promise of real-time or verified adjustment basis."""
+from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta, timezone
 import json
@@ -89,7 +90,9 @@ def fetch_daily_prices(ticker: str, start: date, as_of: date, now: datetime | No
 def fetch_kbs_prices(ticker: str, start: date, as_of: date) -> dict:
     """Whole-series fallback. Never splice providers with different adjustment bases."""
     cutoff = completed_day_cutoff(as_of)
-    query = urlencode({"sdate": start.strftime("%d-%m-%Y"), "edate": cutoff.strftime("%d-%m-%Y")})
+    # KBS boundary probes: edate=10/10 omitted the 09/10 session, while
+    # edate=11/10 returned it. Buffer the request only; rows still <= cutoff.
+    query = urlencode({"sdate": start.strftime("%d-%m-%Y"), "edate": (cutoff+timedelta(days=2)).strftime("%d-%m-%Y")})
     url = f"https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/{ticker}/data_day?{query}"
     raw = download(url)
     try:
@@ -105,6 +108,51 @@ def fetch_kbs_prices(ticker: str, start: date, as_of: date) -> dict:
         raise DataSourceError("Unrecognized KBS daily response") from exc
     return {"url": url, "raw": raw, "rows": sorted(rows, key=lambda r:r["date"]), "meta": {},
             "cutoff": cutoff.isoformat(), "retrieved_at": datetime.now(VN_TIME).isoformat()}
+
+
+def parse_vietcap_chart(payload, ticker, start, cutoff):
+    """Vietcap gap-chart prices are VND, timestamps epoch seconds (not thousands)."""
+    items = payload.get("data") if isinstance(payload, dict) else payload
+    if not isinstance(items, list) or len(items) != 1 or items[0].get("symbol") != ticker:
+        raise DataSourceError("Vietcap price symbol/response mismatch")
+    data = items[0]
+    fields = {"open":"o", "high":"h", "low":"l", "close":"c", "volume":"v"}
+    timestamps = data.get("t")
+    if not isinstance(timestamps, list) or any(not isinstance(data.get(k), list) or len(data[k]) != len(timestamps) for k in fields.values()):
+        raise DataSourceError("Vietcap price arrays have inconsistent lengths")
+    rows = []
+    try:
+        for i, ts in enumerate(timestamps):
+            session = datetime.fromtimestamp(float(ts), VN_TIME).date()
+            if start <= session <= cutoff:
+                rows.append({"ticker":ticker,"date":session.isoformat(),
+                             **{k:data[v][i] for k,v in fields.items()},
+                             "adjusted_close":None,"price_provider":"Vietcap",
+                             "price_basis":"vietcap_gap_chart_adjustment_unverified","unit":"VND_per_share"})
+    except (TypeError, ValueError, OSError, OverflowError) as exc:
+        raise DataSourceError("Invalid Vietcap timestamp") from exc
+    return sorted(rows, key=lambda r:r["date"])
+
+
+def fetch_vietcap_prices(ticker: str, start: date, as_of: date) -> dict:
+    """Independent provider for HNX/UPCoM too; no provider splicing or re-scaling."""
+    ticker = ticker.strip().upper()
+    if not re.fullmatch(r"[A-Z][A-Z0-9]{1,9}",ticker):raise ValueError("Invalid ticker")
+    cutoff = completed_day_cutoff(as_of)
+    if start > cutoff:raise ValueError("start must be on or before cutoff")
+    url = "https://trading.vietcap.com.vn/api/chart/OHLCChart/gap-chart"
+    parameters = {"timeFrame":"ONE_DAY","symbols":[ticker],
+                  "to":int(datetime.combine(cutoff+timedelta(days=1),time.min,VN_TIME).timestamp()),
+                  "countBack":(cutoff-start).days+10}
+    request = Request(url,data=json.dumps(parameters).encode(),headers={"User-Agent":"Mozilla/5.0 StockInsight/0.1",
+        "Content-Type":"application/json","Origin":"https://trading.vietcap.com.vn","Referer":"https://trading.vietcap.com.vn/"})
+    try:
+        with urlopen(request,timeout=20) as response:raw=response.read()
+        rows = parse_vietcap_chart(json.loads(raw),ticker,start,cutoff)
+    except (OSError,ValueError) as exc:
+        raise DataSourceError(f"Unable to retrieve Vietcap daily prices: {exc}") from exc
+    return {"url":url,"raw":raw,"rows":rows,"meta":{},"request_payload":parameters,
+            "cutoff":cutoff.isoformat(),"retrieved_at":datetime.now(VN_TIME).isoformat()}
 
 
 def parse_hpg_reports(html: bytes, as_of: date) -> list[dict]:

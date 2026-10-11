@@ -1,0 +1,254 @@
+{
+  "checked_at": "2026-10-11T15:30:01.782257+07:00",
+  "offline_tests": {
+    "command": "python -m unittest discover -s tests -q",
+    "passed": 101,
+    "failed": 0
+  },
+  "scope": "Six live source examples, not all tickers or full historical adjustment certification",
+  "changes": [
+    "Persistent chart-left/narrative-right PDF frames; full-width source/method appendices",
+    "Independent Vietcap quote fallback and whole-series fallback",
+    "KBS buffered query bounded by completed-day filter",
+    "Three annual Head records accepted only with empty unused Value4; securities CFO 4735",
+    "Evidence-linked deterministic research recommendation in UI/PDF/analysis.json"
+  ],
+  "runs": [
+    {
+      "ticker": "VNM",
+      "exchange": "HOSE",
+      "run_id": "VNM_20261011_152034_563749",
+      "as_of": "2026-10-11",
+      "status": "analyzed",
+      "primary_price_provider": "Yahoo",
+      "price_row_count": 260,
+      "latest_price_date": "2026-10-09",
+      "latest_close_vnd": 57700.0,
+      "quote_reference_provider": "KBS",
+      "quote_status": "matched",
+      "matched_count": 20,
+      "expected_count": 20,
+      "financial_years": [
+        2025,
+        2024,
+        2023,
+        2022
+      ],
+      "cfo_vnd": 8668137049000.0,
+      "recommendation": "ƯU TIÊN QUẢN TRỊ RỦI RO",
+      "recommendation_blockers": [],
+      "errors": [],
+      "pdf": {
+        "ticker": "VNM",
+        "path": "outputs\\pdf\\VNM_report.pdf",
+        "pages": 13,
+        "sha256": "f6a5fd5767551044f9d3b51265003bd9e9a3cd79c6215d57a0a0c7fbcfb09248",
+        "geometry_violations": [],
+        "visual_review": "All pages rendered and visually inspected; chart/narrative columns, legends, tables, sources and footers checked"
+      }
+    },
+    {
+      "ticker": "SHS",
+      "exchange": "HNX",
+      "run_id": "SHS_20261011_152053_394606",
+      "as_of": "2026-10-11",
+      "status": "partial",
+      "primary_price_provider": "KBS",
+      "price_row_count": 247,
+      "latest_price_date": "2026-10-09",
+      "latest_close_vnd": 11700.0,
+      "quote_reference_provider": "Vietcap",
+      "quote_status": "matched",
+      "matched_count": 20,
+      "expected_count": 20,
+      "financial_years": [
+        2024,
+        2023,
+        2022
+      ],
+      "cfo_vnd": -1403638756000.0,
+      "recommendation": "CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ",
+      "recommendation_blockers": [
+        "Tài chính mới nhất 2024, cần bổ sung kỳ 2025 hoặc mới hơn."
+      ],
+      "errors": [],
+      "pdf": {
+        "ticker": "SHS",
+        "path": "outputs\\pdf\\SHS_report.pdf",
+        "pages": 12,
+        "sha256": "8f2f652abed962e12dba6fe753f4fe0dfd259971f7f5914dbf3709a473ac799c",
+        "geometry_violations": [],
+        "visual_review": "All pages rendered and visually inspected; chart/narrative columns, legends, tables, sources and footers checked"
+      }
+    },
+    {
+      "ticker": "VNZ",
+      "exchange": "UPCoM",
+      "run_id": "VNZ_20261011_152110_409788",
+      "as_of": "2026-10-11",
+      "status": "analyzed",
+      "primary_price_provider": "KBS",
+      "price_row_count": 235,
+      "latest_price_date": "2026-10-09",
+      "latest_close_vnd": 533000.0,
+      "quote_reference_provider": "Vietcap",
+      "quote_status": "matched",
+      "matched_count": 20,
+      "expected_count": 20,
+      "financial_years": [
+        2025,
+        2024,
+        2023,
+        2022
+      ],
+      "cfo_vnd": 1836374589000.0,
+      "recommendation": "ƯU TIÊN QUẢN TRỊ RỦI RO",
+      "recommendation_blockers": [],
+      "errors": [],
+      "pdf": {
+        "ticker": "VNZ",
+        "path": "outputs\\pdf\\VNZ_report.pdf",
+        "pages": 12,
+        "sha256": "14aab47e41436a49c9ac07c51adf4cdfb21eeb5de3841052048f69a851a1e500",
+        "geometry_violations": [],
+        "visual_review": "All pages rendered and visually inspected; chart/narrative columns, legends, tables, sources and footers checked"
+      }
+    },
+    {
+      "ticker": "PVS",
+      "exchange": "HNX",
+      "run_id": "PVS_20261011_151522_861170",
+      "as_of": "2026-10-11",
+      "status": "analyzed",
+      "primary_price_provider": "KBS",
+      "price_row_count": 247,
+      "latest_price_date": "2026-10-09",
+      "latest_close_vnd": 33900.0,
+      "quote_reference_provider": "Vietcap",
+      "quote_status": "matched",
+      "matched_count": 20,
+      "expected_count": 20,
+      "financial_years": [
+        2025,
+        2024,
+        2023,
+        2022
+      ],
+      "cfo_vnd": 1935064984000.0,
+      "recommendation": "THEO DÕI",
+      "recommendation_blockers": [],
+      "errors": [],
+      "pdf": null
+    },
+    {
+      "ticker": "QNS",
+      "exchange": "UPCoM",
+      "run_id": "QNS_20261011_151549_118964",
+      "as_of": "2026-10-11",
+      "status": "analyzed",
+      "primary_price_provider": "KBS",
+      "price_row_count": 247,
+      "latest_price_date": "2026-10-09",
+      "latest_close_vnd": 51800.0,
+      "quote_reference_provider": "Vietcap",
+      "quote_status": "matched",
+      "matched_count": 20,
+      "expected_count": 20,
+      "financial_years": [
+        2025,
+        2024,
+        2023,
+        2022
+      ],
+      "cfo_vnd": 2106348503000.0,
+      "recommendation": "CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ",
+      "recommendation_blockers": [
+        "Chưa đủ ít nhất hai nhóm phương pháp định giá để có mức tham chiếu tổng hợp."
+      ],
+      "errors": [],
+      "pdf": null
+    },
+    {
+      "ticker": "F88",
+      "exchange": "UPCoM",
+      "run_id": "F88_20261011_151619_289804",
+      "as_of": "2026-10-11",
+      "status": "partial",
+      "primary_price_provider": "KBS",
+      "price_row_count": 247,
+      "latest_price_date": "2026-10-09",
+      "latest_close_vnd": 46900.0,
+      "quote_reference_provider": "Vietcap",
+      "quote_status": "matched",
+      "matched_count": 20,
+      "expected_count": 20,
+      "financial_years": [
+        2024,
+        2023
+      ],
+      "cfo_vnd": -603625241000.0,
+      "recommendation": "CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ",
+      "recommendation_blockers": [
+        "Tài chính mới nhất 2024, cần bổ sung kỳ 2025 hoặc mới hơn."
+      ],
+      "errors": [
+        {
+          "stage": "industry_peers",
+          "message": "Chưa đủ hai doanh nghiệp so sánh có kỳ phù hợp; không tính trung vị mẫu."
+        }
+      ],
+      "pdf": null
+    }
+  ],
+  "pdf_checks": [
+    {
+      "ticker": "VNM",
+      "path": "outputs\\pdf\\VNM_report.pdf",
+      "pages": 13,
+      "sha256": "f6a5fd5767551044f9d3b51265003bd9e9a3cd79c6215d57a0a0c7fbcfb09248",
+      "geometry_violations": [],
+      "visual_review": "All pages rendered and visually inspected; chart/narrative columns, legends, tables, sources and footers checked"
+    },
+    {
+      "ticker": "SHS",
+      "path": "outputs\\pdf\\SHS_report.pdf",
+      "pages": 12,
+      "sha256": "8f2f652abed962e12dba6fe753f4fe0dfd259971f7f5914dbf3709a473ac799c",
+      "geometry_violations": [],
+      "visual_review": "All pages rendered and visually inspected; chart/narrative columns, legends, tables, sources and footers checked"
+    },
+    {
+      "ticker": "VNZ",
+      "path": "outputs\\pdf\\VNZ_report.pdf",
+      "pages": 12,
+      "sha256": "14aab47e41436a49c9ac07c51adf4cdfb21eeb5de3841052048f69a851a1e500",
+      "geometry_violations": [],
+      "visual_review": "All pages rendered and visually inspected; chart/narrative columns, legends, tables, sources and footers checked"
+    }
+  ],
+  "ui_checks": [
+    {
+      "ticker": "SHS",
+      "exceptions": [],
+      "recommendation": [
+        "Khuyến nghị nghiên cứu: CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ"
+      ],
+      "scope": "UI renders saved live analysis; pipeline mocked, PDF path verified"
+    },
+    {
+      "ticker": "VNZ",
+      "exceptions": [],
+      "recommendation": [
+        "Khuyến nghị nghiên cứu: ƯU TIÊN QUẢN TRỊ RỦI RO"
+      ],
+      "scope": "UI renders saved live analysis; pipeline mocked, PDF path verified"
+    }
+  ],
+  "limitations": [
+    "SHS/F88 2025 metadata rejected as 24 months; latest valid year remains 2024",
+    "QNS lacks at least two valuation method groups",
+    "F88 lacks two eligible industry peers",
+    "HSX/HNX reference Parquet not reassigned to UPCoM",
+    "Gemini live API, Cloud deployment and all-market coverage not tested"
+  ]
+}

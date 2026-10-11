@@ -1,10 +1,11 @@
 """Compute peer P/B from dated financials and independently matched daily quotes."""
+from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 import json
 import statistics
 from src.analysis.valuation import number
-from src.data.providers import download, fetch_daily_prices, fetch_kbs_prices, VN_TIME, DataSourceError
+from src.data.providers import download, fetch_daily_prices, fetch_kbs_prices, fetch_vietcap_prices, VN_TIME, DataSourceError
 from src.data.research import KBS_BASE
 
 
@@ -29,13 +30,17 @@ def collect_valuation_peers(industry, as_of, price_date, root, run_id):
         start=as_of-timedelta(days=45)
         quotes=[]
         for provider,fetch in [("Yahoo",fetch_daily_prices),("KBS",fetch_kbs_prices)]:
-            response=fetch(ticker,start,as_of);q=next((r for r in response["rows"] if r["date"]==price_date),None)
+            try:response=fetch(ticker,start,as_of)
+            except DataSourceError:
+                if provider!="Yahoo":raise
+                provider="Vietcap";response=fetch_vietcap_prices(ticker,start,as_of)
+            q=next((r for r in response["rows"] if r["date"]==price_date),None)
             if not q or not number(q["close"],True):raise DataSourceError("Peer closing price missing on target date")
             quotes.append(q["close"])
             qs=f"VAL_{provider.upper()}_{ticker}_{run_id}";(folder/f"{qs}.json").write_bytes(response["raw"])
             quote_inputs.append({"source_id":qs,"value":q["close"],"unit":"VND/share","period":price_date,"provider":provider})
-            sources.append({"source_id":qs,"url_or_file":response["url"],"retrieved_at":response["retrieved_at"],"page_or_table":price_date,"notes":"Only closing price on this date cross-checked; not full adjustment history"})
-        if abs(quotes[0]/quotes[1]-1)>.001:raise DataSourceError("Peer close mismatch between Yahoo and KBS")
+            sources.append({"source_id":qs,"url_or_file":response["url"],"retrieved_at":response["retrieved_at"],"page_or_table":price_date,"notes":"Only closing price on this date cross-checked; not full adjustment history; request="+str(response.get("request_payload",{}))})
+        if abs(quotes[0]/quotes[1]-1)>.001:raise DataSourceError("Peer close mismatch between independent provider and KBS")
         fields=period["fields"]
         e=fields.get("equity",{}).get("value");n=fields.get("non_controlling_equity",{}).get("value")
         capital=e if period["scope"] in {"parent","separate"} else e-n if number(e) and number(n) else None

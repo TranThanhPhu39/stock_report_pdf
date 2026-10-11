@@ -1,4 +1,5 @@
 """Strict annual KBS parser. Currency values requested in thousands of VND."""
+from __future__ import annotations
 import calendar
 from datetime import date
 import math
@@ -16,7 +17,7 @@ FIELD_IDS["income"].update({4378:"net_profit",4380:"parent_profit",4381:"eps",43
     4590:"revenue",4585:"net_profit",4587:"parent_profit",4588:"eps",4599:"brokerage_revenue",5436:"lending_revenue",4584:"pretax_profit"})
 FIELD_IDS["balance"].update({4375:"assets",4304:"liabilities",4325:"equity",5699:"non_controlling_equity",4348:"customer_loans",4320:"customer_deposits",
     4476:"assets",4477:"liabilities",4478:"equity",4482:"non_controlling_equity",5373:"financial_loans"})
-FIELD_IDS["cashflow"].update({4110:"cfo",2254:"capex_cash",2250:"interest_paid",2263:"borrowings_received",2264:"debt_repaid"})
+FIELD_IDS["cashflow"].update({4110:"cfo",4735:"cfo",2254:"capex_cash",2250:"interest_paid",2263:"borrowings_received",2264:"debt_repaid"})
 
 
 def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: str, issues: list | None=None) -> list[dict]:
@@ -24,12 +25,16 @@ def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: st
     if not heads:
         raise DataSourceError("Nguồn không có metadata kỳ tài chính")
     # Live source probes show pageSize 1/2 mislabels old values as recent years.
-    # Fetch exactly four annual periods and reject any ambiguous head/value layout.
-    if [h.get("ID") for h in heads] != [1, 2, 3, 4]:
-        raise DataSourceError("Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu")
-    if len({h.get("YearPeriod") for h in heads}) != 4:
-        raise DataSourceError("Kỳ tài chính bị trùng")
+    # Three-year histories are valid for newer listings only when the unused
+    # fourth value column is empty. One/two-head source bugs remain rejected.
     rows = [r for group in payload.get("Content", {}).values() for r in group]
+    ids = [h.get("ID") for h in heads]
+    short_history = ids == [1,2,3] and all(r.get("Value4") is None for r in rows)
+    if ids != [1, 2, 3, 4] and not short_history:
+        raise DataSourceError("Ánh xạ kỳ/Value không rõ ràng; không sử dụng số liệu")
+    if len({h.get("YearPeriod") for h in heads}) != len(heads):
+        raise DataSourceError("Kỳ tài chính bị trùng")
+    if short_history and issues is not None:issues.append(f"{source_id}: nguồn chỉ có ba kỳ năm; Value4 trống, chỉ dùng kỳ có metadata.")
     parsed = []
     for head in heads:
         if head.get("TermCode") != "N":
