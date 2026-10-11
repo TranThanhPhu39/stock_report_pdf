@@ -68,8 +68,9 @@ class RecommendationTests(unittest.TestCase):
         r['valuation']=value();r['quality']['price_check']=compare_prices([{'date':'2026-10-08','close':20000}],{'data_day':[{'t':'2026-10-08','c':20000}]},NOW)
         r['quality']['financial_check']['status']='matched_selected_fields'
         next(m for m in r['financial']['metrics'] if m['key']=='net_profit_growth')['value']=20
-        r['valuation']['weighted_average']['components']=[{'method':'P/B','target_price_vnd':26000,'weight_pct':50,'contribution_vnd':13000},{'method':'P/E','target_price_vnd':28000,'weight_pct':50,'contribution_vnd':14000}]
-        r['valuation']['weighted_average']['target_price_vnd']=27000
+        r['valuation']['primary']={'available':True,'selected_method':'P/B mẫu','source_ids':['fixture'], 'upside_pct':35,'selection_reason':'Fixture đồng kỳ','methodology':'Mẫu dữ liệu kiểm thử','comparisons':[]}
+        r['valuation']['primary']['methods']=[{'method':'P/B','target_price_vnd':26000,'weight_pct':50,'contribution_vnd':13000},{'method':'P/E','target_price_vnd':28000,'weight_pct':50,'contribution_vnd':14000}]
+        r['valuation']['primary']['target_price_vnd']=27000
         return r
     def test_opportunity_has_sources_conditions_and_invalidation(self):
         r=build_recommendation(self.fixture());self.assertIn('TÍCH LŨY',r['stance']);self.assertTrue(r['entry_ceiling_vnd'])
@@ -86,17 +87,17 @@ class RecommendationTests(unittest.TestCase):
             r=self.fixture()
             if kind=='price':r['quality']['price_check']['checks']=[]
             elif kind=='financial':r['financial']['periods'][0]['year']=2024
-            elif kind=='method':r['valuation']['weighted_average']['available']=False
+            elif kind=='method':r['valuation']['primary']['available']=False
             else:r['request']['as_of']='2026-10-20'
             self.assertEqual(build_recommendation(r)['stance'],'CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ')
     def test_weak_cash_or_expensive_scenario_prioritizes_risk(self):
         for kind in ['cash','price']:
             r=self.fixture()
             if kind=='cash':next(m for m in r['financial']['metrics'] if m['key']=='cfo')['value']=-1
-            else:r['valuation']['weighted_average']['target_price_vnd']=16000
+            else:r['valuation']['primary']['target_price_vnd']=16000
             self.assertEqual(build_recommendation(r)['stance'],'ƯU TIÊN QUẢN TRỊ RỦI RO')
     def test_models_divergent_or_one_below_price_cannot_recommend_buy(self):
-        r=self.fixture();r['valuation']['weighted_average']['components'][0]['target_price_vnd']=10000
+        r=self.fixture();r['valuation']['primary']['methods'][0]['target_price_vnd']=10000
         self.assertEqual(build_recommendation(r)['stance'],'THEO DÕI')
     def test_pdf_narrative_in_right_column_and_recommendation_visible(self):
         import pymupdf

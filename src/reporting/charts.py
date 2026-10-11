@@ -47,28 +47,34 @@ def research_chart(result, kind, folder: Path):
             ax.tick_params(axis="x",labelrotation=45,labelsize=10)
             ax.set_ylabel("Tỷ VND");ax.grid(axis="y",alpha=.15);ax.set_axisbelow(True)
     elif kind=="industry":
-        rows=[c for c in result.get("industry",{}).get("comparisons",[]) if c["key"] in {"roe","roa","cir","net_margin"}][:3]
+        rows=([{**c,"unit":"x"} for c in result.get("valuation",{}).get("primary",{}).get("comparisons",[])]+[c for c in result.get("industry",{}).get("comparisons",[]) if c["key"] in {"roe","roa","cir","net_margin"}])[:3]
         if not rows:return None
         fig,axes=plt.subplots(len(rows),1,figsize=(3.5,2.1*len(rows)),squeeze=False)
         for ax,c in zip(axes[:,0],rows):
             ax.bar([result["request"]["ticker"],f"Trung vị\nn={c['sample_size']}"],[c["company_value"],c["sample_median"]],color=["#14566e","#d5a144"])
             ax.tick_params(axis="x",labelsize=10)
-            ax.set_title({"roe":"ROE", "roa":"ROA", "cir":"CIR", "net_margin":"Biên ròng"}.get(c["key"],c["label"]),fontsize=11);ax.set_ylabel(c["unit"]);ax.grid(axis="y",alpha=.15)
+            ax.set_title({"pe":"P/E năm", "pb":"P/B", "roe":"ROE", "roa":"ROA", "cir":"CIR", "net_margin":"Biên ròng"}.get(c["key"],c["label"]),fontsize=11);ax.set_ylabel(c["unit"]);ax.grid(axis="y",alpha=.15)
             for i,v in enumerate([c["company_value"],c["sample_median"]]):ax.annotate(f"{v:.2f}",(i,v),ha="center",va="bottom",fontsize=10)
     elif kind=="macro":
+        current=result.get("market_context",{}).get("series",[])
         rows=[r for r in result.get("macro",{}).get("annual_history",[]) if r["key"] in {"gdp_annual","cpi_annual"}]
-        if not rows:return None
-        fig,axes=plt.subplots(2,1,figsize=(3.5,4.4))
-        for ax,key,label in zip(axes,["gdp_annual","cpi_annual"],["GDP thực tăng trưởng năm","CPI bình quân năm"]):
-            selected=sorted([r for r in rows if r["key"]==key],key=lambda r:r["period"])
-            ax.plot([r["period"] for r in selected],[r["value"] for r in selected],marker="o",color="#207a78");ax.set_title(label);ax.set_ylabel("% / năm");ax.grid(alpha=.15)
+        if current:
+            import pandas as pd
+            fig,axes=plt.subplots(len(current),1,figsize=(3.5,2.3*len(current)),squeeze=False)
+            for ax,row in zip(axes[:,0],current):
+                ax.plot(pd.to_datetime([r["date"] for r in row["rows"]]),[r["close"] for r in row["rows"]],color="#207a78")
+                ax.set_title("VN-Index" if row["symbol"]=="VNINDEX" else "Brent futures - hợp đồng gần");ax.set_ylabel(row["unit"]);ax.grid(alpha=.15);ax.tick_params(axis='x',labelrotation=35,labelsize=8)
+        elif rows:
+            fig,axes=plt.subplots(2,1,figsize=(3.5,4.4))
+            for ax,key,label in zip(axes,["gdp_annual","cpi_annual"],["GDP thực tăng trưởng năm","CPI bình quân năm"]):
+                selected=sorted([r for r in rows if r["key"]==key],key=lambda r:r["period"])
+                ax.plot([r["period"] for r in selected],[r["value"] for r in selected],marker="o",color="#207a78");ax.set_title(label);ax.set_ylabel("% / năm");ax.grid(alpha=.15)
+        else:return None
     elif kind=="valuation":
-        val=result["valuation"];rows=[(m["method"],m["target_price_vnd"]) for m in val.get("pb_methods",[])]
-        for key,label,field in [("pe","P/E năm quy đổi","base_price_vnd"),("dcf","DCF FCFF","per_share_price_vnd"),("weighted_average","Bình quân trọng số","target_price_vnd")]:
-            if val.get(key,{}).get("available"):rows.append((label,val[key][field]))
+        rows=[(m["method"],m["target_price_vnd"]) for m in result["valuation"].get("primary",{}).get("methods",[])]
         if not rows:return None
         fig,ax=plt.subplots(figsize=(3.5,2.6));ax.barh([str(i+1) for i in range(len(rows))],[r[1]/1000 for r in rows],color="#207a78")
-        ax.set_title("Định giá theo phương pháp",fontsize=11)
+        ax.set_title("Định giá từ mẫu so sánh",fontsize=11)
         if result.get("market"):ax.axvline(result["market"]["latest_close_vnd"]/1000,color="#ca714b",ls="--",label="Giá đóng cửa");ax.legend(loc="lower right",fontsize=10)
         ax.set_xlim(left=0);ax.set_xlabel("Nghìn VND / CP");ax.grid(axis="x",alpha=.15)
     elif kind=="sensitivity":

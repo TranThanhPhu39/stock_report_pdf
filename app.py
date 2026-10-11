@@ -26,6 +26,14 @@ def fetch_news_preview(ticker: str, as_of: date) -> list[dict]:
     return parse_company_news(payload,ticker,f"KBS_news_preview_{ticker}",as_of)
 
 
+def show_research_notes(result,section):
+    for item in result.get("research_narrative",{}).get(section,[]):
+        with st.expander(item["title"],expanded=True):
+            st.write(item["evidence"]);st.write(item["interpretation"])
+            st.caption("Theo dõi: "+item["monitor"])
+            st.caption("Kỳ/ngày nguồn "+item["period"]+" · "+", ".join(item["source_ids"]))
+
+
 st.set_page_config(page_title="StockInsight",layout="wide",initial_sidebar_state="collapsed")
 st.markdown("""
 <style>
@@ -104,7 +112,7 @@ with request_column:
             if section_cols[index%len(section_cols)].checkbox(label,value=True,key=f"pdf_section_{section}"):
                 sections.append(section)
     with st.expander("Tuỳ chọn nâng cao"):
-        target_pb=st.number_input("P/B cơ sở giả định",min_value=0.1,max_value=20.0,value=1.5,step=0.1,help="Dùng làm giả định cho kịch bản định giá; không phải khuyến nghị mua/bán.")
+        target_pb=st.number_input("P/B cơ sở giả định",min_value=0.1,max_value=20.0,value=1.5,step=0.1,help="Chỉ dùng trong phụ lục độ nhạy; không thay đổi định giá chính hoặc khuyến nghị.")
     with st.expander("Giả định định giá: P/E, Gordon và DCF"):
         vc=st.columns(3)
         target_pe=vc[0].number_input("P/E năm giả định",min_value=.1,max_value=100.,value=12.,step=.5)
@@ -115,7 +123,7 @@ with request_column:
         forecast_growth=vc[1].number_input("Tăng trưởng FCFF 3 năm (%)",min_value=-50.,max_value=50.,value=7.,step=.5)/100
         tax_rate=vc[2].number_input("Thuế suất giả định (%)",min_value=0.,max_value=99.,value=20.,step=1.)/100
         st.caption("Các tỷ lệ trên là giả định do người dùng chọn. DCF chỉ áp cho doanh nghiệp phi tài chính có FCFF và đầu vào đầy đủ. EPS năm quy đổi không phải EPS công bố/TTM.")
-    use_ai=st.checkbox("Gemini hỗ trợ nhận xét từ dữ liệu và nguồn",value=False,help="Cần GEMINI_API_KEY trong Streamlit Secrets hoặc environment. Gửi số liệu công khai đã thu thập cho Gemini; nếu thiếu key hoặc lỗi, vẫn tạo báo cáo bằng quy tắc.")
+    use_ai=st.checkbox("Gemini hỗ trợ nhận xét từ dữ liệu và nguồn",value=False,help="Cần GEMINI_API_KEY trong Streamlit Secrets hoặc environment. Gửi số liệu và trích xuất bài công khai có giới hạn cho Gemini; nếu thiếu key hoặc lỗi, vẫn tạo báo cáo bằng quy tắc.")
     submitted=st.button("Phân tích và tạo PDF",type="primary",use_container_width=True,key="run_analysis")
 
 with brief_column:
@@ -256,6 +264,10 @@ if result:
             st.write(macro.get("assessment",""))
             st.caption("Các kỳ riêng biệt; số liệu năm WDI không thay số liệu tháng. Lãi suất/tỷ giá bình quân lịch sử không phải mức hiện tại.")
         else:st.warning("Chưa lấy được dữ liệu vĩ mô hợp lệ.")
+        show_research_notes(result,"macro")
+        with st.expander("Phạm vi nguồn tin và thị trường"):
+            st.caption(result.get("context_news",{}).get("note",""))
+            st.json({"news_errors":result.get("context_news",{}).get("errors",[]),"market_context_errors":result.get("market_context",{}).get("errors",[])})
     with context_tabs[1]:
         industry=result.get("industry",{})
         if industry.get("available"):
@@ -272,6 +284,7 @@ if result:
             with st.expander("Phạm vi mẫu và mã bị loại"):
                 st.json({"coverage":industry.get("coverage"),"excluded":industry.get("excluded"),"eligible_candidates":industry.get("eligible_candidates")})
         else:st.warning("Nguồn chưa xác nhận phân ngành của mã này; không tự gán ngành.")
+        show_research_notes(result,"industry")
     tabs=st.tabs(["Tài chính","Định giá đa phương pháp","Cơ hội và rủi ro","Tin tức","Nguồn dữ liệu"])
     with tabs[0]:
         diagnostics=result.get("financial_data_status",{})
@@ -325,24 +338,48 @@ if result:
             for error in reference.get("errors",[]):st.warning(error["message"])
             if not reference.get("available"):st.info("Chưa có dữ liệu bổ sung đủ điều kiện theo phiên bản nguồn/ngày phân tích/sàn.")
     with tabs[1]:
-        val=result["valuation"]
-        if val["available"]:
-            if val.get("price_warning"):st.warning(val["price_warning"])
-            if val.get("book_value_per_share") is not None:st.caption(f"BVPS mẹ {formatted(val['book_value_per_share'],'VND/share')} · P/B tham chiếu {val['reference_pb']:.2f} lần")
-            if val.get("pb_methods"):st.dataframe(pd.DataFrame(val["pb_methods"]),hide_index=True,width="stretch")
-            if val.get("scenarios"):st.dataframe(pd.DataFrame([{"Kịch bản":s["label"],"P/B giả định":s["target_pb"],"Giá trị quy đổi":formatted(s["reference_price_vnd"],"VND/share"),"Chênh lệch":formatted(s["difference_pct"],"%")} for s in val["scenarios"]]),hide_index=True,width="stretch")
-            for method,label in [("gordon","P/B Gordon"),("industry","P/B mẫu ngành"),("pe","P/E lợi nhuận năm quy đổi"),("dcf","DCF FCFF"),("weighted_average","Bình quân trọng số")]:
-                data=val.get(method,{})
-                with st.expander(label,expanded=bool(data.get("available"))):
-                    if data.get("available"):
-                        if data.get("scenarios"):st.dataframe(pd.DataFrame(data["scenarios"]),hide_index=True,width="stretch")
-                        if data.get("components"):st.dataframe(pd.DataFrame(data["components"]),hide_index=True,width="stretch")
-                        target=data.get("target_price_vnd",data.get("base_price_vnd",data.get("per_share_price_vnd")))
-                        if target is not None:st.metric("Giá trị kịch bản / CP",formatted(target,"VND/share"))
-                        st.caption(data.get("eps_basis") or data.get("explanation") or data.get("formula") or data.get("note", ""))
-                    else:st.info(data.get("reason","Chưa đủ đầu vào."))
-            st.info(val["assumption"])
-        else:st.info(val["reason"])
+        val=result["valuation"];primary=val.get("primary",{});benchmark=val.get("benchmark",{})
+        st.subheader("Định giá chính từ dữ liệu so sánh")
+        if primary.get("available"):
+            st.metric("Giá tham chiếu chính",formatted(primary["target_price_vnd"],"VND/share"),formatted(primary["upside_pct"],"%"))
+            st.write(primary["selected_method"]+". "+primary["selection_reason"])
+            st.caption(primary["methodology"])
+            st.dataframe(pd.DataFrame([{ "Chỉ tiêu":c["label"],"Hiện tại (x)":c["company_value"],"Trung vị mẫu (x)":c["sample_median"],"Cao/thấp hơn mẫu (%)":c["premium_pct"],"Số mẫu":c["sample_size"]} for c in primary["comparisons"]]),hide_index=True,width="stretch")
+            for c in primary["comparisons"]:st.write(c["label"]+": "+c["interpretation"])
+            st.dataframe(pd.DataFrame([{"Phương pháp":m["method"],"Bội số (x)":m.get("multiple"),"Giá / CP (VND)":m["target_price_vnd"],"Chênh với giá (%)":m.get("difference_pct"),"Số mẫu":m.get("sample_size")} for m in primary["methods"]]),hide_index=True,width="stretch")
+        else:st.info(primary.get("reason","Chưa đủ dữ liệu cho định giá chính."))
+        peers=benchmark.get("peers",[])
+        if peers:
+            st.write("**Các doanh nghiệp so sánh**")
+            st.dataframe(pd.DataFrame([{ "Mã":r["ticker"],"P/E năm (x)":r["pe"],"P/B (x)":r["pb"],"ROE (%)":r["roe"],"LNST YoY (%)":r.get("profit_growth"),"Nợ vay/vốn":r.get("debt_equity")} for r in peers]),hide_index=True,width="stretch")
+            st.caption(f"Kỳ {benchmark.get('period_end')}; giá {benchmark.get('price_date')}. P/E theo lợi nhuận mẹ năm/CP snapshot; không phải TTM hay dự phóng. Mẫu không đại diện toàn ngành.")
+        sotp=val.get("sotp",{})
+        with st.expander("SOTP: định giá từng mảng",expanded=bool(sotp.get("available"))):
+            st.write(sotp.get("reason","Chưa có dữ liệu từng mảng có nguồn."))
+            if sotp.get("available"):
+                st.caption(f"Mô hình {sotp.get('provider')}; ngày {sotp['published_at']}; CP theo báo cáo nguồn.")
+                st.dataframe(pd.DataFrame(sotp["components"]),hide_index=True,width="stretch")
+                st.metric("Giá SOTP tính lại theo báo cáo nguồn",formatted(sotp["target_price_vnd"],"VND/share"))
+                st.caption(sotp["basis"])
+        with st.expander("Phụ lục: giả định cá nhân và kiểm tra độ nhạy",expanded=False):
+            st.caption("P/B và P/E nhập tay chỉ để thử độ nhạy. Không tham gia định giá chính hoặc khuyến nghị; Gordon/DCF ở đây chưa phải dự báo kinh doanh được xác nhận.")
+            if val["available"]:
+                if val.get("price_warning"):st.warning(val["price_warning"])
+                if val.get("book_value_per_share") is not None:st.caption(f"BVPS mẹ {formatted(val['book_value_per_share'],'VND/share')} · P/B tham chiếu {val['reference_pb']:.2f} lần")
+                if val.get("pb_methods"):st.dataframe(pd.DataFrame(val["pb_methods"]),hide_index=True,width="stretch")
+                if val.get("scenarios"):st.dataframe(pd.DataFrame([{"Kịch bản":s["label"],"P/B giả định":s["target_pb"],"Giá trị quy đổi":formatted(s["reference_price_vnd"],"VND/share"),"Chênh lệch":formatted(s["difference_pct"],"%")} for s in val["scenarios"]]),hide_index=True,width="stretch")
+                for method,label in [("gordon","P/B Gordon"),("industry","P/B mẫu ngành"),("pe","P/E lợi nhuận năm quy đổi"),("dcf","DCF FCFF"),("weighted_average","Bình quân trọng số")]:
+                    data=val.get(method,{})
+                    with st.expander(label,expanded=bool(data.get("available"))):
+                        if data.get("available"):
+                            if data.get("scenarios"):st.dataframe(pd.DataFrame(data["scenarios"]),hide_index=True,width="stretch")
+                            if data.get("components"):st.dataframe(pd.DataFrame(data["components"]),hide_index=True,width="stretch")
+                            target=data.get("target_price_vnd",data.get("base_price_vnd",data.get("per_share_price_vnd")))
+                            if target is not None:st.metric("Giá trị kịch bản / CP",formatted(target,"VND/share"))
+                            st.caption(data.get("eps_basis") or data.get("explanation") or data.get("formula") or data.get("note", ""))
+                        else:st.info(data.get("reason","Chưa đủ đầu vào."))
+                st.info(val["assumption"])
+            else:st.info(val["reason"])
     with tabs[2]:
         recommendation=result.get("recommendation",{})
         if recommendation:
@@ -350,7 +387,7 @@ if result:
             st.write(recommendation["reason"])
             st.caption(f"Ngày {recommendation['as_of']} · {recommendation['horizon']} · Tin cậy {recommendation['confidence']}")
             if recommendation.get("target_price_vnd"):
-                st.write(f"Giá trị kịch bản tổng hợp: {recommendation['target_price_vnd']:,.0f} VND/CP · Chênh lệch "+formatted(recommendation.get('upside_pct'),'%'))
+                st.write(f"Giá tham chiếu chính: {recommendation['target_price_vnd']:,.0f} VND/CP · Chênh lệch "+formatted(recommendation.get('upside_pct'),'%'))
             for thesis in recommendation["opportunities"]:
                 with st.expander(thesis["title"]):
                     st.write(thesis["evidence"]);st.write(thesis["implication"])
@@ -374,7 +411,9 @@ if result:
             for section,items in ai["sections"].items():
                 for item in items:
                     st.write(item["text"])
-                    for e in item["evidence"]:st.caption(f"{e['label']} · Kỳ {e['period']} · {e.get('value',e.get('company_value'))} {e.get('unit','')}")
+                    for e in item["evidence"]:
+                        detail="Bài công khai; ngày bài không thay kỳ của số liệu" if e.get("evidence_type")=="news_article" else f"{e.get('value',e.get('company_value'))} {e.get('unit','')}"
+                        st.caption(f"{e['label']} · Kỳ {e['period']} · {detail}")
                     st.caption("Nguồn: "+", ".join(item["source_ids"])+f" · Chốt {ai['as_of']} · {ai['model']}")
     with tabs[3]:
         for item in result["news"]:st.markdown(f"{item['published_at']} · [{item['title']}]({item['url']})")

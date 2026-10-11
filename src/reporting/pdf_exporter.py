@@ -37,12 +37,13 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     styles=getSampleStyleSheet()
     styles.add(ParagraphStyle(name="BodyVN",fontName="DV",fontSize=9,leading=14,spaceAfter=6,allowWidows=0,allowOrphans=0,textColor=colors.HexColor("#263640")))
     styles.add(ParagraphStyle(name="SmallVN",parent=styles["BodyVN"],fontSize=8,leading=11.5,spaceAfter=3,wordWrap="CJK"))
-    styles.add(ParagraphStyle(name="SourceVN",parent=styles["SmallVN"],fontSize=7.2,leading=10,spaceAfter=2))
-    styles.add(ParagraphStyle(name="MethodVN",parent=styles["SmallVN"],leading=10.5,spaceAfter=2))
+    styles.add(ParagraphStyle(name="SourceVN",parent=styles["SmallVN"],fontSize=7.2,leading=9,spaceAfter=2))
+    styles.add(ParagraphStyle(name="MethodVN",parent=styles["SmallVN"],leading=10,spaceAfter=2))
     styles.add(ParagraphStyle(name="HeadingVN",parent=styles["BodyVN"],fontName="DV-Bold",fontSize=14,leading=19,spaceBefore=14,spaceAfter=9,keepWithNext=True,textColor=colors.HexColor("#14566e")))
+    styles.add(ParagraphStyle(name="EvidenceHeadingVN",parent=styles["HeadingVN"],fontSize=11,leading=15,spaceBefore=8,spaceAfter=5))
     styles.add(ParagraphStyle(name="TitleVN",parent=styles["HeadingVN"],fontSize=22,leading=28,spaceBefore=0))
     story=[];left_panels={};left_cards={};current_section="overview"
-    full_width={"methods","sources"};right_width=112*mm;left_width=56*mm
+    full_width={"methods","sources","valuation_appendix"};right_width=112*mm;left_width=56*mm
     def p(value,small=False,source=False):
         safe=str(value).translate(str.maketrans({"—":"-","–":"-","‑":"-","−":"-"}))
         return Paragraph(escape(safe).replace("\n","<br/>"),styles["SourceVN" if source else "MethodVN" if small and current_section=="methods" else "SmallVN" if small else "BodyVN"])
@@ -72,22 +73,41 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         ids={i for i in ids if i in source_numbers};used_sources.update(ids)
         if ids:
             if story and isinstance(story[-1],Paragraph):story[-1].keepWithNext=True
-            text("Nguồn: "+", ".join(sorted(source_numbers[i] for i in ids))+". "+note,True)
+            nums=sorted({int(source_numbers[i][1:]) for i in ids});ranges=[]
+            start=end=nums[0]
+            for n in nums[1:]+[None]:
+                if n is not None and n==end+1:end=n;continue
+                ranges.append(f"S{start:02}"+(f"-S{end:02}" if end>start else ""))
+                start=end=n
+            text("Nguồn: "+", ".join(ranges)+". "+note,True)
     def panel(kind,note):
         chart=market_chart(result,path.parent/"charts") if kind=="market" else research_chart(result,kind,path.parent/"charts")
         if chart:
             if kind=="valuation":
-                val=result["valuation"];names=[m["method"] for m in val.get("pb_methods",[])]
-                names.extend(label for key,label in [("pe","P/E năm quy đổi"),("dcf","DCF FCFF"),("weighted_average","Bình quân trọng số")] if val.get(key,{}).get("available"))
+                names=[m["method"] for m in result["valuation"].get("primary",{}).get("methods",[])]
                 note="\n".join(f"{i+1}. {name}" for i,name in enumerate(names))+"\n\n"+note
-            left_panels.setdefault(current_section,[]).append((chart,note))
+            if current_section in full_width:
+                iw,ih=ImageReader(str(chart)).getSize();story.append(Image(str(chart),width=50*mm,height=ih/iw*50*mm));text(note,True)
+            else:left_panels.setdefault(current_section,[]).append((chart,note))
+    def narrative_notes(section):
+        for item in result.get("research_narrative",{}).get(section,[]):
+            # These values and channels are already printed in the industry tables
+            # and driver paragraphs immediately above; avoid repeating them.
+            if section=="industry" and (item["title"]=="Kênh vĩ mô vào ngành" or item["title"].endswith("trong nhóm so sánh")):continue
+            note_start=len(story)
+            story.append(Paragraph(escape(item["title"]),styles["EvidenceHeadingVN"]))
+            interpretation=item["interpretation"].replace("Nguồn báo chí đang đề cập vấn đề này; đây là kênh tác động có điều kiện, không chứng nhận mọi phát biểu trong bài. ","Suy luận có điều kiện từ tin báo chí: ")
+            text(item["evidence"],True);text(interpretation,True)
+            text("Theo dõi: "+item["monitor"],True);citations(item["source_ids"],"Kỳ/ngày nguồn: "+item["period"])
+            story[note_start:]=[KeepTogether(story[note_start:])]
     def ai_notes(section):
         ai=result.get("ai_commentary",{})
         for item in ai.get("sections",{}).get(section,[]):
             text("Nhận xét hỗ trợ AI: "+item["text"])
             for e in item.get("evidence",[]):
                 value=e.get("value")
-                caption=f"{e['label']}: "+(formatted(value,e.get("unit","")) if value is not None else f"mã {e.get('company_value')}; trung vị {e.get('sample_median')}; n={e.get('sample_size')}")
+                caption=(e['label']+": bằng chứng bài công khai, cần kiểm tra kỳ của số liệu." if e.get("evidence_type")=="news_article" else
+                         f"{e['label']}: "+(formatted(value,e.get("unit","")) if value is not None else f"mã {e.get('company_value')}; trung vị {e.get('sample_median')}; n={e.get('sample_size')}"))
                 text(caption+f" · Kỳ {e.get('period')} · Ngày chốt {ai.get('as_of')}",True)
             citations(item["source_ids"],f"AI {ai.get('model')}; tạo {ai.get('generated_at','')[:10]}; suy luận có điều kiện.")
     selected=set(request["sections"]);full=request["mode"]=="full"
@@ -119,7 +139,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             text(recommendation["stance"]);text(recommendation["reason"])
             text(recommendation["horizon"]+f" · Tin cậy: {recommendation['confidence']}",True)
             if recommendation.get("target_price_vnd"):
-                text(f"Kịch bản tổng hợp: {recommendation['target_price_vnd']:,.0f} VND/CP; chênh lệch "+formatted(recommendation.get("upside_pct"),"%")+". Không phải lợi suất dự báo.",True)
+                text(f"Định giá chính: {recommendation['target_price_vnd']:,.0f} VND/CP; chênh lệch "+formatted(recommendation.get("upside_pct"),"%")+". Không phải lợi suất dự báo.",True)
             citations(recommendation["source_ids"])
 
         text(f"Sàn: {result['company'].get('exchange') or 'chưa có'} · Website: {result['company'].get('website') or 'chưa có'}")
@@ -140,9 +160,12 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         indicators=macro.get("indicators",[])
         chosen=[r for r in indicators if r["key"] not in {"gdp_current_usd","lending_annual","fx_annual"}] if full else [r for r in indicators if r["key"] in {"gdp_ytd","cpi_ytd","credit_growth","usd_index_yoy","gdp_annual","cpi_annual"}]
         table(["Chỉ tiêu","Giá trị","Kỳ tham chiếu","Công bố / cập nhật nguồn"],[[r["label"],formatted(r["value"],r["unit"]),r["period"],r.get("published_at") or "Cập nhật "+r.get("source_updated_at","")] for r in chosen],[69*mm,27*mm,38*mm,40*mm])
-        panel("macro","Nền năm WDI dùng để nhìn xu hướng. Không ghép năm với chỉ tiêu lũy kế tháng thành cùng một chuỗi. Nguồn và kỳ được nêu ngay bên dưới.")
+        panel("macro","Chuỗi VN-Index (điểm) và Brent futures (USD/thùng) nếu lấy được; chỉ dùng phiên đã kết thúc. Hợp đồng dầu có chuyển kỳ; không phải dầu giao ngay. Khi thiếu, hiển thị nền năm WDI và ghi nguồn.")
         citations([r["source_id"] for r in chosen]+[r["source_id"] for r in macro.get("annual_history",[]) if r["key"] in {"gdp_annual","cpi_annual"}])
         text(macro.get("assessment","Chưa có dữ liệu vĩ mô hợp lệ."))
+        narrative_notes("macro")
+        for source_block in [result.get("context_news",{}),result.get("market_context",{})]:
+            for error in source_block.get("errors",[]):text("Nguồn nhận xét chưa lấy được: "+error["message"],True)
         for item in result["conclusion"].get("integrated_thesis",[]):
             if item.startswith("Vĩ mô"):text(item)
         ai_notes("macro")
@@ -168,6 +191,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             panel("industry","So sánh mẫu cùng kỳ/phạm vi; trung vị loại mã đang phân tích. Số mẫu được ghi cho từng chỉ tiêu, không đại diện toàn ngành.")
             citations([r["source_id"] for r in industry.get("sources",[])]+[d["indicator"]["source_id"] for d in industry.get("drivers",[])])
             ai_notes("industry")
+            narrative_notes("industry")
     if "market" in selected:
         start_section("market",SECTION_LABELS["market"]);market=result.get("market")
         if market:
@@ -264,8 +288,8 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         for error in reference.get("errors",[]):text("Nguồn bổ sung chưa đủ: "+error["message"],True)
         if not reference.get("available"):text("Chưa có dữ liệu bổ sung phù hợp ngày phân tích/sàn/phiên bản nguồn.")
         if reference.get("commit"):text("Phiên bản dữ liệu: "+reference["commit"]+"; ghi nhận tại "+reference["version_available_at"]+". Năm báo cáo không phải ngày công bố.",True)
-    if "valuation" in selected:
-        start_section("valuation",SECTION_LABELS["valuation"]);val=result["valuation"]
+    def valuation_appendix():
+        start_section("valuation_appendix","Phụ lục: giả định và kiểm tra độ nhạy");val=result["valuation"]
         if val["available"]:
             text(val["assumption"])
             if val.get("price_warning"):text(val["price_warning"],True)
@@ -273,7 +297,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             a=val.get("assumptions",{})
             if a:text(f"Giả định: P/B {a['target_pb']:.2f}x; P/E {a['target_pe']:.2f}x; Ke {a['cost_of_equity']*100:.2f}%; WACC {a['wacc']*100:.2f}%; g dài hạn {a['terminal_growth']*100:.2f}%; tăng FCFF {a['forecast_growth']*100:.2f}%; thuế {a['tax_rate']*100:.2f}%.",True)
             if val.get("book_value_per_share") is not None:text(f"BVPS mẹ: {formatted(val['book_value_per_share'],'VND/share')} · P/B tham chiếu: {val['reference_pb']:.2f} lần.")
-            panel("valuation","Giá trị kịch bản dùng giả định người dùng. Đường dọc là giá đóng cửa đã đối chiếu. Chênh lệch dương không tự tạo khuyến nghị mua.")
+            text("P/B/P/E nhập tay, Gordon và DCF dưới đây là giả định thử độ nhạy; không quyết định định giá hoặc khuyến nghị chính.")
             citations([s["source_id"] for s in val.get("industry",{}).get("sources",[])]+[r["source_id"] for peer in val.get("industry",{}).get("peers",[]) for r in peer.get("inputs",[]) if r.get("source_id")])
             if val.get("pb_methods"):table(["Phương pháp P/B","Bội số","Giá trị / CP","Chênh lệch"],[[m["method"],formatted(m["multiple"],"x"),formatted(m["target_price_vnd"],"VND/share"),formatted(m["difference_pct"],"%")] for m in val["pb_methods"]])
             if val.get("scenarios"):table(["Kịch bản P/B","P/B giả định","Giá trị / CP","Chênh lệch"],[[m["label"],formatted(m["target_pb"]),formatted(m["reference_price_vnd"],"VND/share"),formatted(m["difference_pct"],"%")] for m in val["scenarios"]])
@@ -295,12 +319,40 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             for key,label in [("gordon","Gordon"),("industry","P/B ngành"),("pe","P/E"),("dcf","DCF"),("weighted_average","Bình quân")]:
                 method=val.get(key,{})
                 if not method.get("available"):blocked_notes.setdefault(method.get("reason","Chưa đủ đầu vào."),[]).append(label)
-                elif method.get("explanation"):text(label+": "+method["explanation"],True)
+                elif method.get("explanation") and key!="industry":text(label+": "+method["explanation"],True)
                 method_sources.extend([r["source_id"] for r in method.get("inputs",[]) if r.get("source_id")])
             for reason,names in blocked_notes.items():left_cards.setdefault("valuation",[]).append(p(" / ".join(names)+": "+reason,True))
             citations(method_sources+[r["source_id"] for r in val.get("inputs",[]) if r.get("source_id")])
 
         else:text(val["reason"])
+    if "valuation" in selected:
+        start_section("valuation","Định giá và so sánh P/E - P/B")
+        val=result["valuation"];primary=val.get("primary",{});benchmark=val.get("benchmark",{})
+        if val.get("price_warning"):text(val["price_warning"],True)
+        text("P/B hiện tại = giá / BVPS mẹ; P/E năm = giá / EPS mẹ năm quy đổi. Bội số mục tiêu lấy từ trung vị mẫu cùng kỳ/phạm vi và ngày giá; không dùng mức 1,5x/12x nhập tay như dữ liệu ngành.",True)
+        if primary.get("available"):
+            text(f"Phương pháp chính: {primary['selected_method']}. Giá tham chiếu {primary['target_price_vnd']:,.0f} VND/CP; chênh {primary['upside_pct']:+.2f}% so với đóng cửa.")
+            text(primary["selection_reason"]);text(primary["methodology"],True)
+            table(["Chỉ tiêu","Hiện tại","Trung vị","Chênh bội số","n"],[[c["label"],formatted(c["company_value"],"x"),formatted(c["sample_median"],"x"),formatted(c["premium_pct"],"%"),str(c["sample_size"])] for c in primary["comparisons"]])
+            for c in primary["comparisons"]:text(c["label"]+": "+c["interpretation"],True)
+            table(["Phương pháp","Bội số","Giá / CP","Chênh giá"],[[m["method"],formatted(m.get("multiple"),"x"),formatted(m["target_price_vnd"],"VND/share"),formatted(m.get("difference_pct"),"%")] for m in primary["methods"]])
+            panel("valuation","Chỉ hiển thị các phương pháp định giá chính có đầu vào từ mẫu đồng kỳ. Giá tham chiếu không phải cam kết lợi suất.")
+        else:text(primary.get("reason","Chưa đủ dữ liệu định giá chính có nguồn."))
+        peers=benchmark.get("peers",[])
+        if peers:
+            heading("Doanh nghiệp so sánh")
+            table(["Mã","P/E năm","P/B","ROE (%)","LNST YoY (%)"],[[r["ticker"]]+[formatted(r.get(k)) for k in ["pe","pb","roe","profit_growth"]] for r in peers])
+            text(f"Kỳ {benchmark.get('period_end')}; ngày giá {benchmark.get('price_date')}; P/E n={benchmark.get('pe_sample_size',0)}, P/B n={benchmark.get('pb_sample_size',0)}. Mẫu không phải toàn ngành; P/E âm không được tính trung vị. Không trộn P/E năm với TTM hoặc dự phóng.",True)
+        citations(primary.get("source_ids",[])+[i["source_id"] for r in peers for i in r.get("inputs",[]) if i.get("source_id")]+[i["source_id"] for i in val.get("inputs",[]) if i.get("source_id")])
+        sotp=val.get("sotp",{})
+        heading("SOTP: định giá từng mảng")
+        text(sotp.get("reason","Chưa có dữ liệu từng mảng và điều chỉnh vốn có nguồn."),True)
+        if sotp.get("available"):
+            text(f"Nguồn mô hình: {sotp.get('provider')}; ngày {sotp['published_at']}. Bảng tham khảo lịch sử; không ghép giá mục tiêu cũ vào khuyến nghị hiện tại.",True)
+            table(["Mảng","Giá trị (tỷ VND)","Cơ sở"],[[r["label"],formatted(r["value_vnd"]/1e9),r["method"]] for r in sotp["components"]])
+            table(["Tính lại SOTP","Giá trị"],[["Tổng các mảng",formatted(sotp["enterprise_value"],"VND")],["Vốn sau điều chỉnh",formatted(sotp["equity_value"],"VND")],["Chiết khấu nguồn",formatted(sotp["discount_pct"],"%")],["CP của báo cáo",formatted(sotp["shares"],"CP")],["Giá tính lại / giá nguồn",formatted(sotp["target_price_vnd"],"VND/share")+" / "+formatted(sotp["reported_target"],"VND/share")]])
+            text(sotp["basis"],True);citations(sotp["source_ids"])
+        if full:text("Các giả định nhập tay và kiểm tra độ nhạy được đặt ở phụ lục sau phần Cơ hội và rủi ro.",True)
     if "news" in selected:
         start_section("news",SECTION_LABELS["news"])
         panel("news","Số mục trong mẫu tin đã lấy, không phải tổng số tin thị trường. Tin doanh nghiệp và tin mã cùng ngành được gắn nhãn; chưa đọc toàn văn để xác nhận tác động.")
@@ -323,17 +375,16 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             text(f"Ngày chốt {recommendation['as_of']} · {recommendation['horizon']}",True)
             text(recommendation["confidence_note"],True)
             if recommendation.get("entry_ceiling_vnd"):
-                text(f"Giá trần tham chiếu có điều kiện: {recommendation['entry_ceiling_vnd']:,.0f} VND/CP. Tính min(giá tổng hợp/1,15; giá thấp nhất của mô hình).")
+                text(f"Giá trần tham chiếu có điều kiện: {recommendation['entry_ceiling_vnd']:,.0f} VND/CP. Tính min(giá chính/1,15; giá thấp nhất của mô hình).")
             for item in recommendation["opportunities"]:
-                heading(item["title"]);text(item["evidence"]);text(item["implication"])
+                story.append(Paragraph(escape(item["title"]),styles["EvidenceHeadingVN"]))
+                text(item["evidence"]);text(item["implication"])
                 text("Điều kiện xác nhận: "+item["catalyst"])
                 text("Luận điểm không còn đúng khi: "+item["invalidation"],True)
                 citations(item["source_ids"],"Kỳ "+item["period"])
             if not recommendation["opportunities"]:text("Chưa có luận điểm cơ hội đạt điều kiện dữ liệu. Ưu tiên bổ sung và kiểm chứng đầu vào.")
-            text(recommendation["methodology"],True)
-            for condition in recommendation["conditions"]:text("• "+condition,True)
             citations(recommendation["source_ids"])
-            if "valuation" in selected:panel("valuation","Kịch bản định giá là đầu vào của khuyến nghị nghiên cứu; cần đọc cả điều kiện xác nhận và các luận điểm bị bác bỏ bên phải.")
+            if "valuation" in selected:panel("valuation","Định giá chính từ mẫu là đầu vào khuyến nghị nghiên cứu; cần đọc cả điều kiện xác nhận và các luận điểm bị bác bỏ bên phải.")
         matrix=result["conclusion"].get("risk_matrix",[])
         if matrix:
             table(["Rủi ro chính","Theo dõi"],[[r["evidence"],r["impact"]+". "+r["monitor"]] for r in matrix[:2]],sidebar=True)
@@ -342,8 +393,12 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         if "overview" not in selected:
             for item in result["conclusion"]["opportunities"]:text("• "+item)
         for item in result["conclusion"]["risks"]:
-            if not recommendation or "sụt giảm lớn" in item:text("• "+item)
+            if not recommendation or ("sụt giảm lớn" in item and "market" not in selected):text("• "+item)
+    if full and "valuation" in selected:valuation_appendix()
     start_section("methods","Phương pháp và giới hạn dữ liệu")
+    if "risks" in selected and result.get("recommendation"):
+        text(result["recommendation"]["methodology"],True)
+        for condition in result["recommendation"]["conditions"]:text("• "+condition,True)
     if "market" in selected:text("Giá dùng phiên trước ngày hiện tại để tránh phiên chưa kết thúc. Biểu đồ và MA luôn dùng Close của nguồn; giá mới nhất cho định giá là Close, không phải Adj Close. Biến động/drawdown/độ biến động dùng Adj Close nếu đầy đủ, nếu không dùng Close có nhãn chưa xác minh điều chỉnh quyền. Biến động = (giá cuối / đầu - 1) × 100; drawdown là mức giảm lớn nhất từ đỉnh trước đó; độ biến động năm hóa = độ lệch chuẩn lợi suất log ngày × √252 × 100. Đối chiếu giá không chứng nhận toàn bộ sự kiện quyền hay tổng lợi nhuận.",True)
     if "macro" in selected:text("Trích vĩ mô theo câu so sánh cụ thể (GDP lũy kế, CPI bình quân, tín dụng so với cuối năm, chỉ số USD cùng tháng); giữ khác biệt giữa YoY, YTD, danh nghĩa và thực. Dữ liệu WDI có null được bỏ, không lấy năm chưa kết thúc.",True)
     if full and "macro" in selected:
@@ -384,7 +439,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         source_rows.append([p(source_numbers[sid]+" · "+sid.replace("_"+run_id,""),source=True),[link,p("Truy xuất "+source.get("retrieved_at","")[:10]+" · "+source.get("page_or_table",""),source=True)]])
     if source_rows:
         sources_table=Table(source_rows,colWidths=[64*mm,110*mm],hAlign="LEFT")
-        sources_table.setStyle(TableStyle([("VALIGN",(0,0),(-1,-1),"TOP"),("LINEBELOW",(0,0),(-1,-1),.3,colors.HexColor("#cedde3")),("TOPPADDING",(0,0),(-1,-1),2),("BOTTOMPADDING",(0,0),(-1,-1),2)]))
+        sources_table.setStyle(TableStyle([("VALIGN",(0,0),(-1,-1),"TOP"),("LINEBELOW",(0,0),(-1,-1),.3,colors.HexColor("#cedde3")),("TOPPADDING",(0,0),(-1,-1),1),("BOTTOMPADDING",(0,0),(-1,-1),1)]))
         story.append(sources_table)
     seen=set()
     for check in quality["financial_check"].get("checks",[]):
@@ -425,7 +480,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             canvas.restoreState()
         return draw_page
     templates=[]
-    for section in ["overview"]+[k for k in request["sections"] if k!="overview"]+["methods","sources"]:
+    for section in ["overview"]+[k for k in request["sections"] if k!="overview"]+(["valuation_appendix"] if full and "valuation" in selected else [])+["methods","sources"]:
         width=174*mm if section in full_width else right_width
         x=18*mm if section in full_width else 80*mm
         frame=Frame(x,23*mm,width,256*mm,leftPadding=0,rightPadding=0,topPadding=0,bottomPadding=0,id=section)

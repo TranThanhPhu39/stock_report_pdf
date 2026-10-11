@@ -25,6 +25,11 @@ from src.data.reference_miner import collect_reference
 from src.analysis.context import integrated_thesis
 from src.data.valuation_peers import collect_valuation_peers
 from src.analysis.ai_commentary import generate_commentary
+from src.data.context_news import collect_context_news
+from src.data.market_context import collect_market_context
+from src.data.sotp_provider import collect_sotp
+from src.analysis.investment_valuation import investment_valuation
+from src.analysis.research_narrative import research_narrative
 
 
 def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5,
@@ -89,6 +94,18 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     valuation=analyze_valuation(financial,market,company,research["quote_check"],as_of,target_pb,target_pe=target_pe,
                                 discount_rate=cost_of_equity,perpetual_growth=terminal_growth,forecast_growth=forecast_growth,wacc=wacc,tax_rate=tax_rate,industry_benchmark=benchmark)
     conclusion=build_conclusion(financial,market,valuation,research["quote_check"],interim)
+    sotp=collect_sotp(ticker,as_of,company,root,acquisition["run_id"])
+    valuation["sotp"]=sotp
+    valuation["benchmark"]=benchmark
+    valuation["primary"]=investment_valuation(financial,market,valuation,benchmark,sotp)
+    research["sources"].extend(sotp["sources"])
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        news_future=pool.submit(collect_context_news,ticker,as_of,context["industry"],financial,root,acquisition["run_id"])
+        market_future=pool.submit(collect_market_context,as_of,root,acquisition["run_id"])
+        context_news,market_context=news_future.result(),market_future.result()
+    research["sources"].extend(context_news["sources"]+market_context["sources"])
+    narrative=research_narrative(context["macro"],context["industry"],financial,market_context,context_news)
     research["sources"].extend(context["sources"])
     research["errors"].extend(context["errors"])
     research["warnings"].extend(context["warnings"])
@@ -104,7 +121,7 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     result = {"request": request.to_dict(),
               "acquisition": acquisition, "market": market, "price_rows": rows,
               "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],"macro":context["macro"],"industry":context["industry"],
-              "reference":reference,"vnfinancialdata":vnf,"issuer_financials":issuer,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
+              "reference":reference,"vnfinancialdata":vnf,"issuer_financials":issuer,"context_news":context_news,"market_context":market_context,"research_narrative":narrative,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
               "errors":acquisition["errors"]+research["errors"],"financial_metrics_status":"analyzed" if financial["metrics"] else "unavailable",
               "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or (acquisition["prices"] and acquisition["prices"].get("coverage",{}).get("start_gap_days",0)>7) or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
     import json

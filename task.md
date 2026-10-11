@@ -103,3 +103,14 @@ Minh chứng: submission/exchange_report_acceptance.json; phương pháp và gi�
 - [x] 134 kiểm thử offline đạt; SHS/VNM chạy nguồn thực, BCTC đến 2025, minh chứng riêng trong submission/evidence/*_close_vnfinancialdata.json.
 - [x] AppTest chọn năm/tải CSV không ngoại lệ; PDF bật/tắt phần bổ sung đúng; xem toàn bộ 29 trang hai PDF và khởi động lại web bằng .venv.
 - [ ] Xác minh phạm vi/ngày công bố từng kỳ dataset trước khi dùng tự thay dữ liệu chính; bổ sung nguồn UPCoM có metadata phù hợp.
+
+## Báo cáo đầu tư, mẫu định giá và SOTP (11/10/2026)
+
+- [x] Định giá chính theo P/E/P/B trung vị mẫu đồng kỳ; so sánh bội số hiện tại, ROE/tăng trưởng/đòn bẩy; ưu tiên phương pháp theo loại ngành.
+- [x] Tách giả định nhập tay/Gordon/DCF/bình quân vào phụ lục độ nhạy; khuyến nghị chỉ dùng phương pháp chính đủ dữ liệu.
+- [x] Tự lấy VN-Index/Brent, bài công khai VnExpress/VnEconomy, lưu ngày/URL/hash; luận điểm có bằng chứng, kênh tác động và chỉ tiêu theo dõi.
+- [x] Gemini nhận nội dung bài có giới hạn và số liệu; chặn số tự tạo/dẫn nguồn không hợp lệ/diễn giải quá dài, fallback.
+- [x] Engine SOTP kiểm tra mảng/cầu nối/số CP; adapter REE/SSI tự lấy báo cáo và giữ tham khảo cũ ngoài khuyến nghị.
+- [x] 155 tests đạt; pipeline nguồn thực SHS/VNM/REE và minh chứng riêng. Chi tiết docs/investment_research_upgrade.md.
+- [x] AppTest ba mã thực; PDF đầy đủ/tóm tắt/bỏ mục; render 53 trang cuối, rà soát các phần và phân trang; web health HTTP 200.
+- [ ] Xác minh BCTC REE 2025 và tài sản từng mảng SOTP mới; thêm adapter doanh nghiệp khác có đủ nguồn; kiểm chứng API Gemini/Cloud thật.

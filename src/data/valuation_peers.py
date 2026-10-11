@@ -1,4 +1,4 @@
-"""Compute peer P/B from dated financials and independently matched daily quotes."""
+"""Comparable P/B and annual P/E, with dated, independently matched quotes."""
 from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
@@ -11,6 +11,7 @@ from src.data.research import KBS_BASE
 
 def collect_valuation_peers(industry, as_of, price_date, root, run_id):
     result={"available":False,"peers":[],"excluded":[],"sources":[],"median_pb":None,
+            "median_pe":None,"pb_sample_size":0,"pe_sample_size":0,"pe_available":False,
             "sector_name":industry.get("name"),"period_end":industry.get("period_end"),"scope":industry.get("scope"),"reason":"Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot."}
     if as_of!=datetime.now(VN_TIME).date() or not price_date:return result
     folder=root/"data/raw/valuation_peers";folder.mkdir(parents=True,exist_ok=True)
@@ -45,11 +46,14 @@ def collect_valuation_peers(industry, as_of, price_date, root, run_id):
         e=fields.get("equity",{}).get("value");n=fields.get("non_controlling_equity",{}).get("value")
         capital=e if period["scope"] in {"parent","separate"} else e-n if number(e) and number(n) else None
         profit=fields.get("parent_profit",{}).get("value")
+        if profit is None and period["scope"] in {"parent","separate"}:profit=fields.get("net_profit",{}).get("value")
+        metrics={m["key"]:m["value"] for m in peer["financial"]["metrics"]}
         return {"ticker":ticker,"price_date":price_date,"shares_snapshot":as_of.isoformat(),"equity_period":period["period_end"],
                 "pb":quotes[0]/(capital/shares) if number(capital,True) else None,
                 "pe":quotes[0]/(profit/shares) if number(profit,True) else None,
-                "roe":next((m["value"] for m in peer["financial"]["metrics"] if m["key"]=="roe"),None),
-                "inputs":[fields[k] for k in ["equity","non_controlling_equity","parent_profit"] if k in fields]+[{"source_id":sid,"value":shares,"unit":"shares","period":as_of.isoformat()}]+quote_inputs,"sources":sources}
+                "roe":metrics.get("roe"),"profit_growth":metrics.get("net_profit_growth"),"debt_equity":metrics.get("debt_equity"),
+                "pe_basis":"LNST cổ đông mẹ năm / CP snapshot; không phải TTM hoặc dự phóng",
+                "inputs":[fields[k] for k in ["equity","non_controlling_equity","parent_profit","net_profit"] if k in fields]+[{"source_id":sid,"value":shares,"unit":"shares","period":as_of.isoformat()}]+quote_inputs,"sources":sources}
     def safe(peer):
         try:return collect(peer),None
         except (DataSourceError,ValueError,KeyError,TypeError,OSError) as exc:return None,{"ticker":peer["ticker"],"reason":str(exc)}
@@ -59,6 +63,11 @@ def collect_valuation_peers(industry, as_of, price_date, root, run_id):
                 result["sources"].extend(row.pop("sources"));result["peers"].append(row)
             if error:result["excluded"].append(error)
     values=[p["pb"] for p in result["peers"] if p["pb"] is not None]
+    earnings=[p["pe"] for p in result["peers"] if p["pe"] is not None]
+    result.update(pb_sample_size=len(values),pe_sample_size=len(earnings),pe_available=len(earnings)>=2,
+                  median_pe=statistics.median(earnings) if len(earnings)>=2 else None,
+                  price_date=price_date,
+                  pe_reason="" if len(earnings)>=2 else "Chưa đủ hai P/E lợi nhuận mẹ dương, đồng kỳ và có giá đối chiếu.")
     if len(values)>=2:
         result.update(available=True,reason="",median_pb=statistics.median(values),sample_size=len(values),price_date=price_date,
                       explanation=f"Trung vị {len(values)} mã khác trong mẫu {industry.get('name')}, giá {price_date}; vốn năm quy đổi trên CP snapshot. Không phải chỉ số P/B toàn ngành.")
