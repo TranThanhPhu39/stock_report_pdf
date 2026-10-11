@@ -1,0 +1,85 @@
+{
+  "run_id": "SSI_20261011_222135_393293",
+  "request": {
+    "ticker": "SSI",
+    "start": "2025-10-11",
+    "as_of": "2026-10-11",
+    "mode": "full",
+    "sections": [
+      "overview",
+      "macro",
+      "industry",
+      "market",
+      "financial",
+      "reference",
+      "valuation",
+      "news",
+      "risks"
+    ],
+    "target_pb": 1.5,
+    "target_pe": 12.0,
+    "cost_of_equity": 0.115,
+    "terminal_growth": 0.035,
+    "forecast_growth": 0.07,
+    "wacc": 0.1,
+    "tax_rate": 0.2,
+    "use_ai": false
+  },
+  "latest_financial_year": 2025,
+  "issuer_pdf": {
+    "year": 2025,
+    "published_at": "2026-03-27",
+    "sha256": "406da3dfc1130da4c47b4e08c81c7ab1fd82a8e0bbe225af08b6fcb62cb91625",
+    "file": "data/raw/documents/SSI_2025_audited.pdf"
+  },
+  "ssi_current_year_checks": 12,
+  "ssi_selected_checks_all_matched": true,
+  "peer_year": "2025-12-31",
+  "peer_tickers": [
+    "VDS",
+    "TVS"
+  ],
+  "comparison_count": 13,
+  "primary_methods": [
+    {
+      "method": "P/B trung vị mẫu đồng kỳ",
+      "multiple": 0.9648062514359499,
+      "target_price_vnd": 10266.270418902433,
+      "sample_size": 2
+    },
+    {
+      "method": "P/E trung vị mẫu đồng kỳ",
+      "multiple": 10.08656823570589,
+      "target_price_vnd": 13799.46322472566,
+      "sample_size": 2
+    }
+  ],
+  "stance": "ƯU TIÊN QUẢN TRỊ RỦI RO",
+  "news": {
+    "macro": 8,
+    "industry": 8
+  },
+  "tests": {
+    "offline_passed": 170,
+    "sdk_live_call": false,
+    "cloud_deployed": false,
+    "reason_live_call_not_run": "Automatic approval review rejected exporting SSI evidence bundle to Google/Gemini without specific authorization."
+  },
+  "ui_evidence": "submission/evidence/ssi_ui_upgrade.json",
+  "ui_regression_evidence": "submission/evidence/ssi_ui_regression.json",
+  "pdf": {
+    "file": "outputs/pdf/SSI_report.pdf",
+    "pages": 17,
+    "sha256": "bd369095924d0b386771fa9e56128b2904a91e92eb6552ed8a71de1afcb776aa",
+    "rendered_every_page": true,
+    "reviewed_every_page": true,
+    "source_codes_removed": true
+  },
+  "limitations": [
+    "SSI quarterly/interim 2026 and TTM not integrated",
+    "Two-peer sample is not representative of the entire industry",
+    "Only selected values cross-checked; not a certification of entire statements",
+    "Gemini live API and Cloud not verified"
+  ],
+  "web_health": "ok"
+}

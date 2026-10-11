@@ -68,9 +68,11 @@ def parse_article(raw,feed_item):
     return body.get_text(" ",strip=True)[:12000]
 
 
-def collect_context_news(ticker,as_of,industry,financial,root,run_id):
+def collect_context_news(ticker,as_of,industry,financial,root,run_id,limit_per_scope=8):
+    limit_per_scope=max(1,min(int(limit_per_scope),12))
     out={"available":False,"articles":[],"sources":[],"errors":[],"warnings":[],
-         "note":"Mẫu tin công khai trong 30 ngày; ngày tin không phải kỳ của mọi số liệu được bài đề cập. Tin/opinion không thay dữ liệu định lượng."}
+         "sample_limit_per_scope":limit_per_scope,"candidate_counts":{},
+         "note":f"Mẫu tối đa {limit_per_scope} tin mỗi nhóm trong 30 ngày từ RSS công khai, không phải toàn bộ tin thị trường. Ngày tin không phải kỳ của mọi số liệu được bài đề cập; nhận định báo chí không thay dữ liệu định lượng."}
     folder=root/"data/raw/context_news";folder.mkdir(parents=True,exist_ok=True)
     candidates=[]
     for scope,url in FEEDS:
@@ -79,10 +81,12 @@ def collect_context_news(ticker,as_of,industry,financial,root,run_id):
             (folder/f"{run_id}_{scope}_{hashlib.sha256(url.encode()).hexdigest()[:8]}.xml").write_bytes(raw)
             candidates.extend(parse_feed(raw,as_of,scope,industry.get("name",""),financial.get("industry_group",""),ticker))
         except Exception as exc:out["errors"].append({"stage":"context_news","message":f"RSS {url}: {type(exc).__name__}"})
-    # At most three per scope, with repeated URLs removed; do not favor one RSS twice.
+    # Bound collection separately from the three-card UI preview.
     unique={r["url"]:r for r in candidates};selected=[]
     for scope in ["macro","industry"]:
-        selected.extend(sorted([r for r in unique.values() if r["scope"]==scope],key=lambda r:r["published_at"],reverse=True)[:3])
+        scoped=sorted([r for r in unique.values() if r["scope"]==scope],key=lambda r:r["published_at"],reverse=True)
+        out["candidate_counts"][scope]=len(scoped)
+        selected.extend(scoped[:limit_per_scope])
     def fetch(item):
         try:
             raw=download(item["url"],timeout=12)

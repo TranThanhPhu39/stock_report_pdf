@@ -9,6 +9,9 @@ def investment_valuation(financial, market, valuation, benchmark, sotp=None):
     if not valuation.get("shares") or not market or not financial.get("periods"):return out
     latest=financial["periods"][0]
     same_basis=benchmark.get("period_end")==latest["period_end"] and benchmark.get("scope")==latest["scope"] and benchmark.get("price_date")==market["latest_date"]
+    if not same_basis:
+        scope_names={'consolidated':'hợp nhất','separate':'riêng lẻ','parent':'công ty mẹ'}
+        out["reason"]=f"BCTC mã phân tích kết thúc {latest['period_end']} ({scope_names.get(latest['scope'],'chưa xác định')}); mẫu định giá kết thúc {benchmark.get('period_end') or 'chưa có'} ({scope_names.get(benchmark.get('scope'),'chưa xác định')}), giá {benchmark.get('price_date') or 'chưa có'}. Chưa đủ mẫu đúng kỳ/phạm vi/ngày giá; không trộn năm để tạo giá mục tiêu."
     price=market["latest_close_vnd"]
     for kind,label,own,base in [
         ("pb","P/B trung vị mẫu đồng kỳ",valuation.get("reference_pb"),valuation.get("book_value_per_share")),
@@ -38,4 +41,5 @@ def investment_valuation(financial, market, valuation, benchmark, sotp=None):
                        "Chỉ có "+chosen["method"]+" đủ điều kiện; phương pháp ưu tiên theo ngành chưa đủ đầu vào. Cần bổ sung phương pháp đối chiếu." if chosen["key"]!=preferred else
                        "P/B phản ánh hiệu quả sử dụng vốn/tài sản tài chính; P/E mẫu là đối chiếu lợi nhuận." if preferred=="pb" else
                        "P/E mẫu làm tham chiếu lợi nhuận; P/B mẫu đối chiếu mức định giá vốn. Cần kiểm tra tính lặp lại của lợi nhuận."))
+        if chosen["key"]!="sotp":out["selection_reason"]+=f" Mẫu có {chosen['sample_size']} doanh nghiệp đủ dữ liệu; giá trị tham chiếu không đại diện toàn ngành."
     return out

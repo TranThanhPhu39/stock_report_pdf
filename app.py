@@ -27,11 +27,56 @@ def fetch_news_preview(ticker: str, as_of: date) -> list[dict]:
 
 
 def show_research_notes(result,section):
+    groups={}
     for item in result.get("research_narrative",{}).get(section,[]):
-        with st.expander(item["title"]):
-            st.write(item["evidence"]);st.write(item["interpretation"])
-            st.caption("Theo dõi: "+item["monitor"])
-            st.caption("Kỳ/ngày nguồn "+item["period"]+" · "+", ".join(item["source_ids"]))
+        if item["title"]=="Thông tin cập nhật" or item["title"].endswith("trong nhóm so sánh"):continue
+        groups.setdefault(item["title"],[]).append(item)
+    for title,items in groups.items():
+        with st.expander(title):
+            for item in items:
+                st.write(item["evidence"]);st.write(item["interpretation"])
+                st.caption("Theo dõi: "+item["monitor"]+" · Kỳ/ngày nguồn "+item["period"])
+    articles=[article for article in result.get("context_news",{}).get("articles",[]) if article["scope"]==section]
+    if articles:
+        with st.expander(f"Thông tin cập nhật từ báo chí · {len(articles)} bài"):
+            st.caption(result.get("context_news",{}).get("note",""))
+            # The bounded body is evidence for Gemini, not copied into the UI.
+            news=[{**article,"title":" ".join(article["title"].split()[:22]),"summary":"Tin báo chí cần được đối chiếu với số liệu và công bố doanh nghiệp; mở bài gốc để đọc đầy đủ."} for article in articles]
+            show_news(news,key=f"context_news_{result['acquisition']['run_id']}_{section}",title="Tin vĩ mô" if section=="macro" else "Tin ngành")
+
+
+def show_ai_section(result,section):
+    ai=result.get("ai_commentary",{})
+    items=ai.get("sections",{}).get(section,[])
+    if not items:return
+    with st.container(border=True):
+        st.write("**Gemini · Nhận xét từ bằng chứng đã kiểm tra**")
+        for item in items:
+            st.write(item["text"])
+            for evidence in item["evidence"]:
+                st.caption(evidence["label"]+" · Kỳ/ngày "+evidence["period"])
+        st.caption("AI diễn giải kênh tác động và điều kiện theo dõi; các phép tính định giá và quy tắc khuyến nghị do chương trình thực hiện.")
+
+
+def show_price_chart(result):
+    frame=pd.DataFrame(result["price_rows"]).copy()
+    frame["date"]=pd.to_datetime(frame["date"])
+    valid=result["market"].get("history_indicators_available",True)
+    for days in (20,50):frame[f"ma{days}"]=frame["close"].rolling(days).mean() if valid else float('nan')
+    frame["direction"]=frame["close"].ge(frame["open"]).map({True:"Tăng",False:"Giảm"})
+    period=st.radio("Khoảng xem biểu đồ",["3 tháng","6 tháng","Toàn kỳ"],index=2,horizontal=True,key="chart_period")
+    if period!="Toàn kỳ":frame=frame[frame["date"]>=frame["date"].max()-pd.Timedelta(days=90 if period=="3 tháng" else 180)]
+    color={"field":"direction","type":"nominal","scale":{"domain":["Tăng","Giảm"],"range":["#087e72","#cf5757"]},"legend":None}
+    tooltip=[{"field":"date","type":"temporal","title":"Ngày","format":"%d/%m/%Y"}]+[{"field":key,"type":"quantitative","title":label,"format":",.0f"} for key,label in [("open","Mở cửa"),("high","Cao nhất"),("low","Thấp nhất"),("close","Đóng cửa"),("volume","Khối lượng")]]
+    x={"field":"date","type":"temporal","axis":{"title":None,"format":"%d/%m","labelAngle":0,"tickCount":8}}
+    layers=[{"mark":"rule","encoding":{"y":{"field":"low","type":"quantitative","scale":{"zero":False},"axis":{"title":"Giá (VND/CP)","format":",.0f"}},"y2":{"field":"high"}}},
+            {"mark":{"type":"bar","size":4},"encoding":{"y":{"field":"open","type":"quantitative","scale":{"zero":False}},"y2":{"field":"close"}}}]
+    if valid:
+        layers.extend({"mark":{"type":"line","color":color_value,"strokeWidth":1.5},"encoding":{"y":{"field":key,"type":"quantitative","scale":{"zero":False}},"color":{"value":color_value}}} for key,color_value in [("ma20","#c49325"),("ma50","#5e6fa8")])
+    spec={"vconcat":[{"height":330,"encoding":{"x":x,"color":color,"tooltip":tooltip},"layer":layers},
+                     {"height":100,"mark":"bar","encoding":{"x":x,"y":{"field":"volume","type":"quantitative","axis":{"title":"Khối lượng (CP)","format":".2s"}},"color":color,"tooltip":tooltip}}],"resolve":{"scale":{"x":"shared"}},"config":{"view":{"stroke":None},"axis":{"gridOpacity":.12}}}
+    st.vega_lite_chart(frame,spec,width="stretch")
+    st.caption("Nến xanh: đóng cửa ≥ mở cửa; nến đỏ: đóng cửa < mở cửa. Đường vàng: MA20; tím: MA50." if valid else "Nến dùng OHLC từ nguồn. MA tạm ẩn vì mẫu giá lịch sử chưa đủ điều kiện.")
 
 
 def readable_reason(message):
@@ -186,8 +231,8 @@ with request_column:
     st.markdown("<div class='step-heading'><span class='step-heading__number'>01</span><div><div class='step-heading__title'>Cổ phiếu và thời gian</div><div class='step-heading__note'>MÃ GIAO DỊCH · KHOẢNG PHÂN TÍCH</div></div></div>",unsafe_allow_html=True)
     cols=st.columns(3)
     ticker=cols[0].text_input("Mã cổ phiếu",value="HPG",help="Nhập mã niêm yết, ví dụ HPG, FPT hoặc VNM.")
-    start=cols[1].date_input("Từ ngày",value=today-timedelta(days=365),max_value=today-timedelta(days=1))
-    as_of=cols[2].date_input("Ngày phân tích",value=today,max_value=today)
+    start=cols[1].date_input("Giá giao dịch từ ngày",value=today-timedelta(days=365),max_value=today-timedelta(days=1),help="Ngày bắt đầu chuỗi giá. Không giới hạn BCTC vào khoảng này; kỳ năm mới nhất đã công bố trước ngày chốt sẽ được dùng.")
+    as_of=cols[2].date_input("Ngày chốt dữ liệu",value=today,max_value=today,help="Chỉ dùng tài liệu và phiên giá đủ điều kiện đến ngày này. BCTC năm và khoảng lịch sử giá có kỳ riêng.")
 
     st.markdown("<div class='step-heading' style='margin-top:28px'><span class='step-heading__number'>02</span><div><div class='step-heading__title'>Kiểu báo cáo</div><div class='step-heading__note'>CHỌN MỨC ĐỘ CHI TIẾT VÀ NỘI DUNG XUẤT</div></div></div>",unsafe_allow_html=True)
     mode=st.radio("Độ chi tiết",["Đầy đủ","Tóm tắt"],horizontal=True,captions=["Nhiều chỉ tiêu và giải thích","Các điểm chính, ngắn gọn"])
@@ -285,6 +330,12 @@ if result:
     ai=result.get("ai_commentary",{})
     if request.get("use_ai") and not ai.get("available"):
         st.info(ai.get("reason","Gemini chưa có nhận xét hợp lệ; báo cáo vẫn dùng phân tích từ dữ liệu."))
+    elif ai.get("available"):
+        count=sum(len(items) for items in ai.get("sections",{}).values())
+        st.caption(f"Gemini: {count} nhận xét qua kiểm tra, hiển thị trong Vĩ mô, Ngành và Cơ hội và rủi ro.")
+        if ai.get("rejected"):
+            with st.expander("Nhận xét AI chưa được sử dụng"):
+                for reason in dict.fromkeys(row["reason"] for row in ai["rejected"]):st.write(reason)
     issues=result.get("errors",[])
     warnings=acquisition.get("warnings",[])
     if issues or warnings:
@@ -305,13 +356,10 @@ if result:
                 col.metric(label,display)
                 if display=="Không tính":col.caption("Lịch sử chưa khớp")
             price_check=result["quality"]["price_check"]
-            if latest_price_matches(price_check,market):st.success(f"Giá đóng cửa mới nhất {market['latest_close_vnd']:,.0f} VND ngày {market['latest_date']} đã khớp hai nguồn để đối chiếu định giá.")
-            else:st.warning("Giá đóng cửa mới nhất chưa khớp nguồn thứ hai đúng ngày; định giá bị chặn.")
+            if not latest_price_matches(price_check,market):st.warning("Giá đóng cửa mới nhất chưa khớp nguồn thứ hai đúng ngày; định giá bị chặn.")
             if price_check["status"]=="matched":st.caption(f"Mẫu lịch sử: khớp {len(price_check['checks'])}/{price_check.get('expected_count',len(price_check['checks']))} phiên; không xác nhận toàn bộ lịch sử điều chỉnh.")
             else:st.warning(f"Mẫu lịch sử chưa khớp đầy đủ: {price_check.get('matched_count',sum(c['match'] for c in price_check.get('checks',[])))}/{price_check.get('expected_count',20)} phiên khớp. Hạn chế MA, lợi suất, drawdown và biến động năm hóa; kiểm tra giá mới nhất được tách riêng.")
-            prices=pd.DataFrame(result["price_rows"])
-            chart=pd.DataFrame({"Ngày":pd.to_datetime(prices["date"]),market["series_basis"]:market["chart_prices"]}).set_index("Ngày")
-            st.line_chart(chart)
+            show_price_chart(result)
             st.caption(market.get("chart_note","Biểu đồ thể hiện giá đóng cửa từ nguồn."))
             st.caption(market["return_note"])
         else:
@@ -324,6 +372,7 @@ if result:
             st.write(macro.get("assessment",""))
             st.caption("Các kỳ riêng biệt; số liệu năm WDI không thay số liệu tháng. Lãi suất/tỷ giá bình quân lịch sử không phải mức hiện tại.")
         else:st.warning("Chưa lấy được dữ liệu vĩ mô hợp lệ.")
+        show_ai_section(result,"macro")
         show_research_notes(result,"macro")
         with st.expander("Phạm vi nguồn tin và thị trường"):
             st.caption(result.get("context_news",{}).get("note",""))
@@ -341,16 +390,17 @@ if result:
             if comparisons:
                 st.dataframe(pd.DataFrame([{"Chỉ tiêu":c["label"],"Mã phân tích":formatted(c["company_value"],c["unit"]),"Trung vị mẫu":formatted(c["sample_median"],c["unit"]),"Chênh lệch":formatted(c["difference"],"điểm %" if c["unit"]=="%" else c["unit"]),"Số mẫu":c["sample_size"]} for c in comparisons]),hide_index=True,width="stretch")
             else:st.warning("Chưa đủ chỉ tiêu đồng kỳ của ít nhất hai doanh nghiệp để tính trung vị.")
-            for driver in industry.get("drivers",[]):
-                row=driver["indicator"];st.write(f"• {row['label']}: {row['value']:.2f}% ({row['period']}). "+driver["channel"])
-            for risk in industry.get("structural_risks",[]):st.caption(risk)
+            with st.expander("Rủi ro cần theo dõi của ngành"):
+                for risk in industry.get("structural_risks",[]):st.write(risk)
             with st.expander("Mẫu so sánh: mã được chọn và lý do loại"):
                 show_industry_sample(industry)
             st.caption("Trung vị là giá trị ở giữa các doanh nghiệp trong mẫu; không phải bình quân của toàn bộ ngành.")
         else:st.warning("Nguồn chưa xác nhận phân ngành của mã này; không tự gán ngành.")
+        show_ai_section(result,"industry")
         show_research_notes(result,"industry")
     with tabs[3]:
         diagnostics=result.get("financial_data_status",{})
+        st.caption("Khoảng ngày trên đầu trang dành cho lịch sử giá. Phần này dùng BCTC năm mới nhất đủ điều kiện đến ngày chốt, cùng năm trước để tính tăng trưởng; không phải số liệu TTM.")
         for message in diagnostics.get("messages",[]):st.caption(message)
         if result["financial"]["metrics"]:
             st.caption(f"Báo cáo năm {result['financial']['metrics'][0]['period']}; không phải số liệu TTM.")
@@ -402,6 +452,12 @@ if result:
             if not reference.get("available"):st.info("Chưa có dữ liệu bổ sung đủ điều kiện theo phiên bản nguồn/ngày phân tích/sàn.")
     with tabs[4]:
         val=result["valuation"];primary=val.get("primary",{});benchmark=val.get("benchmark",{})
+        st.write(f"**Bội số của {request['ticker']} từ dữ liệu đã xác minh**")
+        multiples=st.columns(3)
+        multiples[0].metric("P/E lợi nhuận mẹ năm",formatted(val.get("pe",{}).get("reference_pe"),"lần"))
+        multiples[1].metric("P/B vốn cổ đông mẹ",formatted(val.get("reference_pb"),"lần"))
+        multiples[2].metric("BVPS cổ đông mẹ",formatted(val.get("book_value_per_share"),"VND/share"))
+        st.caption(f"BCTC năm {diagnostics.get('latest_valid_year','chưa xác định')} và số cổ phiếu tại ngày chốt. P/E năm quy đổi không phải EPS TTM, EPS dự phóng hoặc EPS bình quân gia quyền công bố.")
         st.subheader("Định giá chính từ dữ liệu so sánh")
         if primary.get("available"):
             st.metric("Giá tham chiếu chính",formatted(primary["target_price_vnd"],"VND/share"),formatted(primary["upside_pct"],"%"))
@@ -412,6 +468,11 @@ if result:
             st.dataframe(pd.DataFrame([{"Phương pháp":m["method"],"Bội số (x)":m.get("multiple"),"Giá / CP (VND)":m["target_price_vnd"],"Chênh với giá (%)":m.get("difference_pct"),"Số mẫu":m.get("sample_size")} for m in primary["methods"]]),hide_index=True,width="stretch")
         else:st.info(primary.get("reason","Chưa đủ dữ liệu cho định giá chính."))
         peers=benchmark.get("peers",[])
+        comparisons=result.get("industry",{}).get("comparisons",[])
+        if comparisons:
+            st.write("**So sánh hiệu quả kinh doanh và rủi ro tài chính**")
+            st.caption(f"Kỳ chung: {result['industry'].get('period_end')} · Chỉ tiêu phù hợp loại hình doanh nghiệp · Trung vị mẫu, không phải toàn ngành.")
+            st.dataframe(pd.DataFrame([{"Chỉ tiêu":row["label"],request["ticker"]:formatted(row["company_value"],row["unit"]),"Trung vị mẫu":formatted(row["sample_median"],row["unit"]),"Chênh lệch":formatted(row["difference"],"điểm %" if row["unit"]=="%" else row["unit"]),"Số mẫu":row["sample_size"]} for row in comparisons]),hide_index=True,width="stretch")
         if peers:
             st.write("**Các doanh nghiệp so sánh**")
             st.dataframe(pd.DataFrame([{ "Mã":r["ticker"],"P/E năm (x)":r["pe"],"P/B (x)":r["pb"],"ROE (%)":r["roe"],"LNST YoY (%)":r.get("profit_growth"),"Nợ vay/vốn":r.get("debt_equity")} for r in peers]),hide_index=True,width="stretch")
@@ -470,14 +531,7 @@ if result:
             st.dataframe(pd.DataFrame([{ "Bằng chứng":r["evidence"],"Tác động":r["impact"],"Theo dõi":r["monitor"]} for r in result["conclusion"]["risk_matrix"]]),hide_index=True,width="stretch")
         for item in result["conclusion"]["risks"]:st.write("• "+item)
         if ai.get("available"):
-            st.write("**Nhận xét Gemini có bằng chứng**")
-            for section,items in ai["sections"].items():
-                for item in items:
-                    st.write(item["text"])
-                    for e in item["evidence"]:
-                        detail="Bài công khai; ngày bài không thay kỳ của số liệu" if e.get("evidence_type")=="news_article" else f"{e.get('value',e.get('company_value'))} {e.get('unit','')}"
-                        st.caption(f"{e['label']} · Kỳ {e['period']} · {detail}")
-                    st.caption("Nguồn: "+", ".join(item["source_ids"])+f" · Chốt {ai['as_of']} · {ai['model']}")
+            show_ai_section(result,"company_impact")
     with tabs[6]:
         company_news=[item for item in result.get("news",[]) if item.get("news_scope","company")=="company"]
         peer_news=[item for item in result.get("news",[]) if item.get("news_scope")=="industry_peer"]

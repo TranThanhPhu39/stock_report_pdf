@@ -13,6 +13,11 @@ ICB_SIGNALS={"1757":["construction_growth","industrial_growth","exports_growth"]
  "5379":["real_retail_growth","cpi_ytd"],"8633":["construction_growth","credit_growth"],"7535":["industrial_growth","gdp_ytd"],
  "1357":["industrial_growth","exports_growth"],"9500":["gdp_ytd","exports_growth"],"9530":["gdp_ytd","exports_growth"]}
 
+COMPARISON_KEYS=["revenue_growth","net_profit_growth","roe","roa","gross_margin","net_margin",
+                 "debt_equity","liabilities_equity","assets_equity","cash_conversion","loan_deposit","cir",
+                 "securities_net_margin","brokerage_share","lending_share","loans_equity",
+                 "financial_loans_growth","brokerage_revenue_growth","lending_revenue_growth","realized_profit_growth","unrealized_profit_share"]
+
 def analyze_context(macro,industry,financial):
     indicators={r["key"]:r for r in macro["indicators"]}
     macro["observations"]=[]
@@ -24,9 +29,9 @@ def analyze_context(macro,industry,financial):
     rows=[]
     for peer in industry["peers"]:
         metrics={m["key"]:m for m in peer["financial"]["metrics"]}
-        rows.append({"ticker":peer["ticker"],"period_end":industry["period_end"],"values":{k:metrics.get(k,{}).get("value") for k in ["revenue_growth","net_profit_growth","roe","roa","net_margin","debt_equity","loan_deposit","cir","brokerage_share","lending_share"]}})
+        rows.append({"ticker":peer["ticker"],"period_end":industry["period_end"],"values":{k:metrics.get(k,{}).get("value") for k in COMPARISON_KEYS}})
     industry["comparison_rows"]=rows;industry["comparisons"]=[]
-    for key in ["revenue_growth","net_profit_growth","roe","roa","net_margin","debt_equity","loan_deposit","cir","brokerage_share","lending_share"]:
+    for key in COMPARISON_KEYS:
         own=target_metrics.get(key);sample=[row["values"][key] for row in rows if row["values"].get(key) is not None]
         if not own or own["value"] is None or len(sample)<2:continue
         middle=statistics.median(sample)

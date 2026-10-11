@@ -14,7 +14,7 @@ python -m venv .venv
 
 Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS/Vietcap), chọn khoảng ngày, bản đầy đủ/tóm tắt, phần cần xuất, P/B/P/E giả định và các tỷ lệ Ke/WACC/g/thuế trong mục định giá. Bấm **Phân tích**, sau đó **Tải báo cáo phân tích PDF**. Luồng chính không yêu cầu chạy script lấy dữ liệu riêng.
 
-Để đọc PDF scan bán niên HPG tự động, cài Tesseract OCR có gói `vie` và `eng`, thêm `tesseract` vào PATH. Windows cũng nhận đường dẫn `C:/Program Files/Tesseract-OCR/tesseract.exe`. Thiếu OCR: hệ thống báo thiếu phần bán niên và vẫn dùng số liệu năm hợp lệ. Tệp PDF gốc tải lần đầu có thể mất vài phút; bản lưu được kiểm tra SHA-256 và thời hạn 24 giờ trước khi dùng lại. Giá, tài chính và danh sách công bố vẫn được truy cập mới mỗi lượt.
+Để đọc PDF scan bán niên HPG, BCTC năm SSI và TVS tự động, cài Tesseract OCR có gói `vie` và `eng`, thêm `tesseract` vào PATH. Windows cũng nhận đường dẫn `C:/Program Files/Tesseract-OCR/tesseract.exe`. Thiếu OCR: hệ thống báo thiếu phần bán niên và vẫn dùng số liệu năm hợp lệ. Tệp PDF gốc tải lần đầu có thể mất vài phút; bản lưu được kiểm tra SHA-256 và thời hạn 24 giờ trước khi dùng lại. Giá, tài chính và danh sách công bố vẫn được truy cập mới mỗi lượt.
 
 ## Dùng dòng lệnh (tùy chọn)
 
@@ -46,7 +46,7 @@ PDF mẫu mới: `outputs/pdf/ACB_report.pdf`, `HPG_report.pdf`, `VNM_report.pdf
 
 ## Giới hạn
 
-Mã cổ phiếu là tham số, không cố định HPG; khả năng có số liệu phụ thuộc nguồn. Có tỷ số riêng ngân hàng (thu nhập lãi, CIR, cho vay/tiền gửi) và chứng khoán (cơ cấu môi giới/cho vay). NIM/NPL/CAR và dư nợ margin chưa được xác minh. VCB/SSI/DGC/REE dùng năm hợp lệ gần nhất 2024 vì metadata kỳ 2025 từ nguồn ghi 24 tháng; báo cáo cảnh báo độ trễ. API công khai có thể thay đổi hoặc giới hạn truy cập. Baseline trong `config/verification_baselines.json` là số tham chiếu đã đọc từ tài liệu gốc, **không thay dữ liệu tự lấy** và chỉ áp dụng đúng kỳ. Không dùng dữ liệu giả khi nguồn lỗi.
+Mã cổ phiếu là tham số, không cố định HPG; khả năng có số liệu phụ thuộc nguồn. Có tỷ số riêng ngân hàng (thu nhập lãi, CIR, cho vay/tiền gửi) và chứng khoán (cơ cấu môi giới/cho vay). NIM/NPL/CAR và dư nợ margin chưa được xác minh. VCB/DGC/REE dùng năm hợp lệ gần nhất 2024 vì metadata kỳ 2025 từ nguồn ghi 24 tháng; báo cáo cảnh báo độ trễ. API công khai có thể thay đổi hoặc giới hạn truy cập. Baseline trong `config/verification_baselines.json` là số tham chiếu đã đọc từ tài liệu gốc, **không thay dữ liệu tự lấy** và chỉ áp dụng đúng kỳ. Không dùng dữ liệu giả khi nguồn lỗi.
 
 `projectcontext.md` ghi phạm vi đề gốc; `task.md` ghi hạng mục đã làm. Đề gốc và đề xuất triển khai trong `docs/references/` được giữ riêng.
 
@@ -90,3 +90,15 @@ PDF đã chuyển sang biểu đồ ở cột trái, phân tích ở cột phả
 Đợt bố cục/nguồn tại commit 7634381 đã sửa đối chiếu Yahoo thiếu mã bằng Vietcap, ngày kết thúc truy vấn KBS, bộ đọc ba kỳ F88 và CFO chứng khoán. Khi đó 101 kiểm thử đạt, sáu mã nguồn thực VNM/SHS/VNZ/PVS/QNS/F88 khớp 20/20 phiên. Minh chứng lịch sử: [bố cục và nguồn](docs/exchange_report_upgrade.md), `submission/exchange_report_acceptance.json`.
 
 Cập nhật SHS tiếp theo: **112 kiểm thử đạt**; tự đọc bảng kiểm toán 2025 trong BCTN có công bố chính thức, đối chiếu 12 giá trị hai năm, so sánh ngành/P/B mẫu đồng kỳ 2025. Khuyến nghị **THEO DÕI** vì LNTT đã thực hiện giảm dù LNST tăng. PDF đã kiểm tra 14 trang tại `outputs/pdf/SHS_report.pdf`. Lỗi thử Yahoo 404 lưu trong hồ sơ; không hiện thành lỗi báo cáo khi nguồn dự phòng thành công. F88 còn thiếu 2025 hợp lệ; QNS chưa đủ hai nhóm định giá. Chi tiết: [nguồn và kiểm chứng SHS](docs/shs_issuer_upgrade.md).
+
+## Cập nhật báo cáo SSI (11/10/2026)
+
+SSI tự đọc BCTC hợp nhất kiểm toán 2025 từ PDF chính thức công bố 27/03/2026; qua 12 đối chiếu giá trị với KBS, cân đối tài sản và lợi nhuận thực hiện/chưa thực hiện. Kỳ KBS sai metadata 24 tháng vẫn bị loại. TVS trong mẫu ngành có bộ đọc PDF kiểm toán tương tự; lần kiểm chứng SSI dùng hai mẫu VDS/TVS cùng kỳ 2025, đủ P/E và P/B. Mẫu nhỏ không đại diện toàn ngành; giá trị năm quy đổi theo số CP snapshot, chưa phải TTM/dự phóng. SSI chưa tích hợp BCTC quý/bán niên 2026.
+
+Khoảng ngày đầu trang là lịch sử giá; ngày chốt giới hạn tài liệu được công bố. Web có nến OHLC, khối lượng, MA20/50 khi lịch sử đủ điều kiện và bộ lọc biểu đồ. Tin vĩ mô/ngành lấy tối đa 8 bài phù hợp mỗi phạm vi trong 30 ngày, gộp một ô mỗi mục; mặc định 3 bài với nút mở toàn bộ. Những mã không vào mẫu có lý do riêng: lỗi kỳ, khác phạm vi, thiếu chỉ tiêu hoặc tải nguồn thất bại.
+
+Gemini chỉ diễn giải bằng chứng vĩ mô/ngành và kênh tác động tới doanh nghiệp; nguồn được gắn từ evidence IDs. Nhận xét sai bị loại riêng, nhận xét hợp lệ được giữ. Lỗi JSON và lỗi kiểm tra được giải thích cụ thể; không tự chứng nhận tính đúng đắn của suy luận AI. API thật/Cloud chưa được kiểm chứng trong lần sửa này.
+
+PDF SSI mẫu có biểu đồ trái, chữ phải; nguồn dùng tên đơn vị thay S1/S2, nhãn và kích thước biểu đồ đã chỉnh. Chi tiết và giới hạn: [nâng cấp SSI](docs/ssi_report_upgrade.md). Khi cập nhật code, tải lại web và bấm **Phân tích và tạo PDF** để thay kết quả cũ.
+
+Đã bổ sung `packages.txt` cho OCR trên Streamlit Community Cloud theo [hướng dẫn dependency hệ thống](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies). Đây là cấu hình chuẩn bị triển khai, chưa xác nhận ứng dụng Cloud thực tế.

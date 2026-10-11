@@ -4,13 +4,35 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, date
 import json
 import re
+import subprocess
 from pathlib import Path
 from src.data.providers import download,DataSourceError,VN_TIME
 from src.data.research import KBS_BASE,financial_url
 from src.data.normalize import parse_annual_financials
 from src.analysis.financial import analyze_financials
+from src.data.tvs_issuer import collect_tvs_peer
 
 VCI_URL="https://iq.vietcap.com.vn/api/iq-insight-service/v2/company/search-bar?language=1"
+
+
+def exclusion_detail(valid,target,issues=None):
+    periods=valid.get("periods",[])
+    same_date=[p for p in periods if p["period_end"]==target["period_end"]]
+    scopes={"consolidated":"hợp nhất","separate":"riêng lẻ","parent":"công ty mẹ"}
+    if not same_date:
+        years=", ".join(str(p["year"]) for p in periods) or "chưa có"
+        rejected=any(f"loại kỳ {target['year']}, metadata" in str(w) for w in issues or [])
+        return {"reason_code":"invalid_period_metadata" if rejected else "missing_period",
+                "reason":f"Kỳ {target['year']} của nguồn có metadata đầu/cuối không hợp lệ; không dùng dù có số liệu gắn nhãn năm." if rejected else f"Chưa có kỳ hợp lệ kết thúc {target['period_end']}. Các năm có thể dùng từ nguồn: {years}."}
+    same_scope=[p for p in same_date if p["scope"]==target["scope"]]
+    if not same_scope:
+        available=", ".join(sorted({scopes.get(p["scope"],"chưa xác định") for p in same_date}))
+        return {"reason_code":"scope_mismatch","reason":f"Nguồn có BCTC {available} năm {target['year']}, nhưng mã phân tích dùng {scopes.get(target['scope'],'phạm vi khác')}. Không trộn phạm vi để tính trung vị."}
+    same_type=[p for p in same_scope if p["business_type"]==target["business_type"]]
+    if not same_type:return {"reason_code":"business_type_mismatch","reason":"Loại hình báo cáo tài chính khác với mã đang phân tích."}
+    missing=[label for key,label in [("assets","tài sản"),("equity","vốn chủ"),("liabilities","nợ phải trả")] if same_type[0]["fields"].get(key,{}).get("value") is None]
+    if missing:return {"reason_code":"missing_balance_fields","reason":"Thiếu chỉ tiêu bắt buộc: "+", ".join(missing)+"."}
+    return {"reason_code":"invalid_balance","reason":"Bảng cân đối không qua kiểm tra tài sản, nợ và vốn hoặc tổng tài sản không dương."}
 
 def parse_vci_universe(payload):
     if not isinstance(payload,dict) or not isinstance(payload.get("data"),list):raise DataSourceError("Schema phân ngành Vietcap không hợp lệ")
@@ -89,10 +111,26 @@ def collect_industry(ticker,as_of,financial,root,run_id,max_peers=4):
         result["errors"].append({"stage":"industry_peers","message":"Mã phân tích chưa có kỳ tài chính hợp lệ để so sánh đồng kỳ."});return result
     target=financial["periods"][0];result["period_end"]=target["period_end"];result["scope"]=target["scope"]
     folder=root/"data/raw/industry";folder.mkdir(parents=True,exist_ok=True)
+    issuer_cache={}
     def fetch(symbol,kind):
+        if symbol in issuer_cache:
+            issuer=issuer_cache[symbol]
+            return [r for r in issuer["records"] if r["kind"]==kind],issuer["source"],[]
         url=financial_url(symbol,kind);raw=download(url,timeout=15);source_id=f"PEER_{symbol}_{kind}_{run_id}"
         (folder/f"{source_id}.json").write_bytes(raw);issues=[]
         records=parse_annual_financials(json.loads(raw),kind,as_of,source_id,issues)
+        if symbol=="TVS" and kind=="balance" and target["year"]==as_of.year-1 and target["scope"]=="consolidated" and target["business_type"]==2 and not any(r["year"]==target["year"] and r["scope"]==target["scope"] for r in records):
+            try:
+                snapshots={"balance":json.loads(raw)}
+                for other in ("income","cashflow"):
+                    content=download(financial_url(symbol,other),timeout=15)
+                    (folder/f"PEER_{symbol}_{other}_{run_id}.json").write_bytes(content)
+                    snapshots[other]=json.loads(content)
+                issuer=collect_tvs_peer(as_of,root,run_id,snapshots);issuer_cache[symbol]=issuer
+                issues.append(f"TVS dùng PDF kiểm toán chính thức {target['year']}, qua {len(issuer['checks'])} đối chiếu số liệu. Metadata KBS sai vẫn bị loại.")
+                return [r for r in issuer["records"] if r["kind"]==kind],issuer["source"],issues
+            except (DataSourceError,OSError,ValueError,KeyError,TypeError,RuntimeError,subprocess.SubprocessError) as exc:
+                issues.append("TVS PDF chưa xác minh được: "+str(exc))
         source={"source_id":source_id,"url_or_file":url,"retrieved_at":datetime.now(VN_TIME).isoformat(),"page_or_table":f"{symbol} {kind}","notes":"KBS annual peer snapshot; period and scope checked; not independently verified"}
         return records,source,issues
     candidates=[];balance_cache={}
@@ -110,12 +148,12 @@ def collect_industry(ticker,as_of,financial,root,run_id,max_peers=4):
             for symbol in comparison_group["symbols"]:
                 if symbol==ticker:continue
                 data=balance_cache[symbol]
-                if isinstance(data,str):result["excluded"].append({"ticker":symbol,"reason":data});continue
+                if isinstance(data,str):result["excluded"].append({"ticker":symbol,"reason":data,"reason_code":"source_unavailable"});continue
                 records,source,issues=data;valid=analyze_financials(records)
                 period=next((p for p in valid["periods"] if p["period_end"]==target["period_end"] and p["scope"]==target["scope"] and p["business_type"]==target["business_type"]),None)
                 if period and all(period["fields"].get(k,{}).get("value") is not None for k in ["assets","equity","liabilities"]) and period["fields"]["assets"]["value"]>0:
                     candidates.append({"ticker":symbol,"assets":period["fields"]["assets"]["value"],"records":list(records),"sources":[source],"warnings":list(issues)})
-                else:result["excluded"].append({"ticker":symbol,"reason":"Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"})
+                else:result["excluded"].append({"ticker":symbol,**exclusion_detail(valid,target,issues)})
             if len(candidates)>=2:break
         group=comparison_group
         if len(candidates)>=2:break
@@ -145,5 +183,5 @@ def collect_industry(ticker,as_of,financial,root,run_id,max_peers=4):
         result["sources"].extend(candidate["sources"])
     result["excluded"].sort(key=lambda r:r["ticker"])
     if len(result["peers"])<2:result["errors"].append({"stage":"industry_peers","message":"Chưa đủ hai doanh nghiệp so sánh có kỳ phù hợp; không tính trung vị mẫu."})
-    result["warnings"].append("Số liệu mẫu so sánh lấy một nguồn KBS và kiểm tra cấu trúc/kỳ/bảng cân đối; chưa đối chiếu độc lập tất cả tài liệu gốc của từng doanh nghiệp.")
+    result["warnings"].append("Mẫu so sánh ưu tiên kỳ/phạm vi hợp lệ của KBS; TVS có bộ đọc PDF kiểm toán chính thức khi metadata KBS sai. Nguồn ghi theo từng mã; chưa đối chiếu độc lập toàn bộ mẫu ngành.")
     return result

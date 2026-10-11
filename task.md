@@ -116,3 +116,18 @@ Minh chứng: submission/exchange_report_acceptance.json; phương pháp và gi�
 - [x] 155 tests đạt; pipeline nguồn thực SHS/VNM/REE và minh chứng riêng. Chi tiết docs/investment_research_upgrade.md.
 - [x] AppTest ba mã thực; PDF đầy đủ/tóm tắt/bỏ mục; render 53 trang cuối, rà soát các phần và phân trang; web health HTTP 200.
 - [ ] Xác minh BCTC REE 2025 và tài sản từng mảng SOTP mới; thêm adapter doanh nghiệp khác có đủ nguồn; kiểm chứng API Gemini/Cloud thật.
+
+## Cập nhật SSI và chất lượng báo cáo (11/10/2026)
+
+- [x] SSI dùng PDF kiểm toán hợp nhất 2025 chính thức, ngày 27/03/2026, kiểm tra năm/phạm vi/VND/hàng/cân đối/lợi nhuận; khớp 12 giá trị cột năm KBS. Không sửa metadata nguồn sai; cột 2024 giữ số trình bày lại.
+- [x] TVS có adapter PDF kiểm toán và 12 giá trị đối chiếu; SSI có mẫu VDS/TVS cùng BCTC 2025, P/E/P/B từ giá/CP snapshot, không phải trung bình toàn ngành hoặc TTM.
+- [x] Tăng chỉ tiêu so sánh phù hợp ngành, chẩn đoán lý do loại peer; nến OHLC/volume/MA và lọc khoảng nhìn trên web.
+- [x] Tin vĩ mô/ngành gộp một ô mỗi mục, tối đa tám bài phù hợp/phạm vi, preview ba bài có nút mở/thu gọn; gộp kênh vĩ mô vào ngành.
+- [x] Gemini gắn source IDs từ evidence IDs, giữ từng nhận xét hợp lệ, chẩn đoán lỗi riêng/JSON; không xuất khóa hoặc SDK error nhạy cảm.
+- [x] PDF nguồn theo tên đơn vị, biểu đồ/nhãn dễ đọc hơn, loại biểu đồ giá lặp tại tổng quan; kiểm tra toàn bộ trang. OCR Cloud có packages.txt; chưa triển khai Cloud.
+- [ ] SSI BCTC quý/bán niên 2026 và TTM chưa tích hợp; mẫu định giá SSI hiện chỉ hai doanh nghiệp đủ điều kiện.
+- [ ] API Gemini thật chưa kiểm chứng: automatic review từ chối gửi payload SSI tới Google, chờ cho phép cụ thể của người dùng. Đã tiếp tục mọi phần không phụ thuộc API.
+
+Chi tiết và minh chứng: docs/ssi_report_upgrade.md; submission/evidence/ssi_report_upgrade.json.
+
+Kiểm chứng cuối: 170 kiểm thử offline đạt; AppTest SSI và hồi quy SHS/VNM/REE không ngoại lệ; PDF SSI 17 trang đã render và kiểm tra toàn bộ.

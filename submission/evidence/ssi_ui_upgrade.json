@@ -1,0 +1,19 @@
+{
+  "macro": {
+    "articles_available": 8,
+    "preview": 3,
+    "show_all_and_collapse": true
+  },
+  "industry": {
+    "articles_available": 8,
+    "preview": 3,
+    "show_all_and_collapse": true
+  },
+  "no_exception": true,
+  "no_json_ui": true,
+  "analysis_calls": 1,
+  "company_news_count": 12,
+  "chart_filter_ok": true,
+  "grouped_industry_channels": true,
+  "run_id": "SSI_20261011_222135_393293"
+}

@@ -60,7 +60,7 @@ def analyze_financials(records: list[dict]) -> dict:
     scope_label="hợp nhất" if latest["scope"]=="consolidated" else "riêng lẻ" if latest["scope"]=="separate" else "công ty mẹ"
     basic = [("net_profit", "LNST "+scope_label), ("parent_profit", "LNST cổ đông công ty mẹ"),
                        ("assets", "Tổng tài sản"), ("equity", "Vốn chủ sở hữu"), ("cfo", "Dòng tiền kinh doanh")]
-    for key, label in ([("revenue", "Doanh thu thuần")] if industry!="bank" else []) + basic:
+    for key, label in ([("revenue", "Doanh thu hoạt động" if industry=="securities" else "Doanh thu thuần")] if industry!="bank" else []) + basic:
         metric(key, label, get(latest, key), "VND", "Số liệu báo cáo năm", [key], "Nguồn thiếu chỉ tiêu phù hợp")
     growth_fields = ([("revenue", "Tăng trưởng doanh thu")] if industry!="bank" else []) + [("net_profit", "Tăng trưởng LNST")]
     if industry=="bank":
@@ -79,6 +79,10 @@ def analyze_financials(records: list[dict]) -> dict:
     roa=ratio(get(latest,"net_profit"),average_assets)
     metric("roa","ROA "+scope_label+" năm",roa*100 if roa is not None else None,"%","LNST cùng phạm vi / tổng tài sản bình quân × 100",["net_profit","assets"],"Thiếu tài sản bình quân")
     if previous and "assets" in previous["fields"]:metrics[-1]["inputs"].append(previous["fields"]["assets"])
+    for key,label,numerator,denominator in [
+        ("liabilities_equity","Tổng nợ phải trả / vốn chủ","liabilities","equity"),
+        ("assets_equity","Tổng tài sản / vốn chủ","assets","equity")]:
+        metric(key,label,ratio(get(latest,numerator),get(latest,denominator)),"lần",label,[numerator,denominator],"Thiếu đầu vào hoặc vốn chủ không dương")
     if industry == "nonfinancial":
         for key,label,numerator,denominator,unit in [
             ("gross_margin","Biên lợi nhuận gộp","gross_profit","revenue","%"),
@@ -100,6 +104,10 @@ def analyze_financials(records: list[dict]) -> dict:
         metric("cir","Chi phí / tổng thu nhập hoạt động",cir*100 if cir is not None else None,"%","Chi phí hoạt động / (lợi nhuận trước dự phòng + chi phí hoạt động) × 100",["operating_cost","pre_provision_profit"],"Thiếu thu nhập/chi phí")
         errors.append("Ngân hàng: không dùng biên gộp, CFO/LNST hoặc nợ vay/vốn của doanh nghiệp sản xuất; chưa đủ dữ liệu để tính NIM, NPL và CAR.")
     elif industry=="securities":
+        margin=ratio(get(latest,"net_profit"),get(latest,"revenue"))
+        metric("securities_net_margin","LNST / doanh thu hoạt động",margin*100 if margin is not None else None,"%","LNST cùng phạm vi / doanh thu hoạt động × 100",["net_profit","revenue"],"Thiếu doanh thu hoạt động phù hợp")
+        loans=ratio(get(latest,"financial_loans"),get(latest,"equity"))
+        metric("loans_equity","Các khoản cho vay / vốn chủ",loans,"lần","Các khoản cho vay trên BCTC / VCSH; không đồng nhất với tỷ lệ dư nợ margin theo quy định",["financial_loans","equity"],"Thiếu các khoản cho vay hoặc vốn chủ không dương")
         for key,label in [("realized_pretax_profit","Lợi nhuận trước thuế đã thực hiện"),("unrealized_pretax_profit","Lợi nhuận trước thuế chưa thực hiện")]:
             if key in fields:metric(key,label,get(latest,key),"VND","Chỉ tiêu BCTC chứng khoán",[key])
         if "realized_pretax_profit" in fields:
