@@ -66,10 +66,11 @@ def analyze_valuation(financial, market, company, quote_check, as_of, target_pb=
             val["pb_methods"].append(dict(method="P/B Gordon theo ROE mẹ",multiple=pb,target_price_vnd=target,difference_pct=(target/price-1)*100))
         else:val["gordon"]["reason"]="Thiếu lợi nhuận/vốn mẹ bình quân đồng kỳ, hoặc ROE ≤ g / Ke ≤ g."
         bm=industry_benchmark or {};pb=bm.get("median_pb")
-        if bm.get("available") and number(pb,True):
+        same_period=bm.get("period_end",latest["period_end"])==latest["period_end"] and bm.get("scope",latest["scope"])==latest["scope"]
+        if bm.get("available") and number(pb,True) and same_period:
             val["industry"]={**bm,"industry_pb_median":pb,"target_price_vnd":bv*pb,"difference_pct":(bv*pb/price-1)*100}
             val["pb_methods"].append(dict(method="P/B trung vị mẫu ngành",multiple=pb,target_price_vnd=bv*pb,difference_pct=(bv*pb/price-1)*100))
-        else:val["industry"]["reason"]=bm.get("reason","Chưa đủ hai P/B đồng kỳ; không dùng số cố định từ ZIP như dữ liệu thị trường.")
+        else:val["industry"]["reason"]="Mẫu ngành dùng kỳ/phạm vi khác tài chính định giá; không ghép P/B khác năm." if not same_period else bm.get("reason","Chưa đủ hai P/B đồng kỳ; không dùng số cố định từ ZIP như dữ liệu thị trường.")
         targets=[m["target_price_vnd"] for m in val["pb_methods"][1:]]
         components.append(dict(method="P/B tổng hợp" if targets else "P/B giả định",price=sum(targets)/len(targets) if targets else bv*target_pb,key="pb"))
     else:

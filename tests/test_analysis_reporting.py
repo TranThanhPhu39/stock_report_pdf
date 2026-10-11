@@ -68,9 +68,12 @@ class FinancialGuardTests(unittest.TestCase):
         a=period(2025,10,100);a["business_type"]=3
         keys={m["key"] for m in analyze_financials([a])["metrics"]}
         self.assertNotIn("debt_equity",keys);self.assertNotIn("cash_conversion",keys)
-    def test_missing_adjusted_series_suppresses_return(self):
+    def test_missing_adjusted_series_labels_source_close_statistics(self):
         rows=[{"close":100,"date":"2026-10-08","volume":1}]
-        self.assertIsNone(analyze_market(rows)["return_pct"])
+        market=analyze_market(rows)
+        self.assertEqual(market["return_pct"],0)
+        self.assertFalse(market["adjustment_verified"])
+        self.assertEqual(market["return_label"],"Biến động đóng cửa nguồn")
     def test_drawdown_uses_previous_peak(self):
         rows=[{"close":v,"adjusted_close":v,"date":f"2026-10-0{i+1}","volume":1} for i,v in enumerate([100,120,90,110])]
         self.assertAlmostEqual(analyze_market(rows)["max_drawdown_pct"],-25)

@@ -27,13 +27,19 @@ def build_recommendation(result):
                "Dòng tiền hỗ trợ lợi nhuận trong kỳ; cần phân biệt thu hồi vốn lưu động và dòng tiền lặp lại.",
                "Kỳ tiếp theo giữ CFO dương, chuyển đổi tiền tốt mà không tăng mạnh phải thu/tồn kho.",
                "CFO âm hoặc tăng phải thu/tồn kho làm suy yếu chuyển đổi lợi nhuận thành tiền.",refs("cash_conversion","cfo","net_profit"),year)
+    if financial.get('industry_group')=='securities' and number(val('lending_revenue_growth')) and val('lending_revenue_growth')>0:
+        thesis('Động lực dịch vụ cho vay',f"Lãi cho vay và phải thu {year} tăng {val('lending_revenue_growth'):.2f}%; các khoản cho vay {val('financial_loans')/1e9:,.2f} tỷ VND." if number(val('financial_loans')) else f"Lãi cho vay và phải thu {year} tăng {val('lending_revenue_growth'):.2f}%.",
+               'Tăng thu nhập cho vay là động lực kinh doanh; cần đọc cùng chi phí vốn, tài sản bảo đảm và chất lượng các khoản cho vay.',
+               'BCTC kỳ tiếp theo xác nhận tăng thu nhập cho vay và kiểm soát chi phí vốn/dự phòng.',
+               'Chi phí vốn hoặc dự phòng tăng nhanh, tài sản bảo đảm suy giảm làm giảm hiệu quả cho vay.',refs('lending_revenue_growth','financial_loans'),year)
     for comparison in result.get("industry",{}).get("comparisons",[]):
         if comparison["key"]=="roe" and comparison["sample_size"]>=2 and comparison["company_value"]>comparison["sample_median"]:
-            sids=refs("roe")+[s["source_id"] for s in result["industry"].get("sources",[])]
+            comparison_metrics=result["industry"].get("comparison_financial",financial).get("metrics",[])
+            sids=[i["source_id"] for m in comparison_metrics if m["key"]=="roe" for i in m.get("inputs",[]) if i.get("source_id")]+[s["source_id"] for s in result["industry"].get("sources",[])]
             thesis("Hiệu quả vốn trong mẫu ngành",f"ROE {comparison['company_value']:.2f}% so với trung vị {comparison['sample_median']:.2f}%, n={comparison['sample_size']}.",
                    "Hiệu quả vốn cao hơn mẫu cùng kỳ; cần kiểm tra đòn bẩy và khoản bất thường trước khi trả bội số cao hơn.",
                    "Duy trì ROE trên mẫu đồng kỳ khi cập nhật BCTC, không dựa vào tăng đòn bẩy.",
-                   "ROE xuống dưới mẫu hoặc chất lượng lợi nhuận suy giảm.",sorted(set(sids)),year)
+                   "ROE xuống dưới mẫu hoặc chất lượng lợi nhuận suy giảm.",sorted(set(sids)),comparison["period_end"])
     weighted=valuation.get("weighted_average",{});components=weighted.get("components",[]) if weighted.get("available") else []
     targets=[c["target_price_vnd"] for c in components if number(c.get("target_price_vnd"),True)]
     target=weighted.get("target_price_vnd") if len(targets)>=2 else None
@@ -57,6 +63,8 @@ def build_recommendation(result):
     weak_cash=financial.get("industry_group")=="nonfinancial" and number(val("cfo")) and val("cfo")<=0
     cash_confirmed=financial.get("industry_group")!="nonfinancial" or number(val("cfo"),True)
     finance_verified=result["quality"]["financial_check"].get("status")=="matched_selected_fields"
+    realized_growth=val("realized_profit_growth")
+    profit_quality_weak=financial.get("industry_group")=="securities" and number(realized_growth) and realized_growth<0
     independent_note="Đối chiếu chỉ tiêu đã chọn; không chứng nhận toàn bộ BCTC." if finance_verified else "Tài chính chưa đối chiếu độc lập; mức tin cậy thấp."
     stance="THEO DÕI";reason="Chưa có biên chênh lệch và chất lượng đầu vào đủ mạnh để đề xuất tích lũy."
     if blockers:
@@ -67,6 +75,11 @@ def build_recommendation(result):
         if weak_cash:risk_reasons.append(f"CFO {year} không dương ({val('cfo')/1e9:,.2f} tỷ VND).")
         if upside<=-15:risk_reasons.append(f"Giá trị kịch bản tổng hợp thấp hơn giá đóng cửa {abs(upside):.2f}%.")
         stance="ƯU TIÊN QUẢN TRỊ RỦI RO";reason=" ".join(risk_reasons)+" Cần xác minh sự phục hồi hoặc cập nhật giả định trước khi tăng tỷ trọng."
+    elif profit_quality_weak:
+        share=val("unrealized_profit_share")
+        reason=f"LNST {year} tăng {growth:.2f}% nhưng LNTT đã thực hiện giảm {abs(realized_growth):.2f}%. " if number(growth) else f"LNTT đã thực hiện {year} giảm {abs(realized_growth):.2f}%. "
+        if number(share):reason+=f"Phần chưa thực hiện chiếm {share:.2f}% LNTT. "
+        reason+=f"Chênh lệch định giá giả định {upside:+.2f}%; theo dõi khả năng hiện thực hóa lợi nhuận và kiểm tra kỳ mới trước khi tích lũy."
     elif upside>=15 and number(growth) and growth>0 and finance_verified and cash_confirmed and spread<=60 and min(targets)>=price:
         stance="CÂN NHẮC TÍCH LŨY CÓ ĐIỀU KIỆN";reason="Chênh lệch kịch bản ít nhất 15%, lợi nhuận tăng, giá không cao hơn mức thấp nhất của các phương pháp và các chỉ tiêu chọn đã được đối chiếu."
     else:
@@ -77,7 +90,7 @@ def build_recommendation(result):
                 model_high_vnd=max(targets) if targets else None,model_spread_pct=spread,
                 entry_ceiling_vnd=min(target/1.15,min(targets)) if stance=="CÂN NHẮC TÍCH LŨY CÓ ĐIỀU KIỆN" else None,
                 opportunities=opportunities,blockers=blockers,source_ids=sorted(set(ids+refs("net_profit_growth","net_profit","cfo"))),
-                methodology="Ngưỡng nghiên cứu: chênh ≥15% để xem xét tích lũy; ≤-15% ưu tiên rủi ro; phân tán max/min-1 ≤60%. Cần ≥2 nhóm mô hình, giá ≤7 ngày, tài chính từ năm trước. Tích lũy còn yêu cầu LNST tăng, CFO không âm nếu có, đối chiếu tài chính và mọi mô hình ≥giá. Các ngưỡng là quy tắc của đề tài, không phải chuẩn thị trường.",
+                methodology="Ngưỡng nghiên cứu: chênh ≥15% để xem xét tích lũy; ≤-15% ưu tiên rủi ro; phân tán max/min-1 ≤60%. Cần ≥2 nhóm mô hình, giá ≤7 ngày, tài chính từ năm trước. Tích lũy còn yêu cầu LNST tăng, CFO không âm nếu có, đối chiếu tài chính và mọi mô hình ≥giá. Với chứng khoán, LNTT đã thực hiện giảm thì theo dõi chất lượng lợi nhuận trước khi tích lũy. Các ngưỡng là quy tắc của đề tài, không phải chuẩn thị trường.",
                 conditions=["Kiểm tra BCTC kỳ mới, cổ tức/phát hành và số CP trước khi sử dụng mức tham chiếu.",
                             "Cập nhật kịch bản khi lợi nhuận/dòng tiền suy giảm, chi phí vốn thay đổi hoặc giá không còn biên chênh lệch.",
                             "Đọc toàn văn công bố trọng yếu; tin tiêu đề và kênh vĩ mô có điều kiện chưa xác nhận chất xúc tác."])

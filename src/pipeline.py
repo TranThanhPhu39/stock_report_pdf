@@ -11,6 +11,7 @@ from src.data.acquisition import acquire, write_json
 from src.data.providers import completed_day_cutoff
 from src.data.research import collect_research, collect_peer_news
 from src.data.issuer_pdf import extract_hpg_interim
+from src.data.shs_issuer import collect_shs_issuer
 from src.data.quality import verify_financials
 from src.models import AnalysisRequest
 from src.analysis.market import analyze_market
@@ -57,15 +58,26 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
             except (RuntimeError,OSError,ValueError,ImportError,subprocess.SubprocessError) as exc:
                 research["errors"].append({"stage":"issuer_ocr","message":str(exc)})
     financial=analyze_financials(research["financial_records"])
-    financial_check=verify_financials(ticker,financial,interim,root)
-    if financial_check["status"]=="mismatch":
-        research["errors"].append({"stage":"financial_check","message":"Chỉ tiêu không khớp tài liệu gốc; chặn phân tích tài chính và định giá."})
-        financial={**financial,"periods":[],"metrics":[]}
     market=analyze_market(rows,research["quote_check"])
     company={**research["company"],"name":acquisition["prices"].get("company_name") if acquisition["prices"] else ticker}
     reference=collect_reference(ticker,as_of,financial,company,root,acquisition["run_id"])
     research["sources"].extend(reference["sources"])
     research["warnings"].extend(reference["warnings"])
+    issuer=collect_shs_issuer(ticker,as_of,reference,root,acquisition["run_id"])
+    research["sources"].extend(issuer["sources"])
+    research["warnings"].extend(issuer["warnings"])
+    research["errors"].extend(issuer["errors"])
+    if issuer["available"]:
+        replaced={r["year"] for r in issuer["records"]}
+        financial=analyze_financials([r for r in research["financial_records"] if r["year"] not in replaced]+issuer["records"])
+        company["name"]="Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội"
+    financial_check=verify_financials(ticker,financial,interim,root)
+    if issuer["checks"]:
+        financial_check["checks"].extend(issuer["checks"])
+        financial_check["status"]="matched_selected_fields" if all(c["match"] for c in financial_check["checks"]) else "mismatch"
+    if financial_check["status"]=="mismatch":
+        research["errors"].append({"stage":"financial_check","message":"Chỉ tiêu không khớp tài liệu gốc; chặn phân tích tài chính và định giá."})
+        financial={**financial,"periods":[],"metrics":[]}
     context=collect_context(ticker,as_of,financial,root,acquisition["run_id"])
     benchmark=collect_valuation_peers(context["industry"],as_of,market.get("latest_date") if market else None,root,acquisition["run_id"])
     research["sources"].extend(benchmark["sources"])
@@ -87,7 +99,7 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     result = {"request": request.to_dict(),
               "acquisition": acquisition, "market": market, "price_rows": rows,
               "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],"macro":context["macro"],"industry":context["industry"],
-              "reference":reference,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
+              "reference":reference,"issuer_financials":issuer,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
               "errors":acquisition["errors"]+research["errors"],"financial_metrics_status":"analyzed" if financial["metrics"] else "unavailable",
               "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or (acquisition["prices"] and acquisition["prices"].get("coverage",{}).get("start_gap_days",0)>7) or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
     import json

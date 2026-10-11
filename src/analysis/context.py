@@ -20,7 +20,7 @@ def analyze_context(macro,industry,financial):
         row=indicators.get(key)
         if row:macro["observations"].append(f"{row['label']}: {row['value']:.2f}% ({row['period']}, công bố {row['published_at']}).")
     macro["assessment"]="Nền tăng trưởng, sức mua, giá cả và tín dụng cần được đọc cùng kỳ. GDP dương không bảo đảm mọi ngành/doanh nghiệp tăng lợi nhuận; CPI tăng có thể tác động giá đầu vào và sức mua. Chỉ số giá USD không phải tỷ giá giao ngay."
-    target_metrics={m["key"]:m for m in financial["metrics"]}
+    target_metrics={m["key"]:m for m in industry.get("comparison_financial",financial)["metrics"]}
     rows=[]
     for peer in industry["peers"]:
         metrics={m["key"]:m for m in peer["financial"]["metrics"]}

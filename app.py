@@ -233,7 +233,7 @@ if result:
     market=result.get("market")
     if market:
         cols=st.columns(4)
-        for col,label,key,unit in zip(cols,["Giá đóng cửa","Biến động khoảng chọn","Sụt giảm tối đa","MA20"],["latest_close_vnd","return_pct","max_drawdown_pct","ma20_vnd"],["VND/share","%","%","VND/share"]):
+        for col,label,key,unit in zip(cols,["Giá đóng cửa",market.get("return_label","Biến động khoảng chọn"),"Sụt giảm tối đa","MA20"],["latest_close_vnd","return_pct","max_drawdown_pct","ma20_vnd"],["VND/share","%","%","VND/share"]):
             display="Không tính" if key!="latest_close_vnd" and not market.get("history_indicators_available",True) else formatted(market[key],unit)
             col.metric(label,display)
             if display=="Không tính":col.caption("Lịch sử chưa khớp")

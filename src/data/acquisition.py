@@ -64,7 +64,6 @@ def acquire(ticker: str, start: date, as_of: date, root: Path, report_limit: int
                                 "retrieved_at":candidate["retrieved_at"], "page_or_table":"daily OHLCV",
                                 "notes":f"Raw snapshot: {attempt['raw_file']}; VND; adjustment unverified; valid={validation['valid']}; request={candidate.get('request_payload',{})}"})
                 if not validation["valid"]:
-                    summary["warnings"].append(f"{provider}: loại chuỗi giá do {validation['errors'][:5]}; không tự sửa OHLC.")
                     continue
                 prices = candidate
                 for row in prices["rows"]: row["price_provider"] = provider
@@ -72,11 +71,13 @@ def acquire(ticker: str, start: date, as_of: date, root: Path, report_limit: int
                 break
             except (DataSourceError, ValueError, TypeError) as exc:
                 summary["price_attempts"].append({"provider":provider, "error":str(exc)})
-                summary["warnings"].append(f"{provider}: {exc}")
         if prices is None:
+            summary["warnings"].extend(f"{attempt['provider']}: {attempt.get('error') or attempt.get('validation',{}).get('errors')}" for attempt in summary["price_attempts"])
             write_json(run_dir / "validation.json", {"valid":False,"attempts":summary["price_attempts"]})
             raise DataSourceError("Không có chuỗi giá hợp lệ từ Yahoo, KBS hoặc Vietcap; xem price_attempts trong acquisition.json.")
         write_json(run_dir / "validation.json", validation)
+        if provider != "Yahoo":
+            summary["warnings"].append(f"Giá lấy từ {provider}; nguồn ưu tiên không có chuỗi hợp lệ. Chi tiết lần thử nguồn được lưu trong acquisition.json; mẫu giá được đối chiếu riêng.")
         coverage = {"requested_start":start.isoformat(), "actual_start":prices["rows"][0]["date"],
                     "actual_end":prices["rows"][-1]["date"], "start_gap_days":(date.fromisoformat(prices['rows'][0]['date'])-start).days}
         if coverage["start_gap_days"] > 7:

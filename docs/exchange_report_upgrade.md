@@ -33,6 +33,8 @@ Ngưỡng 15%, 60%, 7 ngày và trọng số là quy tắc công khai của đ�
 
 ## Kiểm chứng và giới hạn
 
+Phần dưới ghi kết quả lịch sử tại commit 7634381. SHS và cách tính chỉ tiêu khi thiếu Adj Close đã được cập nhật tiếp trong [SHS: tài chính 2025](shs_issuer_upgrade.md); không dùng giới hạn cũ bên dưới làm trạng thái SHS hiện tại.
+
 Ngày phân tích 11/10/2026, giá phiên 09/10/2026. Chạy nguồn trực tiếp VNM, SHS, VNZ, PVS, QNS, F88; cả sáu khớp 20/20 phiên trong mẫu đối chiếu. Không chứng nhận toàn thị trường hoặc toàn bộ lịch sử điều chỉnh. KBS/Vietcap không có Adj Close nên chưa tính lợi suất/drawdown/biến động năm hóa; MA được tính trên đóng cửa nguồn khi mẫu đối chiếu khớp.
 
 SHS/F88 vẫn dùng kỳ hợp lệ 2024 do metadata 2025 ghi 24 tháng; không tự sửa thành 12 tháng. QNS thiếu đầu vào cho ít nhất hai nhóm mô hình. F88 thiếu hai peer cùng kỳ nên chưa có trung vị ngành. Các giới hạn này hiện trong giao diện/PDF và hồ sơ phân tích. Báo cáo SHS có CFO chứng khoán âm được trình bày đúng ngành; kịch bản định giá sử dụng 2024 được gắn kỳ và không tạo khuyến nghị tích lũy hiện tại.

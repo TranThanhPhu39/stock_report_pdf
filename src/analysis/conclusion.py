@@ -33,7 +33,8 @@ def build_conclusion(financial, market, valuation, quote_check, interim=None):
         else:
             risks.append("Giá cuối chuỗi chưa đồng thời vượt MA20 và MA50; động lực giá cần được theo dõi thêm.")
     if market and market["max_drawdown_pct"] is not None:
-        risks.append(f"Chuỗi giá điều chỉnh có mức sụt giảm lớn nhất {market['max_drawdown_pct']:.1f}% trong giai đoạn chọn; đây là rủi ro biến động đã quan sát, không phải dự báo.")
+        basis="giá điều chỉnh" if market.get("adjustment_verified",False) else "đóng cửa nguồn chưa xác minh điều chỉnh quyền"
+        risks.append(f"Chuỗi {basis} có mức sụt giảm lớn nhất {market['max_drawdown_pct']:.1f}% trong giai đoạn chọn; không phải dự báo hoặc tổn thất thực nhận. Cần đọc sự kiện cổ tức/chia tách.")
     if interim and interim.get("valid"):
         fields=interim["fields"];profit=fields["net_profit"];revenue=fields["revenue"]
         if profit["previous"]>0 and revenue["previous"]>0:
@@ -47,6 +48,13 @@ def build_conclusion(financial, market, valuation, quote_check, interim=None):
     if not opportunities:
         opportunities.append("Chưa đủ bằng chứng để kết luận cơ hội nổi bật; cần bổ sung hoặc xác minh dữ liệu.")
     matrix=[]
+    realized_growth=value("realized_profit_growth")
+    if financial.get("industry_group")=="securities" and realized_growth is not None and realized_growth<0:
+        share=value("unrealized_profit_share")
+        evidence=f"LNTT đã thực hiện {year} giảm {abs(realized_growth):.2f}%"
+        if share is not None:evidence+=f"; chưa thực hiện chiếm {share:.2f}% LNTT"
+        risks.append(evidence+". Cần kiểm tra khả năng hiện thực hóa lợi nhuận và biến động danh mục tự doanh.")
+        matrix.append({"evidence":evidence,"impact":"Tăng trưởng tổng lợi nhuận chưa đồng nghĩa tăng lợi nhuận đã thực hiện","monitor":"Lợi nhuận đã thực hiện, thuyết minh tự doanh và BCTC kỳ tiếp theo","source_ids":[i["source_id"] for k in ['realized_profit_growth','unrealized_profit_share'] for i in metrics.get(k,{}).get('inputs',[]) if i.get('source_id')]})
     if value("net_profit_growth") is not None and value("net_profit_growth")<0:
         matrix.append({"evidence":f"LNST năm {year} giảm {abs(value('net_profit_growth')):.2f}%", "impact":"Áp lực duy trì lợi nhuận", "monitor":"Thu nhập lãi và dự phòng" if financial.get("industry_group")=="bank" else "Sản lượng, biên lợi nhuận và khoản bất thường", "source_ids":[i["source_id"] for i in metrics["net_profit_growth"]["inputs"] if i.get("source_id")]})
     if market and market.get("ma20_vnd") is not None and market["latest_close_vnd"]<market["ma20_vnd"]:

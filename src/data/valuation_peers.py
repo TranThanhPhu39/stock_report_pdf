@@ -11,7 +11,7 @@ from src.data.research import KBS_BASE
 
 def collect_valuation_peers(industry, as_of, price_date, root, run_id):
     result={"available":False,"peers":[],"excluded":[],"sources":[],"median_pb":None,
-            "sector_name":industry.get("name"),"reason":"Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot."}
+            "sector_name":industry.get("name"),"period_end":industry.get("period_end"),"scope":industry.get("scope"),"reason":"Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot."}
     if as_of!=datetime.now(VN_TIME).date() or not price_date:return result
     folder=root/"data/raw/valuation_peers";folder.mkdir(parents=True,exist_ok=True)
     def collect(peer):

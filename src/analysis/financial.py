@@ -57,7 +57,8 @@ def analyze_financials(records: list[dict]) -> dict:
         metrics.append({"key": key, "label": label, "value": value, "unit": unit, "period": str(latest["year"]),
                         "formula": formula, "inputs": refs, "reason": reason if value is None else None})
     industry = "bank" if latest["business_type"]==3 or "net_interest_income" in fields else "securities" if latest["business_type"]==2 or "brokerage_revenue" in fields else "nonfinancial" if latest["business_type"] == 1 else "financial"
-    basic = [("net_profit", "LNST hợp nhất"), ("parent_profit", "LNST cổ đông công ty mẹ"),
+    scope_label="hợp nhất" if latest["scope"]=="consolidated" else "riêng lẻ" if latest["scope"]=="separate" else "công ty mẹ"
+    basic = [("net_profit", "LNST "+scope_label), ("parent_profit", "LNST cổ đông công ty mẹ"),
                        ("assets", "Tổng tài sản"), ("equity", "Vốn chủ sở hữu"), ("cfo", "Dòng tiền kinh doanh")]
     for key, label in ([("revenue", "Doanh thu thuần")] if industry!="bank" else []) + basic:
         metric(key, label, get(latest, key), "VND", "Số liệu báo cáo năm", [key], "Nguồn thiếu chỉ tiêu phù hợp")
@@ -71,12 +72,12 @@ def analyze_financials(records: list[dict]) -> dict:
             metrics[-1]["inputs"].append(previous["fields"][key])
     average_equity = (get(latest,"equity")+get(previous,"equity"))/2 if get(latest,"equity") is not None and get(previous,"equity") is not None else None
     roe = ratio(get(latest,"net_profit"), average_equity)
-    metric("roe", "ROE hợp nhất năm", roe*100 if roe is not None else None, "%", "LNST hợp nhất / VCSH hợp nhất bình quân × 100", ["net_profit","equity"], "Thiếu vốn bình quân hoặc vốn không dương")
+    metric("roe", "ROE "+scope_label+" năm", roe*100 if roe is not None else None, "%", "LNST cùng phạm vi / VCSH bình quân × 100", ["net_profit","equity"], "Thiếu vốn bình quân hoặc vốn không dương")
     if previous and "equity" in previous["fields"]:
         metrics[-1]["inputs"].append(previous["fields"]["equity"])
     average_assets=(get(latest,"assets")+get(previous,"assets"))/2 if get(latest,"assets") is not None and get(previous,"assets") is not None else None
     roa=ratio(get(latest,"net_profit"),average_assets)
-    metric("roa","ROA hợp nhất năm",roa*100 if roa is not None else None,"%","LNST hợp nhất / tổng tài sản bình quân × 100",["net_profit","assets"],"Thiếu tài sản bình quân")
+    metric("roa","ROA "+scope_label+" năm",roa*100 if roa is not None else None,"%","LNST cùng phạm vi / tổng tài sản bình quân × 100",["net_profit","assets"],"Thiếu tài sản bình quân")
     if previous and "assets" in previous["fields"]:metrics[-1]["inputs"].append(previous["fields"]["assets"])
     if industry == "nonfinancial":
         for key,label,numerator,denominator,unit in [
@@ -99,10 +100,21 @@ def analyze_financials(records: list[dict]) -> dict:
         metric("cir","Chi phí / tổng thu nhập hoạt động",cir*100 if cir is not None else None,"%","Chi phí hoạt động / (lợi nhuận trước dự phòng + chi phí hoạt động) × 100",["operating_cost","pre_provision_profit"],"Thiếu thu nhập/chi phí")
         errors.append("Ngân hàng: không dùng biên gộp, CFO/LNST hoặc nợ vay/vốn của doanh nghiệp sản xuất; chưa đủ dữ liệu để tính NIM, NPL và CAR.")
     elif industry=="securities":
+        for key,label in [("realized_pretax_profit","Lợi nhuận trước thuế đã thực hiện"),("unrealized_pretax_profit","Lợi nhuận trước thuế chưa thực hiện")]:
+            if key in fields:metric(key,label,get(latest,key),"VND","Chỉ tiêu BCTC chứng khoán",[key])
+        if "realized_pretax_profit" in fields:
+            metric("realized_profit_growth","Tăng trưởng lợi nhuận đã thực hiện",growth(get(latest,"realized_pretax_profit"),get(previous,"realized_pretax_profit")),"%","(LNTT đã thực hiện hiện tại / cùng kỳ - 1) × 100",["realized_pretax_profit"],"Thiếu kỳ gốc phù hợp")
+            if previous and "realized_pretax_profit" in previous["fields"]:metrics[-1]["inputs"].append(previous["fields"]["realized_pretax_profit"])
+        if "unrealized_pretax_profit" in fields:
+            share=ratio(get(latest,"unrealized_pretax_profit"),get(latest,"pretax_profit"))
+            metric("unrealized_profit_share","Tỷ trọng LNTT chưa thực hiện",share*100 if share is not None else None,"%","LNTT chưa thực hiện / tổng LNTT × 100",["unrealized_pretax_profit","pretax_profit"],"Thiếu LNTT phù hợp")
         for key,label,numerator in [("brokerage_share","Tỷ trọng doanh thu môi giới","brokerage_revenue"),("lending_share","Tỷ trọng lãi cho vay và phải thu","lending_revenue")]:
             v=ratio(get(latest,numerator),get(latest,"revenue"))
             metric(key,label,v*100 if v is not None else None,"%",f"{numerator} / doanh thu thuần hoạt động × 100",[numerator,"revenue"],"Thiếu doanh thu phù hợp")
         metric("financial_loans","Các khoản cho vay trên bảng cân đối",get(latest,"financial_loans"),"VND","Số liệu tài sản tài chính; không tự coi toàn bộ là dư nợ margin",["financial_loans"],"Thiếu cho vay tài chính")
+        for key,label in [('financial_loans','Tăng trưởng các khoản cho vay'),('lending_revenue','Tăng trưởng lãi cho vay và phải thu'),('brokerage_revenue','Tăng trưởng doanh thu môi giới')]:
+            metric(key+'_growth',label,growth(get(latest,key),get(previous,key)),"%","(Kỳ hiện tại / cùng kỳ - 1) × 100",[key],"Thiếu cùng kỳ")
+            if previous and key in previous['fields']:metrics[-1]['inputs'].append(previous['fields'][key])
         errors.append("Chứng khoán: tách tỷ trọng môi giới/lãi cho vay; không áp CFO/LNST hay biên gộp của doanh nghiệp sản xuất. Khoản cho vay không đồng nhất dư nợ margin.")
     else:
         errors.append("Doanh nghiệp tài chính: chỉ hiển thị chỉ tiêu ánh xạ được; không áp biên lợi nhuận/CFO/nợ vay của doanh nghiệp phi tài chính.")

@@ -87,6 +87,9 @@ Bộ bàn giao: README, projectcontext/task, docs, outputs/pdf và submission. M
 - [x] Cho phép ba Head khi Value4 trống, giữ chặn ánh xạ không rõ/24 tháng; bổ sung CFO chứng khoán 4735.
 - [x] Khuyến nghị nghiên cứu, mức tin cậy, kỳ/horizon và quy tắc công khai; luận điểm có bằng chứng/nguồn/điều kiện xác nhận/bác bỏ.
 - [x] 101 tests đạt; nguồn thực sáu mã gồm HNX/UPCoM; UI AppTest SHS/VNZ từ kết quả thực không ngoại lệ; render tất cả trang ba PDF mới.
-- [ ] Xác minh kỳ 2025 SHS/F88 từ tài liệu có đơn vị/phạm vi/ngày công bố; bổ sung đầu vào QNS và mẫu peer F88. Không thay metadata lỗi hoặc NCI null bằng giả định số liệu.
+- [x] SHS: tự đọc bảng kiểm toán riêng lẻ 2025 trong BCTN, kiểm tra cột/đơn vị/phạm vi/ngày/cân đối; khớp 12 giá trị với KBS, không sửa kỳ KBS lỗi.
+- [x] Cache có checksum/URL/thời gian; Yahoo lỗi chỉ lưu lần thử nếu nguồn dự phòng thành công; thống kê đóng cửa nguồn có nhãn điều chỉnh quyền.
+- [x] SHS THEO DÕI với luận điểm cho vay/ROE và rủi ro lợi nhuận chưa thực hiện; 112 tests, pipeline thực, AppTest và 14 trang PDF cuối đã kiểm tra. Minh chứng: submission/evidence/shs_issuer_upgrade.json.
+- [ ] Xác minh kỳ 2025 F88, bổ sung QNS/mẫu peer F88. Không thay metadata lỗi hoặc NCI null bằng giả định số liệu.
 
 Minh chứng: submission/exchange_report_acceptance.json; phương pháp và giới hạn: docs/exchange_report_upgrade.md. Đây là kiểm chứng sáu mã, không phải toàn thị trường; API Gemini thật và deploy vẫn chưa được kiểm chứng.

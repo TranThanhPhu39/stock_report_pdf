@@ -104,20 +104,28 @@ def collect_industry(ticker,as_of,financial,root,run_id,max_peers=4):
                 symbol=futures[future]
                 try:balance_cache[symbol]=future.result()
                 except (DataSourceError,ValueError,KeyError,TypeError) as exc:balance_cache[symbol]=str(exc)
-        for symbol in comparison_group["symbols"]:
-            if symbol==ticker:continue
-            data=balance_cache[symbol]
-            if isinstance(data,str):result["excluded"].append({"ticker":symbol,"reason":data});continue
-            records,source,issues=data;valid=analyze_financials(records)
-            period=next((p for p in valid["periods"] if p["period_end"]==target["period_end"] and p["scope"]==target["scope"] and p["business_type"]==target["business_type"]),None)
-            if period and all(period["fields"].get(k,{}).get("value") is not None for k in ["assets","equity","liabilities"]) and period["fields"]["assets"]["value"]>0:
-                candidates.append({"ticker":symbol,"assets":period["fields"]["assets"]["value"],"records":list(records),"sources":[source],"warnings":list(issues)})
-            else:result["excluded"].append({"ticker":symbol,"reason":"Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"})
+        targets=[p for p in financial["periods"] if p["year"]>=financial["periods"][0]["year"]-1 and p["scope"]==financial["periods"][0]["scope"]]
+        for target in targets:
+            candidates=[];result["excluded"]=[]
+            for symbol in comparison_group["symbols"]:
+                if symbol==ticker:continue
+                data=balance_cache[symbol]
+                if isinstance(data,str):result["excluded"].append({"ticker":symbol,"reason":data});continue
+                records,source,issues=data;valid=analyze_financials(records)
+                period=next((p for p in valid["periods"] if p["period_end"]==target["period_end"] and p["scope"]==target["scope"] and p["business_type"]==target["business_type"]),None)
+                if period and all(period["fields"].get(k,{}).get("value") is not None for k in ["assets","equity","liabilities"]) and period["fields"]["assets"]["value"]>0:
+                    candidates.append({"ticker":symbol,"assets":period["fields"]["assets"]["value"],"records":list(records),"sources":[source],"warnings":list(issues)})
+                else:result["excluded"].append({"ticker":symbol,"reason":"Thiếu tài sản/bảng cân đối hợp lệ cùng ngày cuối kỳ, phạm vi hoặc loại hình"})
+            if len(candidates)>=2:break
         group=comparison_group
         if len(candidates)>=2:break
     if group["code"]!=result["code"]:
         result["warnings"].append(f"Không đủ mẫu cùng kỳ trong {result['subsector_name']}; mở rộng mẫu lên ICB cấp {group.get('level')}: {group['name']}. So sánh nhóm rộng hơn, không coi là các đối thủ có sản phẩm giống nhau.")
         result.update({"name":group["name"],"code":group["code"],"level":group.get("level"),"members":group["symbols"]})
+    result.update(period_end=target["period_end"],scope=target["scope"])
+    if target["period_end"]!=financial["periods"][0]["period_end"]:
+        result["warnings"].append(f"Mẫu ngành dùng kỳ chung {target['year']} do chưa đủ hai peer ở kỳ mới nhất. So sánh mã phân tích và peer đều tại {target['period_end']}; không ghép chỉ tiêu khác năm.")
+    result["comparison_financial"]=analyze_financials([p for p in financial["periods"] if p["period_end"]<=target["period_end"] and p["scope"]==target["scope"]])
     result["sources"][0]["page_or_table"]=f"{taxonomy}; level {group.get('level')}; code {group['code']}; {group['name']}"
     candidates.sort(key=lambda c:(-c["assets"],c["ticker"]))
     chosen=candidates[:max_peers];result["eligible_candidates"]=len(candidates)
