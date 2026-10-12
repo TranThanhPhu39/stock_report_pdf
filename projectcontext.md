@@ -99,3 +99,13 @@ Bộ đọc `src/data/bank_issuer.py`, cấu hình `config/bank_issuer_sources.j
 Lượt nguồn thật `MBB_20261012_133521_709871`: tài chính 2025/2024/2023/2022, bán niên 30/06/2026; so sánh ngành bốn mã CTG/TCB/ACB/VIB năm 2025. P/B đủ hai mã có vốn mẹ, P/E đủ bốn mã; P/B chính 19.341 VND, chênh +1,53% so giá 19.050 ngày 09/10/2026, khuyến nghị THEO DÕI. Bán niên không ghép vào EPS năm, không nhân đôi dự báo; six-month flows và year-end/opening balances có kỳ riêng trong UI/PDF/Gemini evidence. Chưa có TTM, mẫu P/B bán niên, NIM/NPL/CAR hoặc live Gemini mới. PDF 20 trang và AppTest MBB đạt; minh chứng tại submission/evidence/mbb_upgrade, hướng dẫn docs/mbb_bank_upgrade.md.
 
 Kiểm chứng cuối: 189 kiểm thử offline đạt; AppTest MBB không ngoại lệ, web 8501 trả health OK. Không đưa source_registry.csv hoặc Secrets vào commit.
+
+## TTM và tỷ lệ MBB — cập nhật tiếp 12/10/2026
+
+Trạng thái mới thay thế giới hạn TTM/NIM/NPL/CAR của lượt MBB trước: bộ đọc `src/data/bank_ratios.py` xác minh NIM 3,9%, CAR hợp nhất 11,0% năm 2025 và NPL tính lại 1,294026% từ nhóm nợ 3–5/tổng cho vay gộp thuyết minh 9.1. NIM/CAR là tỷ lệ ngân hàng công bố, không tự tính từ tổng tài sản/vốn chủ. Trang PDF 46/58/67/161 được khóa theo cùng checksum. Chỉ mở cho MBB; các mã khác cần tài liệu và xác minh riêng.
+
+`src/analysis/bank_metrics.py`: TTM bán niên = năm trước + bán niên hiện tại − cùng kỳ trong bản bán niên mới nhất; kiểm tra năm, ngày đầu/cuối, phạm vi, VND, khả dụng, phân bổ mẹ/NCI. MBB LNST mẹ TTM 30.078,169 tỷ VND trong 01/07/2025–30/06/2026. P/E TTM vốn hóa/lợi nhuận mẹ hiển thị riêng, không dùng mẫu P/E năm để định giá TTM. UI/PDF và Gemini evidence nhận các dữ liệu này. TCB NCI trình bày trong ngoặc là dòng khấu trừ, được khóa quy ước theo PDF; giữ số nguồn gốc và không đổi dấu NCI lỗ thực tế ở tài liệu khác.
+
+Ngày khả dụng vẫn 12/10/2026; tỷ lệ ngân hàng mới là 2025, không gọi là số 2026. Chưa có mẫu định giá TTM/P/B bán niên, chưa mở rộng tỷ lệ cho mọi ngân hàng hoặc kiểm chứng Gemini/Cloud mới. Chi tiết: docs/mbb_metrics_upgrade.md; minh chứng mới: submission/evidence/mbb_metrics_upgrade/.
+
+Kiểm chứng đợt mới: 202 kiểm thử đạt (13 kiểm thử mới), nguồn thật MBB TTM mẹ 30.078,169 tỷ VND, P/E TTM 5,86688 lần. Mẫu năm P/E 4/P/B 2, P/B chính 19.341 VND và THEO DÕI; AppTest không ngoại lệ, PDF 20 trang đã kiểm tra. Source registry và Secrets không đưa vào commit.

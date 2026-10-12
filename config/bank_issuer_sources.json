@@ -86,6 +86,24 @@
         "balance": "31/12/2025 31/12/2024",
         "income": "Năm 2025 Năm 2024",
         "cashflow": "Năm 2025 Năm 2024"
+      },
+      "ratio_pages": {
+        "table": {
+          "page": 46,
+          "side": 0
+        },
+        "nim_scope": {
+          "page": 58,
+          "side": 1
+        },
+        "car_scope": {
+          "page": 67,
+          "side": 1
+        },
+        "loans": {
+          "page": 161,
+          "side": 0
+        }
       }
     },
     {
@@ -247,7 +265,8 @@
         "balance": "31 December 2025 31 December 2024",
         "income": "2025 2024",
         "cashflow": "2025 2024"
-      }
+      },
+      "profit_allocation_convention": "deduction_to_parent"
     }
   ],
   "CTG": [

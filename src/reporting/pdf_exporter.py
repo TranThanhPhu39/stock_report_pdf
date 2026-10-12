@@ -265,8 +265,14 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             citations([r["source_id"] for m in metrics for r in m["inputs"] if r.get("source_id")])
             for item in result["conclusion"]["opportunities"]+result["conclusion"]["risks"]:
                 if any(word in item for word in ["CFO","LNST","doanh thu","ROE","CIR"]):text(item)
-            chosen=metrics if full else [m for m in metrics if m["key"] in {"revenue","net_profit","revenue_growth","net_profit_growth","roe","cash_conversion","net_interest_income","cir","roa"}]
-            table(["Chỉ tiêu","Giá trị"],[[m["label"],formatted(m["value"],m["unit"])] for m in chosen],[100*mm,74*mm])
+            chosen=metrics if full else [m for m in metrics if m["key"] in {"revenue","net_profit","revenue_growth","net_profit_growth","roe","cash_conversion","net_interest_income","cir","roa","nim","npl","car"}]
+            table(["Chỉ tiêu","Giá trị"],[[m["label"],formatted(m["value"],m["unit"])] for m in chosen if m['key'] not in {'nim','npl','car'}],[100*mm,74*mm])
+            ratios=[m for m in metrics if m['key'] in {'nim','npl','car'}]
+            if ratios:
+                heading('Tỷ lệ ngân hàng: kỳ và phương pháp')
+                table(['Chỉ tiêu / kỳ','Hiện tại','Năm trước'],[[m['key'].upper()+' / '+m['period'],formatted(m['value'],'%'),formatted(m.get('previous_value'),'%')] for m in ratios])
+                for m in ratios:text(m['key'].upper()+': '+(m.get('limitation') or m.get('reason','')),True)
+                text('Tỷ lệ có kỳ riêng, chưa xác nhận tình hình tại ngày chốt; cập nhật BCTC kỳ mới trước khi đánh giá thay đổi rủi ro.',True)
             if full:
                 bank=result["financial"].get("industry_group")=="bank"
                 income="net_interest_income" if bank else "revenue"
@@ -280,6 +286,12 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
                 table(['Chỉ tiêu số dư','Cuối kỳ (tỷ)','Đầu năm (tỷ)'],[[label,formatted(interim['fields'][k]['value'],'VND').replace(' tỷ VND',''),formatted(interim['fields'][k]['previous'],'VND').replace(' tỷ VND','')] for k,label in [('assets','Tổng tài sản'),('equity','Vốn chủ sở hữu'),('non_controlling_equity','Vốn cổ đông không kiểm soát')] if k in interim['fields']])
                 citations([interim['source_id']])
             text(interim["note"],True)
+        ttm=result['financial'].get('ttm',{})
+        if ttm.get('available'):
+            heading(f"Lợi nhuận TTM: {ttm['period_begin']} đến {ttm['period_end']}")
+            table(['Chỉ tiêu (tỷ VND)','Năm trước','+ Bán niên','− Cùng kỳ','= TTM'],[[label]+[formatted(f[k]/1e9) for k in ['annual_value','current_ytd','prior_ytd','value']] for key,label in [('parent_profit','LNST cổ đông mẹ'),('net_profit','LNST hợp nhất'),('net_interest_income','Thu nhập lãi thuần')] if (f:=ttm['fields'].get(key))])
+            text(ttm['note'],True)
+            citations([i['source_id'] for f in ttm['fields'].values() for i in f['inputs']])
         if full:
             names={m['key']:m['label'] for m in metrics}
             names.update(revenue='Doanh thu hoạt động' if result['financial'].get('industry_group')=='securities' else 'Doanh thu thuần',net_profit='LNST',assets='Tài sản',equity='Vốn chủ',liabilities='Nợ phải trả',
@@ -373,6 +385,12 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         val=result["valuation"];primary=val.get("primary",{});benchmark=val.get("benchmark",{})
         if val.get("price_warning"):text(val["price_warning"],True)
         text("P/B hiện tại = giá / BVPS mẹ; P/E năm = giá / EPS mẹ năm quy đổi. Bội số mục tiêu lấy từ trung vị mẫu cùng kỳ/phạm vi và ngày giá; không dùng mức 1,5x/12x nhập tay như dữ liệu ngành.",True)
+        pe_ttm=val.get('pe_ttm',{})
+        if pe_ttm.get('available'):
+            heading('P/E TTM tham khảo')
+            text(f"Lợi nhuận mẹ TTM {pe_ttm['period_begin']} đến {pe_ttm['period_end']}: {pe_ttm['profit']/1e9:,.2f} tỷ VND. P/E TTM {pe_ttm['reference_pe']:.2f} lần; giá ngày {pe_ttm['price_date']}, CP snapshot {pe_ttm['shares_snapshot']}.")
+            text(pe_ttm['note'],True)
+            citations([i['source_id'] for i in pe_ttm['inputs'] if i.get('source_id')])
         if primary.get("available"):
             text(f"Phương pháp chính: {primary['selected_method']}. Giá tham chiếu {primary['target_price_vnd']:,.0f} VND/CP; chênh {primary['upside_pct']:+.2f}% so với đóng cửa.")
             text(primary["selection_reason"]);text(primary["methodology"],True)

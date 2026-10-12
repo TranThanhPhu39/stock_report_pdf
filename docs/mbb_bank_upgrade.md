@@ -1,5 +1,7 @@
 # Bổ sung MBB và định giá ngân hàng
 
+Ghi nhận đợt đầu. TTM và NIM/NPL/CAR đã được bổ sung sau đó: xem [kết quả hiện tại và phương pháp](mbb_metrics_upgrade.md). Minh chứng và PDF 20 trang bên dưới thuộc lượt chạy ban đầu; PDF hiện tại đã được thay bằng bản mới.
+
 Ngày kiểm chứng: 12/10/2026. Lượt chạy nguồn thật `MBB_20261012_133521_709871`.
 
 ## Vấn đề và cách xử lý

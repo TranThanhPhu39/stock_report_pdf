@@ -345,8 +345,22 @@ if result:
         for message in diagnostics.get("messages",[]):st.caption(message)
         if result["financial"]["metrics"]:
             st.caption(f"Báo cáo năm {result['financial']['metrics'][0]['period']}; không phải số liệu TTM.")
-            st.dataframe(pd.DataFrame([{"Chỉ tiêu":m["label"],"Giá trị":formatted(m["value"],m["unit"])} for m in result["financial"]["metrics"]]),hide_index=True,width="stretch")
+            st.dataframe(pd.DataFrame([{"Chỉ tiêu":m["label"],"Giá trị":formatted(m["value"],m["unit"])} for m in result["financial"]["metrics"] if m['key'] not in {'nim','npl','car'}]),hide_index=True,width="stretch")
         else:st.info("Chưa có chỉ tiêu tài chính đủ điều kiện tính toán.")
+        bank_ratios=[m for m in result['financial']['metrics'] if m['key'] in {'nim','npl','car'}]
+        if bank_ratios:
+            st.write('**Biên lãi, chất lượng cho vay và an toàn vốn**')
+            st.dataframe(pd.DataFrame([{'Chỉ tiêu':m['key'].upper(),'Kỳ':m['period'],
+                'Hiện tại':formatted(m['value'],'%'),'Năm trước':formatted(m.get('previous_value'),'%'),
+                'Cách xác định':m.get('limitation') or m.get('reason')} for m in bank_ratios]),hide_index=True,width='stretch')
+            st.caption('Các tỷ lệ này có kỳ riêng; cần đối chiếu báo cáo kỳ mới để đánh giá tình hình tại ngày chốt.')
+        ttm=result['financial'].get('ttm',{})
+        if ttm.get('available'):
+            st.write(f"**Lợi nhuận TTM: {ttm['period_begin']} đến {ttm['period_end']}**")
+            st.dataframe(pd.DataFrame([{'Chỉ tiêu':label,'Năm trước':formatted(f['annual_value'],'VND'),
+                '+ Bán niên hiện tại':formatted(f['current_ytd'],'VND'),'− Bán niên cùng kỳ':formatted(f['prior_ytd'],'VND'),
+                '= TTM':formatted(f['value'],'VND')} for key,label in [('parent_profit','LNST cổ đông mẹ'),('net_profit','LNST hợp nhất'),('net_interest_income','Thu nhập lãi thuần')] if (f:=ttm['fields'].get(key))]),hide_index=True,width='stretch')
+            st.caption(ttm['note'])
         interim=result.get("interim")
         if interim and interim["valid"]:
             st.write(f"**Bán niên {request['ticker']} đến {interim['period_end']}**")
@@ -403,6 +417,13 @@ if result:
         multiples[1].metric("P/B vốn cổ đông mẹ",formatted(val.get("reference_pb"),"lần"))
         multiples[2].metric("BVPS cổ đông mẹ",formatted(val.get("book_value_per_share"),"VND/share"))
         st.caption(f"BCTC năm {diagnostics.get('latest_valid_year','chưa xác định')} và số cổ phiếu tại ngày chốt. P/E năm quy đổi không phải EPS TTM, EPS dự phóng hoặc EPS bình quân gia quyền công bố.")
+        pe_ttm=val.get('pe_ttm',{})
+        if pe_ttm.get('available'):
+            st.metric('P/E TTM (vốn hóa / lợi nhuận mẹ)',formatted(pe_ttm['reference_pe'],'lần'))
+            st.caption(f"Lợi nhuận {pe_ttm['period_begin']} đến {pe_ttm['period_end']}; giá {pe_ttm['price_date']}, CP snapshot {pe_ttm['shares_snapshot']}.")
+            st.caption(pe_ttm['note'])
+        elif result['financial'].get('industry_group')=='bank':
+            st.caption('P/E TTM: '+pe_ttm.get('reason','Chưa đủ đầu vào.'))
         st.subheader("Định giá chính từ dữ liệu so sánh")
         if primary.get("available"):
             st.metric("Giá tham chiếu chính",formatted(primary["target_price_vnd"],"VND/share"),formatted(primary["upside_pct"],"%"))

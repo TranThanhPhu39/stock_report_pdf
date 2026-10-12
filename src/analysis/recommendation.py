@@ -28,7 +28,7 @@ def build_recommendation(result):
         if interest and profit and interest['previous']>0 and profit['previous']>0:
             thesis('Cập nhật kết quả bán niên',
                 f"Sáu tháng kết thúc {interim['period_end']}: thu nhập lãi thuần {interest['value']/1e9:,.2f} tỷ VND ({(interest['value']/interest['previous']-1)*100:+.2f}%); LNST cổ đông mẹ {profit['value']/1e9:,.2f} tỷ VND ({(profit['value']/profit['previous']-1)*100:+.2f}%) so với cùng kỳ.",
-                'Kết quả mới bổ sung bằng chứng kinh doanh; P/E/P/B mẫu đồng kỳ vẫn dùng BCTC năm, chưa phải TTM hoặc định giá dự phóng.',
+                'Kết quả mới bổ sung bằng chứng kinh doanh; P/E/P/B mẫu đồng kỳ vẫn dùng BCTC năm. TTM, nếu đã xác minh, là tham khảo riêng và không phải định giá dự phóng.',
                 'Kiểm tra tăng trưởng thu nhập lãi cùng dự phòng, NPL, NIM và CAR trong BCTC/thuyết minh kỳ tiếp theo.',
                 'Tăng trưởng thu nhập lãi/lợi nhuận suy giảm hoặc chi phí tín dụng, chất lượng tài sản xấu đi.',
                 sorted({interest['source_id'],profit['source_id']}),interim['period_end'])

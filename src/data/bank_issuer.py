@@ -165,15 +165,21 @@ def parse_bank_pages(pages, manifest, source_id):
                     if values is None:continue
                     multiplier = manifest['unit_multiplier']
                     value, previous = (v*multiplier for v in values)
+                    allocation = manifest.get('profit_allocation_convention','signed_profit')
+                    if key == 'non_controlling_profit' and allocation == 'deduction_to_parent':
+                        if value > 0 or previous > 0:
+                            raise DataSourceError('Dòng NCI không khớp quy ước khấu trừ đã xác minh trong PDF.')
+                        value, previous = -value, -previous
                     # Expense rows are displayed as positive costs in the bank metrics.
                     if key in {'operating_cost', 'credit_provision'}:
                         value, previous = abs(value), abs(previous)
                     field = dict(value=value, previous=previous, unit='VND', unit_multiplier=multiplier,
-                        source_value=values[0], source_id=source_id, source_field='PDF: '+prefix,
+                        source_value=values[0], source_previous=values[1], source_id=source_id, source_field='PDF: '+prefix,
                         source_label=prefix, page=page['page'], page_side=page.get('side'),
                         extraction_mode=page.get('extraction_mode','embedded_text'), source_row=row,
                         period=manifest['period_end'], published_at=None, available_at=manifest['available_at'],
                         availability_basis=manifest['availability_basis'], statement_scope='consolidated')
+                    if key == 'non_controlling_profit':field['allocation_convention']=allocation
                     if page.get('ocr_trials'):
                         field.update(ocr_trials=page['ocr_trials'], source_region=page['rect'],
                                      label_verification=page['label_verification'])
@@ -252,9 +258,18 @@ def collect_bank_issuer(ticker, as_of, root, run_id, snapshots=None, *, include_
                     reference = next((r.get(f"Value{heads[0]['ID']}") for rows in snapshots[kind].get('Content',{}).values() for r in rows if FIELD_IDS[kind].get(r.get('ReportNormID')) == key),None) if len(heads)==1 else None
                     if reference is None or abs(values[key]['value']-float(reference)*1000)>manifest['unit_multiplier']:
                         del values[key]
+        if ticker == 'MBB' and manifest.get('ratio_pages'):
+            from src.data.bank_ratios import read_ratio_pages, parse_mbb_ratios
+            try:
+                out['bank_ratios'] = parse_mbb_ratios(read_ratio_pages(path,manifest),manifest,fields,source['source_id'])
+                fields['balance']['customer_loans'] = out['bank_ratios']['gross_loans']
+                source['page_or_table'] += '; ratios/loan notes: '+', '.join(str(p['page']) for p in manifest['ratio_pages'].values())
+            except (DataSourceError,OSError,ValueError,KeyError,TypeError) as exc:
+                out['bank_ratios'] = dict(available=False,reason=str(exc))
+                out['warnings'].append('Bộ đọc tỷ lệ ngân hàng: '+str(exc))
         for year, column in [(manifest['year'],'value'),(manifest['year']-1,'previous')]:
             for kind, values in fields.items():
-                mapped = {k:{**v,'value':v[column],'source_value':v[column]/manifest['unit_multiplier'],'period':str(year)} for k,v in values.items()}
+                mapped = {k:{**v,'value':v[column],'source_value':v.get('source_value') if column=='value' else v.get('source_previous',v[column]/manifest['unit_multiplier']),'period':str(year)} for k,v in values.items()}
                 out['records'].append(dict(year=year,period_end=f'{year}-12-31',period_begin=f'{year}01',
                     published_at=None,available_at=manifest['available_at'],scope='consolidated',business_type=3,audit='KT',kind=kind,fields=mapped,source_id=source['source_id']))
         out.update(available=True, year=manifest['year'],checks=checks,file=path.relative_to(root).as_posix(),sha256=manifest['sha256'],
@@ -279,7 +294,7 @@ def collect_bank_issuer(ticker, as_of, root, run_id, snapshots=None, *, include_
                             raise DataSourceError('Cột đầu năm bán niên không khớp BCTC năm đã xác minh.')
                     # Optional OCR rows are not inputs until independently checked.
                     merged = {k:v for kind,group in current.items() for k,v in group.items() if k in REQUIRED[kind] or k == 'non_controlling_profit'}
-                    out['interim'] = dict(valid=True,ticker=ticker,period_end=m['period_end'],period_type='half_year',
+                    out['interim'] = dict(valid=True,ticker=ticker,period_end=m['period_end'],period_begin=f"{m['year']}-01-01",period_type='half_year',
                         fields=merged,checks=[{'name':'balance_identity_and_audited_opening_balance','valid':True}],
                         file=interim_path.relative_to(root).as_posix(),source_id=src['source_id'],
                         note='Lợi nhuận/thu nhập/dòng tiền là lũy kế sáu tháng; cột so sánh cùng kỳ. Tài sản/vốn/nợ là số dư cuối kỳ và đầu năm. Không nhân đôi thành dự báo năm hoặc ghép vào P/E năm. '+m['availability_note'])

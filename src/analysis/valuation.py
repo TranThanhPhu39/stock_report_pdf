@@ -23,7 +23,8 @@ def analyze_valuation(financial, market, company, quote_check, as_of, target_pb=
              reference_pb=None,inputs=[],assumptions=assumptions,
              assumption="Kịch bản giả định, không phải khuyến nghị mua/bán. Vốn/lợi nhuận cuối năm quy đổi trên CP snapshot; giả định không đổi vốn, cần xem phát hành/cổ tức sau cuối kỳ.",
              formula="BVPS = vốn mẹ / CP; Gordon P/B = (ROE mẹ - g)/(Ke - g); EPS quy đổi = LNST mẹ năm / CP snapshot; FCFF = CFO + lãi đã trả × (1-thuế) - CAPEX; vốn = PV(FCFF) + tiền - nợ vay - NCI.",
-             pe_status="Chưa có bốn quý độc lập để tính P/E TTM.")
+             pe_status="Chưa có lợi nhuận TTM từ bộ số liệu cùng kỳ/phạm vi đã kiểm tra.",
+             pe_ttm=dict(available=False,reason=financial.get('ttm',{}).get('reason','Chưa có lợi nhuận TTM đã xác minh.')))
     for key in ["gordon","industry","pe","dcf","weighted_average"]:val[key]=dict(available=False)
     reasons=val["blocked_reasons"];shares=company.get("outstanding_shares")
     if not financial.get("periods"):reasons.append("Thiếu kỳ tài chính hợp lệ.")
@@ -35,8 +36,22 @@ def analyze_valuation(financial, market, company, quote_check, as_of, target_pb=
     if reasons:
         val["reason"]=" ".join(reasons)
         for key in ["gordon","industry","pe","dcf","weighted_average"]:val[key]["reason"]=val["reason"]
+        val['pe_ttm']['reason']=val['reason']
         return val
     latest=financial["periods"][0];fields=latest["fields"];price=market["latest_close_vnd"]
+    ttm=financial.get('ttm',{})
+    trailing=ttm.get('fields',{}).get('parent_profit',{})
+    if ttm.get('available') and ttm.get('period_end','9999')<=as_of.isoformat() and number(trailing.get('value'),True):
+        val['pe_ttm']=dict(available=True,reference_pe=price*shares/trailing['value'],
+            profit=trailing['value'],eps_snapshot=trailing['value']/shares,
+            period_begin=ttm['period_begin'],period_end=ttm['period_end'],scope=ttm['scope'],
+            shares=shares,shares_snapshot=company['snapshot_at'],price=price,price_date=market.get('latest_date'),
+            inputs=trailing['inputs']+[dict(source_id=company.get('source_id'),value=shares,unit='shares',period=company['snapshot_at']),
+                                      dict(source_id=market.get('source_id'),value=price,unit='VND/share',period=market.get('latest_date'))],
+            formula='Vốn hóa theo CP snapshot / LNST cổ đông mẹ TTM',
+            note='P/E TTM là bội số tham khảo. Không so với mẫu P/E năm 2025 hoặc tạo giá mục tiêu khi chưa có mẫu TTM đồng kỳ. Lợi nhuận/CP snapshot không phải EPS bình quân gia quyền ngân hàng công bố.')
+    elif ttm.get('available'):
+        val['pe_ttm']['reason']='LNST cổ đông mẹ TTM không dương/hữu hạn; không tính P/E.'
     val["price_warning"]="" if quote_check.get("status")=="matched" else "Giá đóng cửa mới nhất đã khớp hai nguồn để đối chiếu định giá; mẫu lịch sử chưa khớp đầy đủ. Không xác nhận chuỗi giá hoặc cơ sở điều chỉnh."
     def get(k):return fields.get(k,{}).get("value")
     def refs(keys):return [fields[k] for k in keys if k in fields]

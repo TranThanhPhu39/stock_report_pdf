@@ -46,7 +46,7 @@ PDF mẫu mới: `outputs/pdf/ACB_report.pdf`, `HPG_report.pdf`, `VNM_report.pdf
 
 ## Giới hạn
 
-Mã cổ phiếu là tham số, không cố định HPG; khả năng có số liệu phụ thuộc nguồn. Có tỷ số riêng ngân hàng (thu nhập lãi, CIR, cho vay/tiền gửi) và chứng khoán (cơ cấu môi giới/cho vay). NIM/NPL/CAR và dư nợ margin chưa được xác minh. VCB/DGC/REE dùng năm hợp lệ gần nhất 2024 vì metadata kỳ 2025 từ nguồn ghi 24 tháng; báo cáo cảnh báo độ trễ. API công khai có thể thay đổi hoặc giới hạn truy cập. Baseline trong `config/verification_baselines.json` là số tham chiếu đã đọc từ tài liệu gốc, **không thay dữ liệu tự lấy** và chỉ áp dụng đúng kỳ. Không dùng dữ liệu giả khi nguồn lỗi.
+Mã cổ phiếu là tham số, không cố định HPG; khả năng có số liệu phụ thuộc nguồn. Có tỷ số riêng ngân hàng (thu nhập lãi, CIR, cho vay/tiền gửi) và chứng khoán (cơ cấu môi giới/cho vay). MBB đã có bộ đọc NIM/NPL/CAR năm 2025; các ngân hàng khác chưa được xác minh các tỷ lệ này. Dư nợ margin chuyên sâu chưa được xác minh. VCB/DGC/REE dùng năm hợp lệ gần nhất 2024 vì metadata kỳ 2025 từ nguồn ghi 24 tháng; báo cáo cảnh báo độ trễ. API công khai có thể thay đổi hoặc giới hạn truy cập. Baseline trong `config/verification_baselines.json` là số tham chiếu đã đọc từ tài liệu gốc, **không thay dữ liệu tự lấy** và chỉ áp dụng đúng kỳ. Không dùng dữ liệu giả khi nguồn lỗi.
 
 `projectcontext.md` ghi phạm vi đề gốc; `task.md` ghi hạng mục đã làm. Đề gốc và đề xuất triển khai trong `docs/references/` được giữ riêng.
 
@@ -111,6 +111,10 @@ Giao diện chuyển sang nền trời xanh, tiêu đề giữa trang, khung bá
 
 MBB tự tải/đọc BCTC hợp nhất kiểm toán 2025 và bán niên soát xét 2026. Bộ đọc kiểm tra checksum, ngân hàng, phạm vi, đơn vị, thứ tự cột, cân đối tài sản và phân bổ LNST; chín chỉ tiêu năm 2025 khớp KBS. Kỳ KBS sai metadata vẫn bị loại. MBB dùng bản tài liệu do ngân hàng lập trong kho công bố công khai; CTG/TCB dùng PDF từ website ngân hàng. Chưa xác nhận ngày công bố trên danh mục, nên các PDF mới chỉ khả dụng từ ngày trực tiếp xác minh 12/10/2026; không dùng cho truy vấn lịch sử trước ngày này.
 
-Lần chạy nguồn thật: so sánh tài chính CTG/TCB/ACB/VIB cùng năm 2025; P/B đủ hai mã CTG/TCB có vốn cổ đông mẹ, P/E đủ bốn mã. MBB chuyển từ **CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ** sang **THEO DÕI**: P/B tham chiếu khoảng 19.341 VND, chênh +1,53% so với giá 19.050 VND ngày 09/10/2026. Ngưỡng nghiên cứu 15% không thay đổi. Bán niên được trình bày riêng và đưa vào bằng chứng Gemini tùy chọn; chưa ghép thành TTM hoặc nhân đôi dự báo năm. Chưa xác minh NIM/NPL/CAR. Xem [nguồn, cách chạy và kiểm chứng](docs/mbb_bank_upgrade.md).
+Lần chạy nguồn thật ban đầu: so sánh tài chính CTG/TCB/ACB/VIB cùng năm 2025; P/B đủ hai mã CTG/TCB có vốn cổ đông mẹ, P/E đủ bốn mã. MBB chuyển từ **CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ** sang **THEO DÕI**: P/B tham chiếu khoảng 19.341 VND, chênh +1,53% so với giá 19.050 VND ngày 09/10/2026. Ngưỡng nghiên cứu 15% không thay đổi. Xem [nguồn, cách chạy và kiểm chứng đợt đầu](docs/mbb_bank_upgrade.md).
 
 Kiểm chứng cuối đợt MBB: **189 kiểm thử đạt**, AppTest không ngoại lệ, PDF 20 trang đã kiểm tra nội dung/bố cục. Bấm **Phân tích và tạo PDF** lại để thay báo cáo cũ của phiên web.
+
+Bổ sung tiếp: MBB tự đọc **NIM 3,9%, CAR 11,0% hợp nhất năm 2025**, tính lại **NPL 1,294%** từ thuyết minh nhóm nợ, và ghép **LNST cổ đông mẹ TTM 30.078,169 tỷ VND đến 30/06/2026**. P/E TTM dùng vốn hóa/TTM, hiển thị riêng và không so với mẫu P/E năm khác kỳ. Web/PDF có bảng nguồn và công thức; Gemini tùy chọn nhận thêm bằng chứng. Quy ước NCI khấu trừ của TCB được xác định từ PDF, không tự đổi dấu mọi dòng NCI. Xem [phương pháp, kỳ và giới hạn mới](docs/mbb_metrics_upgrade.md).
+
+Kiểm chứng đợt TTM/tỷ lệ: **202 kiểm thử đạt**, AppTest hiển thị các bảng mới và giữ bảy nút tải; PDF 20 trang đã kiểm tra nội dung/bố cục. MBB P/E TTM khoảng **5,87 lần** trong lượt giá/số CP đã nêu. Bấm **Phân tích và tạo PDF** lại trên web để thay kết quả cũ trong phiên.

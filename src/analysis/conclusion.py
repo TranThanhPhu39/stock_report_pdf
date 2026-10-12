@@ -68,6 +68,14 @@ def build_conclusion(financial, market, valuation, quote_check, interim=None):
     for reason in valuation.get("blocked_reasons",[])[:2]:
         matrix.append({"evidence":reason,"impact":"Một số phương pháp bị chặn","monitor":"Xác minh đầu vào còn thiếu từ tài liệu gốc","source_ids":[]})
     if financial.get("industry_group")=="bank":
-        matrix.append({"evidence":"Chưa xác minh NIM, NPL và CAR","impact":"Chưa lượng hóa chất lượng tín dụng/an toàn vốn","monitor":"BCTC và thuyết minh kỳ mới; không suy luận từ tăng trưởng dư nợ","source_ids":[]})
+        missing=[k.upper() for k in ('nim','npl','car') if value(k) is None]
+        if missing:
+            matrix.append({"evidence":"Chưa xác minh "+', '.join(missing),"impact":"Chưa lượng hóa đầy đủ chất lượng tín dụng/an toàn vốn","monitor":"BCTC và thuyết minh kỳ mới; không suy luận từ tăng trưởng dư nợ","source_ids":[]})
+        else:
+            evidence='; '.join(f"{k.upper()} kỳ {metrics[k]['period']}: {value(k):.2f}%" for k in ('nim','npl','car'))
+            risks.append(evidence+'. Các tỷ lệ năm chưa xác nhận chất lượng tài sản và an toàn vốn tại ngày chốt hiện tại.')
+            matrix.append(dict(evidence=evidence,impact='Đã có mốc đối chiếu biên lãi, chất lượng cho vay và vốn; cần cập nhật kỳ mới',
+                monitor='NIM, nợ nhóm 2–5, dự phòng và CAR trong báo cáo tiếp theo',
+                source_ids=sorted({i['source_id'] for k in ('nim','npl','car') for i in metrics[k]['inputs'] if i.get('source_id')})))
     return {"opportunities":opportunities,"risks":risks,"risk_matrix":matrix,
             "summary":"Đánh giá dựa trên tăng trưởng, dòng tiền, xu hướng giá và giả định định giá; xem từng luận điểm cùng nguồn và giới hạn dữ liệu."}

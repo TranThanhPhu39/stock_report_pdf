@@ -16,6 +16,13 @@ def evidence_bundle(result):
     for m in result["financial"]["metrics"]:
         if m["value"] is not None:
             bundle.append({"id":f"F{len(bundle)+1}","kind":"company","label":m["label"],"value":m["value"],"unit":m["unit"],"period":m["period"],"source_ids":sorted({r["source_id"] for r in m["inputs"] if r.get("source_id")})})
+    ttm=result['financial'].get('ttm',{})
+    if ttm.get('available'):
+        for key,label in [('parent_profit','LNST cổ đông mẹ TTM'),('net_profit','LNST hợp nhất TTM'),('net_interest_income','Thu nhập lãi thuần TTM')]:
+            field=ttm['fields'][key]
+            bundle.append(dict(id=f'F{len(bundle)+1}',kind='company',label=label,value=field['value'],unit='VND',
+                period=ttm['period_begin']+' / '+ttm['period_end'],
+                source_ids=sorted({i['source_id'] for i in field['inputs']}),limitations=ttm['note']))
     interim=result.get('interim')
     if interim and interim.get('valid') and interim.get('ticker'):
         year=int(interim['period_end'][:4])

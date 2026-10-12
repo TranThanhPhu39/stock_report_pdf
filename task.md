@@ -153,8 +153,23 @@ Kiểm tra lại 12/10/2026 trên .venv mới: cài requirements thành công, p
 - [x] CTG/TCB 2025 từ PDF website ngân hàng; so sánh tài chính cùng kỳ với CTG/TCB/ACB/VIB. P/B hai mã có vốn mẹ, P/E bốn mã.
 - [x] Bổ sung luận điểm bán niên và bằng chứng cho Gemini tùy chọn; giữ điều kiện khuyến nghị, không nhân đôi lợi nhuận hoặc ghép TTM.
 - [x] Kiểm chứng nguồn thật MBB: phân tích năm 2025, bán niên 30/06/2026, giá khớp 20/20 phiên, THEO DÕI với P/B chênh +1,53%; PDF 20 trang và AppTest đạt.
-- [ ] TTM/P/B bán niên có mẫu đồng kỳ, NIM/NPL/CAR và mở rộng PDF ngân hàng ngoài cấu hình hiện tại.
+- [ ] Mẫu định giá TTM/P/B bán niên đồng kỳ và mở rộng PDF ngân hàng ngoài cấu hình hiện tại; TTM và tỷ lệ MBB đã bổ sung ở đợt tiếp bên dưới.
 
 Chi tiết: docs/mbb_bank_upgrade.md; submission/evidence/mbb_upgrade/acceptance.json. Ngày khả dụng PDF mới là 12/10/2026, chưa xác nhận ngày công bố danh mục; truy vấn trước ngày này không được sử dụng các tài liệu mới.
 
 Kiểm chứng cuối: 189 kiểm thử offline đạt (18 kiểm thử ngân hàng mới); AppTest MBB không ngoại lệ, web 8501 trả health OK.
+
+## TTM và NIM/NPL/CAR MBB (đợt tiếp 12/10/2026)
+
+- [x] Tự đọc NIM/CAR hợp nhất năm 2025, xác nhận tỷ lệ và phạm vi bằng bảng/nhận xét trong PDF gốc có checksum.
+- [x] NPL tính lại từ nhóm 3–5 và tổng cho vay gộp thuyết minh 9.1; các nhóm và margin/ứng trước cộng khớp cả hai cột, đối chiếu tỷ lệ công bố trong sai số làm tròn.
+- [x] Ghép TTM bằng năm + bán niên − cùng kỳ; khóa kỳ, ngày, đơn vị, phạm vi, khả dụng, phân bổ mẹ/NCI và giữ ba toán hạng có nguồn.
+- [x] P/E TTM vốn hóa/LNST mẹ hiển thị riêng; không trộn với trung vị P/E năm hoặc ép khuyến nghị mua.
+- [x] Bảng TTM/tỷ lệ trên web/PDF, bằng chứng cho Gemini tùy chọn và cảnh báo thiếu theo dữ liệu thực tế.
+- [x] TCB NCI trong ngoặc được hiểu theo quy ước khấu trừ của bản gốc; số âm NCI thực tế ở tài liệu khác vẫn được giữ.
+- [ ] Mẫu P/E TTM/P/B bán niên đồng kỳ; tỷ lệ kỳ 2026 và bộ đọc cho mọi ngân hàng.
+
+Phương pháp và nguồn: docs/mbb_metrics_upgrade.md. Minh chứng đợt mới: submission/evidence/mbb_metrics_upgrade/.
+
+- [x] 202 kiểm thử đạt; chạy nguồn thật MBB và kiểm tra các toán hạng/nguồn TTM, NPL/NIM/CAR.
+- [x] AppTest không ngoại lệ, bảng tỷ lệ/TTM/P/E TTM có trên UI, bảy nút tải; PDF 20 trang và tóm tắt có các mục mới, kiểm tra render.

@@ -92,6 +92,9 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     if financial_check["status"]=="mismatch":
         research["errors"].append({"stage":"financial_check","message":"Chỉ tiêu không khớp tài liệu gốc; chặn phân tích tài chính và định giá."})
         financial={**financial,"periods":[],"metrics":[]}
+    from src.analysis.bank_metrics import attach_bank_metrics
+    financial=attach_bank_metrics(financial,issuer.get('bank_ratios') if financial_check['status']!='mismatch' else None,
+                                  interim if financial_check['status']!='mismatch' else None,as_of)
     vnf=collect_vnfinancialdata(ticker,as_of,company,financial,root,acquisition["run_id"])
     research["sources"].extend(vnf["sources"])
     # A supplementary dataset failure does not discard valid primary statements.

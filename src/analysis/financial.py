@@ -102,7 +102,7 @@ def analyze_financials(records: list[dict]) -> dict:
         metric("total_operating_income","Tổng thu nhập hoạt động",pp+cost if pp is not None and cost is not None else None,"VND","Lợi nhuận trước dự phòng + chi phí hoạt động",["operating_cost","pre_provision_profit"],"Thiếu lợi nhuận trước dự phòng/chi phí")
         cir=ratio(cost,pp+cost) if pp is not None and cost is not None else None
         metric("cir","Chi phí / tổng thu nhập hoạt động",cir*100 if cir is not None else None,"%","Chi phí hoạt động / (lợi nhuận trước dự phòng + chi phí hoạt động) × 100",["operating_cost","pre_provision_profit"],"Thiếu thu nhập/chi phí")
-        errors.append("Ngân hàng: không dùng biên gộp, CFO/LNST hoặc nợ vay/vốn của doanh nghiệp sản xuất; chưa đủ dữ liệu để tính NIM, NPL và CAR.")
+        errors.append("Ngân hàng: không dùng biên gộp, CFO/LNST hoặc nợ vay/vốn của doanh nghiệp sản xuất.")
     elif industry=="securities":
         margin=ratio(get(latest,"net_profit"),get(latest,"revenue"))
         metric("securities_net_margin","LNST / doanh thu hoạt động",margin*100 if margin is not None else None,"%","LNST cùng phạm vi / doanh thu hoạt động × 100",["net_profit","revenue"],"Thiếu doanh thu hoạt động phù hợp")
