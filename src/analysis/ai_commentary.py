@@ -16,6 +16,18 @@ def evidence_bundle(result):
     for m in result["financial"]["metrics"]:
         if m["value"] is not None:
             bundle.append({"id":f"F{len(bundle)+1}","kind":"company","label":m["label"],"value":m["value"],"unit":m["unit"],"period":m["period"],"source_ids":sorted({r["source_id"] for r in m["inputs"] if r.get("source_id")})})
+    interim=result.get('interim')
+    if interim and interim.get('valid') and interim.get('ticker'):
+        year=int(interim['period_end'][:4])
+        for key,label in [('net_interest_income','Thu nhập lãi thuần'),('net_profit','LNST hợp nhất'),('parent_profit','LNST cổ đông mẹ'),('assets','Tổng tài sản'),('equity','Vốn chủ sở hữu'),('cfo','Dòng tiền kinh doanh')]:
+            field=interim['fields'].get(key)
+            if not field:continue
+            stock=key in {'assets','equity'}
+            bundle.append({'id':f'H{len(bundle)+1}','kind':'company','label':label+' bán niên',
+                'value':field['value'],'unit':'VND','period':interim['period_end'] if stock else f"{year}-01-01 / {interim['period_end']}",
+                'previous_value':field['previous'],'previous_period':f'{year-1}-12-31' if stock else f'{year-1}-01-01 / {year-1}-06-30',
+                'source_ids':[field['source_id']], 'available_at':field.get('available_at'),
+                'limitations':'Số dư cuối kỳ/đầu năm.' if stock else 'Lũy kế sáu tháng/cùng kỳ; không phải TTM hay dự báo năm.'})
     industry=result.get("industry",{})
     for c in industry.get("comparisons",[]):
         bundle.append({"id":f"I{len(bundle)+1}","kind":"industry","label":c["label"],"company_value":c["company_value"],"sample_median":c["sample_median"],"sample_size":c["sample_size"],"unit":c["unit"],"period":c["period_end"],"source_ids":[s["source_id"] for s in industry.get("sources",[])]})

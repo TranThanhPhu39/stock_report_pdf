@@ -22,6 +22,16 @@ def build_recommendation(result):
                "Kết quả cải thiện là cơ sở theo dõi khả năng duy trì lợi nhuận, chưa chứng minh tăng trưởng tương lai.",
                "BCTC kỳ tiếp theo xác nhận LNST dương và tăng cùng kỳ, sau khi kiểm tra khoản bất thường.",
                "LNST kỳ tiếp theo giảm hoặc tăng chủ yếu do thu nhập không lặp lại.",refs("net_profit_growth","net_profit"),year)
+    interim=result.get('interim')
+    if financial.get('industry_group')=='bank' and interim and interim.get('valid'):
+        interest=interim['fields'].get('net_interest_income');profit=interim['fields'].get('parent_profit')
+        if interest and profit and interest['previous']>0 and profit['previous']>0:
+            thesis('Cập nhật kết quả bán niên',
+                f"Sáu tháng kết thúc {interim['period_end']}: thu nhập lãi thuần {interest['value']/1e9:,.2f} tỷ VND ({(interest['value']/interest['previous']-1)*100:+.2f}%); LNST cổ đông mẹ {profit['value']/1e9:,.2f} tỷ VND ({(profit['value']/profit['previous']-1)*100:+.2f}%) so với cùng kỳ.",
+                'Kết quả mới bổ sung bằng chứng kinh doanh; P/E/P/B mẫu đồng kỳ vẫn dùng BCTC năm, chưa phải TTM hoặc định giá dự phóng.',
+                'Kiểm tra tăng trưởng thu nhập lãi cùng dự phòng, NPL, NIM và CAR trong BCTC/thuyết minh kỳ tiếp theo.',
+                'Tăng trưởng thu nhập lãi/lợi nhuận suy giảm hoặc chi phí tín dụng, chất lượng tài sản xấu đi.',
+                sorted({interest['source_id'],profit['source_id']}),interim['period_end'])
     if financial.get("industry_group")=="nonfinancial" and number(val("cash_conversion")) and val("cash_conversion")>=1 and number(val("cfo"),True) and number(val("net_profit"),True):
         thesis("Lợi nhuận được hỗ trợ bởi tiền",f"CFO/LNST {year} = {val('cash_conversion'):.2f} lần; CFO {val('cfo')/1e9:,.2f} tỷ VND.",
                "Dòng tiền hỗ trợ lợi nhuận trong kỳ; cần phân biệt thu hồi vốn lưu động và dòng tiền lặp lại.",

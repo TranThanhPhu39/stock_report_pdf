@@ -70,6 +70,10 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     source_by_id={s["source_id"]:s for s in result["sources"]}
     def source_label(source):
         sid=source['source_id'];url=source.get('url_or_file','');host=urlparse(url).hostname or ''
+        if sid.startswith('BANK_'):
+            ticker=sid.split('_')[1]
+            suffix=' (kho công bố)' if 'archive' in source.get('notes','') else ''
+            return ticker+' - BCTC gốc'+suffix
         if sid.startswith('SSI_'):return 'SSI - BCTC kiểm toán' if 'AUDITED' in sid else 'SSI - công bố thông tin'
         if sid.startswith('TVS_AUDITED'):return 'TVS - BCTC kiểm toán'
         if sid.startswith('SHS_'):return 'SHS - báo cáo công bố'
@@ -250,8 +254,11 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             story.append(caption)
             issuer=result.get("issuer_financials",{})
             if issuer.get("available"):
-                scope='hợp nhất' if request['ticker']=='SSI' else 'riêng lẻ'
-                text(f"Bảng kiểm toán {request['ticker']} {issuer['year']}; phạm vi {scope}, đơn vị gốc VND. Ngày công bố {issuer['published_at']}. PDF được kiểm tra checksum, kỳ và từng hàng; đối chiếu chỉ các chỉ tiêu liệt kê.",True)
+                scope='hợp nhất' if issuer.get('scope')=='consolidated' or request['ticker']=='SSI' else 'riêng lẻ'
+                if issuer.get('availability_note'):
+                    text(f"BCTC kiểm toán {request['ticker']} {issuer['year']}, phạm vi {scope}; đơn vị gốc triệu VND, quy đổi VND. {issuer['availability_note']} PDF kiểm tra checksum, kỳ, thứ tự cột và các chỉ tiêu liệt kê; không chứng nhận toàn bộ BCTC.",True)
+                else:
+                    text(f"Bảng kiểm toán {request['ticker']} {issuer['year']}; phạm vi {scope}, đơn vị gốc VND. Ngày công bố {issuer['published_at']}. PDF được kiểm tra checksum, kỳ và từng hàng; đối chiếu chỉ các chỉ tiêu liệt kê.",True)
                 citations([s["source_id"] for s in issuer["sources"]])
             group=result["financial"].get("industry_group")
             panel("financial","Các cột thể hiện số liệu năm đã công bố, cùng phạm vi. "+("CFO ngân hàng phản ánh biến động tài sản/nợ hoạt động; không áp CFO/LNST của doanh nghiệp sản xuất." if group=="bank" else "CFO chứng khoán chịu ảnh hưởng danh mục đầu tư và cho vay; không áp CFO/LNST của doanh nghiệp sản xuất." if group=="securities" else "So sánh lợi nhuận với CFO để theo dõi chuyển đổi thành tiền; cần đọc thay đổi vốn lưu động."))
@@ -267,8 +274,11 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         else:text("Chưa đủ dữ liệu tài chính có kỳ và phạm vi hợp lệ.")
         interim=result.get("interim")
         if interim and interim["valid"]:
-            text(f"Cập nhật bán niên kết thúc {interim['period_end']} — OCR báo cáo hợp nhất soát xét HPG.")
-            table(["Chỉ tiêu","6 tháng hiện tại (tỷ)","6 tháng cùng kỳ (tỷ)","Trang PDF"],[[label,formatted(interim["fields"][k]["value"],"VND").replace(" tỷ VND",""),formatted(interim["fields"][k]["previous"],"VND").replace(" tỷ VND",""),str(interim["fields"][k]["page"])] for k,label in [("revenue","Doanh thu thuần"),("net_profit","LNST hợp nhất"),("cfo","Dòng tiền kinh doanh")] if k in interim["fields"]])
+            text(f"Cập nhật bán niên {request['ticker']} kết thúc {interim['period_end']} — BCTC hợp nhất gốc đã kiểm tra.")
+            table(["Chỉ tiêu","6 tháng hiện tại (tỷ)","6 tháng cùng kỳ (tỷ)","Trang PDF"],[[label,formatted(interim["fields"][k]["value"],"VND").replace(" tỷ VND",""),formatted(interim["fields"][k]["previous"],"VND").replace(" tỷ VND",""),str(interim["fields"][k]["page"])] for k,label in [("revenue","Doanh thu thuần"),("net_interest_income","Thu nhập lãi thuần"),("net_profit","LNST hợp nhất"),("parent_profit","LNST cổ đông mẹ"),("cfo","Dòng tiền kinh doanh")] if k in interim["fields"]])
+            if interim.get('ticker'):
+                table(['Chỉ tiêu số dư','Cuối kỳ (tỷ)','Đầu năm (tỷ)'],[[label,formatted(interim['fields'][k]['value'],'VND').replace(' tỷ VND',''),formatted(interim['fields'][k]['previous'],'VND').replace(' tỷ VND','')] for k,label in [('assets','Tổng tài sản'),('equity','Vốn chủ sở hữu'),('non_controlling_equity','Vốn cổ đông không kiểm soát')] if k in interim['fields']])
+                citations([interim['source_id']])
             text(interim["note"],True)
         if full:
             names={m['key']:m['label'] for m in metrics}

@@ -14,7 +14,7 @@ python -m venv .venv
 
 Nhập HPG (hoặc mã Việt Nam có dữ liệu Yahoo/KBS/Vietcap), chọn khoảng ngày, bản đầy đủ/tóm tắt, phần cần xuất, P/B/P/E giả định và các tỷ lệ Ke/WACC/g/thuế trong mục định giá. Bấm **Phân tích**, sau đó **Tải báo cáo phân tích PDF**. Luồng chính không yêu cầu chạy script lấy dữ liệu riêng.
 
-Để đọc PDF scan bán niên HPG, BCTC năm SSI và TVS tự động, cài Tesseract OCR có gói `vie` và `eng`, thêm `tesseract` vào PATH. Windows cũng nhận đường dẫn `C:/Program Files/Tesseract-OCR/tesseract.exe`. Thiếu OCR: hệ thống báo thiếu phần bán niên và vẫn dùng số liệu năm hợp lệ. Tệp PDF gốc tải lần đầu có thể mất vài phút; bản lưu được kiểm tra SHA-256 và thời hạn 24 giờ trước khi dùng lại. Giá, tài chính và danh sách công bố vẫn được truy cập mới mỗi lượt.
+Để đọc PDF scan bán niên HPG/MBB, BCTC năm SSI/TVS/CTG tự động, cài Tesseract OCR có gói `vie` và `eng`, thêm `tesseract` vào PATH. Windows cũng nhận đường dẫn `C:/Program Files/Tesseract-OCR/tesseract.exe`. Thiếu OCR: phần chưa đọc được không được đưa vào tính toán; các kỳ năm đủ điều kiện từ nguồn khác vẫn được giữ. Tệp PDF gốc tải lần đầu có thể mất vài phút; bản lưu được kiểm tra SHA-256 và thời hạn 24 giờ trước khi dùng lại. Giá, tài chính và danh sách công bố vẫn được truy cập mới mỗi lượt.
 
 ## Dùng dòng lệnh (tùy chọn)
 
@@ -106,3 +106,11 @@ PDF SSI mẫu có biểu đồ trái, chữ phải; nguồn dùng tên đơn v�
 Giao diện chuyển sang nền trời xanh, tiêu đề giữa trang, khung báo cáo trắng trong nhẹ và thẻ xanh tím nhạt theo mẫu Credix người dùng gửi. Có nút cuộn tới phần phân tích, bố cục cho điện thoại và giữ luồng chọn mã → phân tích → tải PDF. Nền SVG/CSS được lưu trong dự án; không cần tải ảnh hoặc font bên ngoài. Xem [phân tích và cách áp dụng mẫu](docs/pinterest_ui_design.md). Tải lại trang để xem giao diện mới.
 
 Đã bổ sung `packages.txt` cho OCR trên Streamlit Community Cloud theo [hướng dẫn dependency hệ thống](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies). Đây là cấu hình chuẩn bị triển khai, chưa xác nhận ứng dụng Cloud thực tế.
+
+## Bổ sung MBB và mẫu ngân hàng (12/10/2026)
+
+MBB tự tải/đọc BCTC hợp nhất kiểm toán 2025 và bán niên soát xét 2026. Bộ đọc kiểm tra checksum, ngân hàng, phạm vi, đơn vị, thứ tự cột, cân đối tài sản và phân bổ LNST; chín chỉ tiêu năm 2025 khớp KBS. Kỳ KBS sai metadata vẫn bị loại. MBB dùng bản tài liệu do ngân hàng lập trong kho công bố công khai; CTG/TCB dùng PDF từ website ngân hàng. Chưa xác nhận ngày công bố trên danh mục, nên các PDF mới chỉ khả dụng từ ngày trực tiếp xác minh 12/10/2026; không dùng cho truy vấn lịch sử trước ngày này.
+
+Lần chạy nguồn thật: so sánh tài chính CTG/TCB/ACB/VIB cùng năm 2025; P/B đủ hai mã CTG/TCB có vốn cổ đông mẹ, P/E đủ bốn mã. MBB chuyển từ **CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ** sang **THEO DÕI**: P/B tham chiếu khoảng 19.341 VND, chênh +1,53% so với giá 19.050 VND ngày 09/10/2026. Ngưỡng nghiên cứu 15% không thay đổi. Bán niên được trình bày riêng và đưa vào bằng chứng Gemini tùy chọn; chưa ghép thành TTM hoặc nhân đôi dự báo năm. Chưa xác minh NIM/NPL/CAR. Xem [nguồn, cách chạy và kiểm chứng](docs/mbb_bank_upgrade.md).
+
+Kiểm chứng cuối đợt MBB: **189 kiểm thử đạt**, AppTest không ngoại lệ, PDF 20 trang đã kiểm tra nội dung/bố cục. Bấm **Phân tích và tạo PDF** lại để thay báo cáo cũ của phiên web.

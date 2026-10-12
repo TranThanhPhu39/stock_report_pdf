@@ -11,6 +11,7 @@ from src.data.research import KBS_BASE,financial_url
 from src.data.normalize import parse_annual_financials
 from src.analysis.financial import analyze_financials
 from src.data.tvs_issuer import collect_tvs_peer
+from src.data.bank_issuer import collect_bank_issuer, BANK_NAMES
 
 VCI_URL="https://iq.vietcap.com.vn/api/iq-insight-service/v2/company/search-bar?language=1"
 
@@ -119,6 +120,22 @@ def collect_industry(ticker,as_of,financial,root,run_id,max_peers=4):
         url=financial_url(symbol,kind);raw=download(url,timeout=15);source_id=f"PEER_{symbol}_{kind}_{run_id}"
         (folder/f"{source_id}.json").write_bytes(raw);issues=[]
         records=parse_annual_financials(json.loads(raw),kind,as_of,source_id,issues)
+        if symbol in BANK_NAMES and kind=="balance" and target["business_type"]==3 and not any(r["period_end"]==target["period_end"] and r["scope"]==target["scope"] for r in records):
+            try:
+                snapshots={"balance":json.loads(raw)}
+                for other in ("income","cashflow"):
+                    content=download(financial_url(symbol,other),timeout=15)
+                    (folder/f"PEER_{symbol}_{other}_{run_id}.json").write_bytes(content)
+                    snapshots[other]=json.loads(content)
+                ids={k:f'PEER_{symbol}_{k}_{run_id}' for k in snapshots}
+                issuer=collect_bank_issuer(symbol,as_of,root,run_id,snapshots,include_interim=False,reference_source_ids=ids)
+                if issuer["available"]:
+                    issuer["source"]=issuer["sources"][0]
+                    issuer_cache[symbol]=issuer
+                    return [r for r in issuer["records"] if r["kind"]==kind],issuer["source"],issues+issuer["warnings"]
+                issues.extend(e["message"] for e in issuer["errors"])
+            except (DataSourceError,OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError) as exc:
+                issues.append(f'{symbol} BCTC gốc chưa xác minh được: {exc}')
         if symbol=="TVS" and kind=="balance" and target["year"]==as_of.year-1 and target["scope"]=="consolidated" and target["business_type"]==2 and not any(r["year"]==target["year"] and r["scope"]==target["scope"] for r in records):
             try:
                 snapshots={"balance":json.loads(raw)}
@@ -181,7 +198,11 @@ def collect_industry(ticker,as_of,financial,root,run_id,max_peers=4):
         if not analysis["periods"] or analysis["periods"][0]["period_end"]!=target["period_end"]:continue
         result["peers"].append({"ticker":candidate["ticker"],"financial":analysis,"warnings":candidate["warnings"]})
         result["sources"].extend(candidate["sources"])
+        issuer=issuer_cache.get(candidate['ticker'])
+        if candidate['ticker'] in BANK_NAMES and issuer and issuer.get('available'):
+            result['peers'][-1]['issuer_checks']=issuer['checks']
+            result['sources'].extend(issuer['sources'][1:])
     result["excluded"].sort(key=lambda r:r["ticker"])
     if len(result["peers"])<2:result["errors"].append({"stage":"industry_peers","message":"Chưa đủ hai doanh nghiệp so sánh có kỳ phù hợp; không tính trung vị mẫu."})
-    result["warnings"].append("Mẫu so sánh ưu tiên kỳ/phạm vi hợp lệ của KBS; TVS có bộ đọc PDF kiểm toán chính thức khi metadata KBS sai. Nguồn ghi theo từng mã; chưa đối chiếu độc lập toàn bộ mẫu ngành.")
+    result["warnings"].append("Mẫu so sánh ưu tiên kỳ/phạm vi hợp lệ của KBS; TVS và các ngân hàng cấu hình có bộ đọc BCTC gốc khi metadata KBS sai. Nguồn ghi theo từng mã; chưa đối chiếu độc lập toàn bộ mẫu ngành.")
     return result

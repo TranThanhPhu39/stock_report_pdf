@@ -16,3 +16,4 @@ data/processed/*
 !data/processed/.gitkeep
 
 outputs/pdf/charts/
+output/pdf/charts/

@@ -349,8 +349,12 @@ if result:
         else:st.info("Chưa có chỉ tiêu tài chính đủ điều kiện tính toán.")
         interim=result.get("interim")
         if interim and interim["valid"]:
-            st.write(f"**Bán niên HPG đến {interim['period_end']}**")
-            st.dataframe(pd.DataFrame([{"Chỉ tiêu":label,"Hiện tại":formatted(interim["fields"][key]["value"],"VND"),"6 tháng cùng kỳ":formatted(interim["fields"][key]["previous"],"VND"),"Trang PDF":interim["fields"][key]["page"]} for key,label in [("revenue","Doanh thu thuần"),("net_profit","LNST"),("cfo","Dòng tiền kinh doanh")]]),hide_index=True,width="stretch")
+            st.write(f"**Bán niên {request['ticker']} đến {interim['period_end']}**")
+            interim_labels=[("revenue","Doanh thu thuần"),("net_interest_income","Thu nhập lãi thuần"),("net_profit","LNST hợp nhất"),("parent_profit","LNST cổ đông mẹ"),("cfo","Dòng tiền kinh doanh")]
+            st.dataframe(pd.DataFrame([{"Chỉ tiêu":label,"6 tháng hiện tại":formatted(interim["fields"][key]["value"],"VND"),"6 tháng cùng kỳ":formatted(interim["fields"][key]["previous"],"VND"),"Trang PDF":interim["fields"][key]["page"]} for key,label in interim_labels if key in interim["fields"]]),hide_index=True,width="stretch")
+            if interim.get('ticker'):
+                st.dataframe(pd.DataFrame([{"Chỉ tiêu":label,"Cuối kỳ":formatted(interim['fields'][key]['value'],'VND'),"Đầu năm":formatted(interim['fields'][key]['previous'],'VND')} for key,label in [('assets','Tổng tài sản'),('equity','Vốn chủ sở hữu'),('non_controlling_equity','Vốn cổ đông không kiểm soát')] if key in interim['fields']]),hide_index=True,width='stretch')
+            st.caption(interim['note'])
         vnf=result.get("vnfinancialdata",{})
         if vnf:
             with st.expander("Báo cáo tài chính bổ sung từ vnfinancialdata"):
@@ -499,7 +503,7 @@ if result:
                 st.caption("Công thức: "+metric.get("formula","Chưa có")+" · Kỳ "+metric.get("period","Chưa có"))
                 if metric.get("reason"):st.caption(metric["reason"])
                 if metric.get("inputs"):
-                    st.dataframe(pd.DataFrame([{"Đầu vào":item.get("source_label","Chỉ tiêu nguồn"),"Giá trị":formatted(item.get("value"),item.get("unit","")),"Kỳ":item.get("period",""),"Ngày công bố":item.get("published_at","")} for item in metric["inputs"]]),hide_index=True,width="stretch")
+                    st.dataframe(pd.DataFrame([{"Đầu vào":item.get("source_label","Chỉ tiêu nguồn"),"Giá trị":formatted(item.get("value"),item.get("unit","")),"Kỳ":item.get("period",""),"Công bố / đã xác minh khả dụng":item.get("published_at") or item.get("available_at") or "Chưa xác nhận"} for item in metric["inputs"]]),hide_index=True,width="stretch")
             if not result["financial"]["metrics"]:st.info("Chưa có chỉ tiêu đủ dữ liệu để trình bày công thức.")
         if acquisition["prices"]:
             st.download_button("Tải dữ liệu giá CSV",(ROOT/acquisition["prices"]["csv"]).read_bytes(),file_name=f"{request['ticker']}_prices.csv",mime="text/csv")

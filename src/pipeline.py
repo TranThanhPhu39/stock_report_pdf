@@ -13,6 +13,7 @@ from src.data.research import collect_research, collect_peer_news
 from src.data.issuer_pdf import extract_hpg_interim
 from src.data.shs_issuer import collect_shs_issuer
 from src.data.ssi_issuer import collect_ssi_issuer
+from src.data.bank_issuer import collect_bank_issuer, BANK_NAMES
 from src.data.vnfinancialdata_provider import collect_vnfinancialdata
 from src.data.quality import verify_financials
 from src.models import AnalysisRequest
@@ -70,14 +71,20 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     reference=collect_reference(ticker,as_of,financial,company,root,acquisition["run_id"])
     research["sources"].extend(reference["sources"])
     research["warnings"].extend(reference["warnings"])
-    issuer=collect_ssi_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=="SSI" else collect_shs_issuer(ticker,as_of,reference,root,acquisition["run_id"])
+    issuer=collect_bank_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker in BANK_NAMES else collect_ssi_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=="SSI" else collect_shs_issuer(ticker,as_of,reference,root,acquisition["run_id"])
     research["sources"].extend(issuer["sources"])
     research["warnings"].extend(issuer["warnings"])
     research["errors"].extend(issuer["errors"])
     if issuer["available"]:
         replaced={r["year"] for r in issuer["records"]}
         financial=analyze_financials([r for r in research["financial_records"] if r["year"] not in replaced]+issuer["records"])
-        company["name"]="Công ty Cổ phần Chứng khoán SSI" if ticker=="SSI" else "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội"
+        company["name"]=BANK_NAMES[ticker] if ticker in BANK_NAMES else "Công ty Cổ phần Chứng khoán SSI" if ticker=="SSI" else "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội"
+        if issuer.get("interim"):
+            interim=issuer["interim"]
+        if ticker in BANK_NAMES:
+            acquisition["financial_documents"].append(dict(title=f"{ticker}: BCTC hợp nhất năm {issuer['year']} đã xác minh",file=issuer["file"]))
+            if interim:
+                acquisition["financial_documents"].append(dict(title=f"{ticker}: BCTC hợp nhất bán niên {interim['period_end']}",file=interim["file"]))
     financial_check=verify_financials(ticker,financial,interim,root)
     if issuer["checks"]:
         financial_check["checks"].extend(issuer["checks"])

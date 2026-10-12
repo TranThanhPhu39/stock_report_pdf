@@ -1,0 +1,339 @@
+{
+  "MBB": [
+    {
+      "url": "https://cmsv5.fiingroup.vn/medialib/FG/2026/2026-03/2026-03-31/MBB/20260330--MBB--Bao-cao-thuong-nien-2025.pdf",
+      "sha256": "d67772421ddeceac697de71c5a84945ae7c34779bae44d6456738844d4950521",
+      "year": 2025,
+      "period_end": "2025-12-31",
+      "period_type": "annual",
+      "available_at": "2026-10-12",
+      "availability_basis": "first_verified_public_availability_upper_bound",
+      "availability_note": "Chưa xác nhận ngày công bố trên danh mục; chỉ dùng từ ngày trực tiếp xác minh tài liệu công khai 12/10/2026, không gán ngày ký thành ngày công bố.",
+      "hosting": "Issuer document mirrored by public disclosure archive",
+      "identity": "ngan hang thuong mai co phan quan doi",
+      "assurance_label": "bao cao kiem toan doc lap",
+      "unit_multiplier": 1000000,
+      "pages": [
+        {
+          "page": 141
+        },
+        {
+          "page": 143,
+          "side": 0
+        },
+        {
+          "page": 144,
+          "side": 0,
+          "kind": "balance"
+        },
+        {
+          "page": 144,
+          "side": 1,
+          "kind": "balance"
+        },
+        {
+          "page": 145,
+          "side": 0,
+          "kind": "balance"
+        },
+        {
+          "page": 146,
+          "side": 0,
+          "kind": "income"
+        },
+        {
+          "page": 146,
+          "side": 1,
+          "kind": "income"
+        },
+        {
+          "page": 147,
+          "side": 0,
+          "kind": "cashflow"
+        },
+        {
+          "page": 147,
+          "side": 1,
+          "kind": "cashflow"
+        },
+        {
+          "page": 148,
+          "side": 0,
+          "kind": "cashflow"
+        }
+      ],
+      "headers": {
+        "balance": [
+          "hop nhat",
+          "trieu dong",
+          "2025",
+          "2024"
+        ],
+        "income": [
+          "hop nhat",
+          "trieu dong",
+          "2025",
+          "2024"
+        ],
+        "cashflow": [
+          "hop nhat",
+          "trieu dong",
+          "2025",
+          "2024"
+        ]
+      },
+      "column_headers": {
+        "balance": "31/12/2025 31/12/2024",
+        "income": "Năm 2025 Năm 2024",
+        "cashflow": "Năm 2025 Năm 2024"
+      }
+    },
+    {
+      "url": "https://cdn.24hmoney.vn/upload/file/2026-3/2026-08-08/no-name-1786128041.pdf",
+      "row_regions": [
+        {
+          "page": 11,
+          "kind": "balance",
+          "key": "liabilities",
+          "label": "TỔNG NỢ PHẢI TRẢ",
+          "rect": [
+            0.6,
+            0.449,
+            0.91,
+            0.47
+          ]
+        }
+      ],
+      "sha256": "de8bc3f9eebfb9f8937a166df058a3cbf6f0e32c6e38a38a64d14c2c57198a8d",
+      "year": 2026,
+      "period_end": "2026-06-30",
+      "period_type": "half_year",
+      "available_at": "2026-10-12",
+      "availability_basis": "first_verified_public_availability_upper_bound",
+      "availability_note": "Chưa xác nhận ngày công bố trên danh mục; chỉ dùng từ ngày trực tiếp xác minh tài liệu công khai 12/10/2026, không gán ngày ký thành ngày công bố.",
+      "hosting": "Issuer document mirrored by public disclosure archive",
+      "identity": "ngan hang thuong mai co phan quan doi",
+      "assurance_label": "bao cao soat xet",
+      "unit_multiplier": 1000000,
+      "pages": [
+        {
+          "page": 1
+        },
+        {
+          "page": 5
+        },
+        {
+          "page": 6
+        },
+        {
+          "page": 7
+        },
+        {
+          "page": 8
+        },
+        {
+          "page": 9
+        },
+        {
+          "page": 10,
+          "kind": "balance"
+        },
+        {
+          "page": 11,
+          "kind": "balance"
+        },
+        {
+          "page": 13,
+          "kind": "income"
+        },
+        {
+          "page": 14,
+          "kind": "cashflow"
+        },
+        {
+          "page": 15,
+          "kind": "cashflow"
+        }
+      ],
+      "headers": {
+        "balance": [
+          "hop nhat",
+          "trieu dong",
+          "2026",
+          "2025"
+        ],
+        "income": [
+          "hop nhat",
+          "trieu dong",
+          "2026",
+          "2025"
+        ],
+        "cashflow": [
+          "hop nhat",
+          "trieu dong",
+          "2026",
+          "2025"
+        ]
+      },
+      "column_headers": {
+        "balance": "30/6/2026 31/12/2025",
+        "income": "30/6/2026 30/6/2025",
+        "cashflow": "30/6/2026 30/6/2025"
+      }
+    }
+  ],
+  "TCB": [
+    {
+      "url": "https://techcombank.com/content/dam/techcombank/public-site/documents/techcombank-vas-consolidated-financial-statements-ye25-searchable.pdf",
+      "sha256": "d6a7ec29a81fc253c5240ae8fc369ff92bd9ada987d955dc99c147d8677c8903",
+      "year": 2025,
+      "period_end": "2025-12-31",
+      "period_type": "annual",
+      "available_at": "2026-10-12",
+      "availability_basis": "first_verified_public_availability_upper_bound",
+      "availability_note": "Chưa xác nhận ngày công bố trên danh mục; chỉ dùng từ ngày trực tiếp xác minh tài liệu công khai 12/10/2026, không gán ngày ký thành ngày công bố.",
+      "hosting": "Official issuer website",
+      "identity": "vietnam technological and commercial joint stock bank",
+      "assurance_label": "independent auditors",
+      "unit_multiplier": 1000000,
+      "pages": [
+        {
+          "page": 3
+        },
+        {
+          "page": 6
+        },
+        {
+          "page": 7
+        },
+        {
+          "page": 8,
+          "kind": "balance"
+        },
+        {
+          "page": 9,
+          "kind": "balance"
+        },
+        {
+          "page": 11,
+          "kind": "income"
+        },
+        {
+          "page": 12,
+          "kind": "cashflow"
+        }
+      ],
+      "headers": {
+        "balance": [
+          "consolidated",
+          "VND million",
+          "2025",
+          "2024"
+        ],
+        "income": [
+          "consolidated",
+          "VND million",
+          "2025",
+          "2024"
+        ],
+        "cashflow": [
+          "consolidated",
+          "VND million",
+          "2025",
+          "2024"
+        ]
+      },
+      "column_headers": {
+        "balance": "31 December 2025 31 December 2024",
+        "income": "2025 2024",
+        "cashflow": "2025 2024"
+      }
+    }
+  ],
+  "CTG": [
+    {
+      "url": "https://investor.vietinbank.vn/documents/20126/667477/BCTC%20hop%20nhat%20kiem%20toan%20nam%202025_VN.pdf.pdf/4c8eda02-b420-612d-24ac-c12f2bbd3451",
+      "row_regions": [
+        {
+          "page": 12,
+          "kind": "cashflow",
+          "key": "cfo",
+          "label": "LƯU CHUYỂN TIỀN THUẦN TỪ HOẠT ĐỘNG KINH DOANH",
+          "rect": [
+            0.65,
+            0.751,
+            0.93,
+            0.78
+          ]
+        }
+      ],
+      "sha256": "b82eeb879b667e80d0b5322969c808089fd39b83835b75dc47f9a890189fc137",
+      "year": 2025,
+      "period_end": "2025-12-31",
+      "period_type": "annual",
+      "available_at": "2026-10-12",
+      "availability_basis": "first_verified_public_availability_upper_bound",
+      "availability_note": "Chưa xác nhận ngày công bố trên danh mục; chỉ dùng từ ngày trực tiếp xác minh tài liệu công khai 12/10/2026, không gán ngày ký thành ngày công bố.",
+      "hosting": "Official issuer website",
+      "identity": "ngan hang thuong mai co phan cong thuong viet nam",
+      "assurance_label": "bao cao kiem toan doc lap",
+      "unit_multiplier": 1000000,
+      "pages": [
+        {
+          "page": 1
+        },
+        {
+          "page": 6
+        },
+        {
+          "page": 7
+        },
+        {
+          "page": 8,
+          "kind": "balance"
+        },
+        {
+          "page": 9,
+          "kind": "balance"
+        },
+        {
+          "page": 11,
+          "kind": "income"
+        },
+        {
+          "page": 12,
+          "kind": "cashflow"
+        },
+        {
+          "page": 13,
+          "kind": "cashflow"
+        }
+      ],
+      "headers": {
+        "balance": [
+          "hop nhat",
+          "trieu dong",
+          "2025",
+          "2024"
+        ],
+        "income": [
+          "hop nhat",
+          "trieu dong",
+          "2025",
+          "2024"
+        ],
+        "cashflow": [
+          "hop nhat",
+          "trieu dong",
+          "2025",
+          "2024"
+        ]
+      },
+      "column_headers": {
+        "balance": "2025 2024",
+        "income": "2025 2024",
+        "cashflow": "2025 2024"
+      }
+    }
+  ]
+}

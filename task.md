@@ -145,3 +145,16 @@ Chi tiết và minh chứng: docs/pinterest_ui_design.md; submission/evidence/pi
 Cập nhật 12/10/2026: môi trường .venv mới được cài lại theo requirements. PyPI đang cách ly vnstock, nên bỏ gói khỏi cài đặt bắt buộc; giữ adapter tùy chọn và kết nối HTTP Yahoo/KBS/Vietcap, vnfinancialdata. Chi tiết: docs/vnstock_fallback.md.
 
 Kiểm tra lại 12/10/2026 trên .venv mới: cài requirements thành công, pip check không xung đột, 171 kiểm thử đạt. AppTest giao diện đạt; Chrome 1440px/390px không tràn ngang, nút bắt đầu cuộn đúng vị trí. Web chính khởi động tại localhost:8501. Ảnh desktop/mobile được cập nhật; ảnh kết quả SSI giữ từ lượt kiểm tra 11/10 với dữ liệu đã lưu.
+
+## MBB và mẫu ngân hàng (12/10/2026)
+
+- [x] Tự tải/đọc PDF MBB hợp nhất kiểm toán 2025, đối chiếu chín chỉ tiêu; giữ nguyên việc loại metadata KBS 24 tháng.
+- [x] MBB bán niên soát xét 2026: kiểm tra OCR, cân đối, phân bổ LNST và cột đầu năm; phân biệt số dư với luồng sáu tháng trên UI/PDF.
+- [x] CTG/TCB 2025 từ PDF website ngân hàng; so sánh tài chính cùng kỳ với CTG/TCB/ACB/VIB. P/B hai mã có vốn mẹ, P/E bốn mã.
+- [x] Bổ sung luận điểm bán niên và bằng chứng cho Gemini tùy chọn; giữ điều kiện khuyến nghị, không nhân đôi lợi nhuận hoặc ghép TTM.
+- [x] Kiểm chứng nguồn thật MBB: phân tích năm 2025, bán niên 30/06/2026, giá khớp 20/20 phiên, THEO DÕI với P/B chênh +1,53%; PDF 20 trang và AppTest đạt.
+- [ ] TTM/P/B bán niên có mẫu đồng kỳ, NIM/NPL/CAR và mở rộng PDF ngân hàng ngoài cấu hình hiện tại.
+
+Chi tiết: docs/mbb_bank_upgrade.md; submission/evidence/mbb_upgrade/acceptance.json. Ngày khả dụng PDF mới là 12/10/2026, chưa xác nhận ngày công bố danh mục; truy vấn trước ngày này không được sử dụng các tài liệu mới.
+
+Kiểm chứng cuối: 189 kiểm thử offline đạt (18 kiểm thử ngân hàng mới); AppTest MBB không ngoại lệ, web 8501 trả health OK.

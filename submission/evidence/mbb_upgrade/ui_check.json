@@ -1,0 +1,11 @@
+{
+  "run_id": "MBB_20261012_133521_709871",
+  "no_exception": true,
+  "annual_year": 2025,
+  "interim_end": "2026-06-30",
+  "stance": "THEO DÕI",
+  "download_buttons": 7,
+  "analysis_calls": 1,
+  "chart_filter_ok": true,
+  "mode": "AppTest with saved live analysis; analysis/PDF calls stubbed, no Gemini API call"
+}

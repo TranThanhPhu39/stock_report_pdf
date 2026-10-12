@@ -17,6 +17,9 @@ def financial_status(result):
     if year is None:messages.append("Chưa có kỳ BCTC đủ metadata và kiểm tra để sử dụng trong phân tích chính.")
     else:messages.append(f"BCTC dùng trong phân tích chính: năm {year}, phạm vi {dict(consolidated='hợp nhất',separate='riêng lẻ',parent='công ty mẹ').get(periods[0]['scope'],periods[0]['scope'])}.")
     if result['request'].get('ticker')=='SSI':messages.append('SSI: bộ đọc hiện xác minh BCTC năm; chưa tích hợp BCTC quý/bán niên hoặc lợi nhuận TTM. Năm 2025 không có nghĩa là báo cáo mới nhất doanh nghiệp đã công bố trong 2026.')
+    interim = result.get('interim')
+    if interim and interim.get('valid') and interim.get('ticker'):
+        messages.append(f"Có cập nhật BCTC hợp nhất bán niên kết thúc {interim['period_end']}. Định giá P/E/P/B mẫu đồng kỳ vẫn dùng năm {year}; chưa tính lợi nhuận TTM hoặc P/B bán niên với mẫu cùng kỳ.")
     if rejected:
         messages.append("Nguồn KBS có kỳ bị loại do metadata đầu/cuối không hợp lệ: "+", ".join(map(str,rejected))+". Có số liệu gắn nhãn năm không đồng nghĩa kỳ đã được xác nhận.")
     if year is not None and year<expected:messages.append(f"Chưa có kỳ {expected} hoặc mới hơn đủ điều kiện sử dụng; không có nghĩa doanh nghiệp chưa công bố BCTC.")

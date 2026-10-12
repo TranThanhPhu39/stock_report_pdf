@@ -1,0 +1,549 @@
+{
+  "run_id": "MBB_20261012_133521_709871",
+  "as_of": "2026-10-12",
+  "status": "analyzed",
+  "financial_years": [
+    2025,
+    2024,
+    2023,
+    2022
+  ],
+  "bank_source_checks": [
+    {
+      "metric": "equity",
+      "period": "2025",
+      "actual_billion_vnd": 142022.525,
+      "reference_billion_vnd": 142022.525,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_balance_MBB_20261012_133521_709871",
+      "locator": "PDF trang 145: TỔNG VỐN CHỦ SỞ HỮU",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "assets",
+      "period": "2025",
+      "actual_billion_vnd": 1615763.927,
+      "reference_billion_vnd": 1615763.927,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_balance_MBB_20261012_133521_709871",
+      "locator": "PDF trang 144: TỔNG TÀI SẢN",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "non_controlling_equity",
+      "period": "2025",
+      "actual_billion_vnd": 5886.495,
+      "reference_billion_vnd": 5886.495,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_balance_MBB_20261012_133521_709871",
+      "locator": "PDF trang 145: Lợi ích của cổ đông không kiểm soát",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "liabilities",
+      "period": "2025",
+      "actual_billion_vnd": 1473741.402,
+      "reference_billion_vnd": 1473741.402,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_balance_MBB_20261012_133521_709871",
+      "locator": "PDF trang 145: TỔNG NỢ PHẢI TRẢ",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "pretax_profit",
+      "period": "2025",
+      "actual_billion_vnd": 34268.358,
+      "reference_billion_vnd": 34268.358,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_income_MBB_20261012_133521_709871",
+      "locator": "PDF trang 146: TỔNG LỢI NHUẬN TRƯỚC THUẾ",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "net_profit",
+      "period": "2025",
+      "actual_billion_vnd": 27382.978,
+      "reference_billion_vnd": 27382.978,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_income_MBB_20261012_133521_709871",
+      "locator": "PDF trang 146: LỢI NHUẬN SAU THUẾ",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "net_interest_income",
+      "period": "2025",
+      "actual_billion_vnd": 51610.117,
+      "reference_billion_vnd": 51610.117,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_income_MBB_20261012_133521_709871",
+      "locator": "PDF trang 146: Thu nhập lãi thuần",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "parent_profit",
+      "period": "2025",
+      "actual_billion_vnd": 26778.939,
+      "reference_billion_vnd": 26778.939,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_income_MBB_20261012_133521_709871",
+      "locator": "PDF trang 146: Lợi nhuận sau thuế thuộc về Ngân hàng mẹ",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    },
+    {
+      "metric": "cfo",
+      "period": "2025",
+      "actual_billion_vnd": 137357.399,
+      "reference_billion_vnd": 137357.399,
+      "match": true,
+      "source_id": "BANK_MBB_2025-12-31_MBB_20261012_133521_709871",
+      "reference_source_id": "KBS_cashflow_MBB_20261012_133521_709871",
+      "locator": "PDF trang 147: Lưu chuyển tiền thuần sử dụng từ hoạt động kinh doanh",
+      "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+    }
+  ],
+  "financial_check_status": "matched_selected_fields",
+  "interim_period": "2026-06-30",
+  "interim_values_billion_vnd": {
+    "assets": {
+      "value": 1733012.662,
+      "previous": 1615763.927
+    },
+    "non_controlling_equity": {
+      "value": 7425.661,
+      "previous": 5886.495
+    },
+    "equity": {
+      "value": 156762.644,
+      "previous": 142022.525
+    },
+    "liabilities": {
+      "value": 1576250.018,
+      "previous": 1473741.402
+    },
+    "net_interest_income": {
+      "value": 31806.771,
+      "previous": 24064.301
+    },
+    "pretax_profit": {
+      "value": 20188.258,
+      "previous": 15889.316
+    },
+    "net_profit": {
+      "value": 16148.193,
+      "previous": 12679.585
+    },
+    "non_controlling_profit": {
+      "value": 403.618,
+      "previous": 234.24
+    },
+    "parent_profit": {
+      "value": 15744.575,
+      "previous": 12445.345
+    },
+    "cfo": {
+      "value": -53201.811,
+      "previous": 4516.54
+    }
+  },
+  "price_date": "2026-10-09",
+  "price_vnd": 19050.0,
+  "price_checks_count": 20,
+  "peer_tickers": [
+    "CTG",
+    "TCB",
+    "ACB",
+    "VIB"
+  ],
+  "peer_period": "2025-12-31",
+  "peer_original_checks": {
+    "CTG": [
+      {
+        "metric": "equity",
+        "period": "2025",
+        "actual_billion_vnd": 179655.005,
+        "reference_billion_vnd": 179655.005,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 9: TONG VON",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "assets",
+        "period": "2025",
+        "actual_billion_vnd": 2767699.3,
+        "reference_billion_vnd": 2767699.3,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 8: TONG TÀI SAN CÓ",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "non_controlling_equity",
+        "period": "2025",
+        "actual_billion_vnd": 1206.433,
+        "reference_billion_vnd": 1206.433,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 9: Lợi ích của cỗ đông không kiểm soát",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "liabilities",
+        "period": "2025",
+        "actual_billion_vnd": 2588044.295,
+        "reference_billion_vnd": 2588044.295,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 9: TONG NO’ PHAI TRA",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "pretax_profit",
+        "period": "2025",
+        "actual_billion_vnd": 43443.809,
+        "reference_billion_vnd": 43443.809,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Tống lợi nhuận trước thuế",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "net_profit",
+        "period": "2025",
+        "actual_billion_vnd": 34871.266,
+        "reference_billion_vnd": 34871.266,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Loi nhuận sau thuê",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "net_interest_income",
+        "period": "2025",
+        "actual_billion_vnd": 66453.245,
+        "reference_billion_vnd": 66453.245,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Thu nhập lãi thuan",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "parent_profit",
+        "period": "2025",
+        "actual_billion_vnd": 34604.481,
+        "reference_billion_vnd": 34604.481,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Lợi nhuận thuận của chủ sở hữu",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "cfo",
+        "period": "2025",
+        "actual_billion_vnd": 82644.0,
+        "reference_billion_vnd": 82644.0,
+        "match": true,
+        "source_id": "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_CTG_cashflow_MBB_20261012_133521_709871",
+        "locator": "PDF trang 12: LƯU CHUYỂN TIỀN THUẦN TỪ HOẠT ĐỘNG KINH DOANH",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      }
+    ],
+    "TCB": [
+      {
+        "metric": "equity",
+        "period": "2025",
+        "actual_billion_vnd": 179501.442,
+        "reference_billion_vnd": 179501.442,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 9: TOTAL SHAREHOLDERS’ EQUITY",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "assets",
+        "period": "2025",
+        "actual_billion_vnd": 1192344.137,
+        "reference_billion_vnd": 1192344.137,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 8: TOTAL ASSETS",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "non_controlling_equity",
+        "period": "2025",
+        "actual_billion_vnd": 9456.938,
+        "reference_billion_vnd": 9456.938,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 9: Non-controlling interests",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "liabilities",
+        "period": "2025",
+        "actual_billion_vnd": 1012842.695,
+        "reference_billion_vnd": 1012842.695,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_balance_MBB_20261012_133521_709871",
+        "locator": "PDF trang 9: TOTAL LIABILITIES",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "pretax_profit",
+        "period": "2025",
+        "actual_billion_vnd": 32538.066,
+        "reference_billion_vnd": 32538.066,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Profit before tax",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "net_profit",
+        "period": "2025",
+        "actual_billion_vnd": 25954.472,
+        "reference_billion_vnd": 25954.472,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Profit after tax",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "net_interest_income",
+        "period": "2025",
+        "actual_billion_vnd": 38155.091,
+        "reference_billion_vnd": 38155.091,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Net interest and similar income",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "parent_profit",
+        "period": "2025",
+        "actual_billion_vnd": 25290.23,
+        "reference_billion_vnd": 25290.23,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_income_MBB_20261012_133521_709871",
+        "locator": "PDF trang 11: Net profit contributed to the Bank’s shareholders",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      },
+      {
+        "metric": "cfo",
+        "period": "2025",
+        "actual_billion_vnd": 39923.618,
+        "reference_billion_vnd": 39923.618,
+        "match": true,
+        "source_id": "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+        "reference_source_id": "PEER_TCB_cashflow_MBB_20261012_133521_709871",
+        "locator": "PDF trang 12: Net cash flows from operating activities",
+        "note": "Chỉ đối chiếu giá trị; kỳ/phạm vi/đơn vị lấy từ BCTC gốc, không sửa metadata KBS."
+      }
+    ]
+  },
+  "primary_valuation": {
+    "available": true,
+    "methods": [
+      {
+        "method": "P/B trung vị mẫu đồng kỳ",
+        "key": "pb",
+        "target_price_vnd": 19341.13787711393,
+        "multiple": 1.3160497879169544,
+        "sample_size": 2,
+        "difference_pct": 1.5282828194957077,
+        "source_ids": [
+          "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+          "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+          "VAL_KBS_CTG_MBB_20261012_133521_709871",
+          "VAL_KBS_TCB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_CTG_MBB_20261012_133521_709871",
+          "VAL_PROFILE_TCB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_CTG_MBB_20261012_133521_709871",
+          "VAL_YAHOO_TCB_MBB_20261012_133521_709871"
+        ],
+        "basis": "Số liệu năm cuối kỳ quy đổi trên CP snapshot; không phải dự báo/TTM. Không điều chỉnh bội số nếu chưa có luận cứ định lượng."
+      },
+      {
+        "method": "P/E trung vị mẫu đồng kỳ",
+        "key": "pe",
+        "target_price_vnd": 20390.4934825845,
+        "multiple": 7.053387612240689,
+        "sample_size": 4,
+        "difference_pct": 7.036711194669287,
+        "source_ids": [
+          "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+          "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+          "PEER_ACB_balance_MBB_20261012_133521_709871",
+          "PEER_ACB_income_MBB_20261012_133521_709871",
+          "PEER_VIB_balance_MBB_20261012_133521_709871",
+          "PEER_VIB_income_MBB_20261012_133521_709871",
+          "VAL_KBS_ACB_MBB_20261012_133521_709871",
+          "VAL_KBS_CTG_MBB_20261012_133521_709871",
+          "VAL_KBS_TCB_MBB_20261012_133521_709871",
+          "VAL_KBS_VIB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_ACB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_CTG_MBB_20261012_133521_709871",
+          "VAL_PROFILE_TCB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_VIB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_ACB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_CTG_MBB_20261012_133521_709871",
+          "VAL_YAHOO_TCB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_VIB_MBB_20261012_133521_709871"
+        ],
+        "basis": "Số liệu năm cuối kỳ quy đổi trên CP snapshot; không phải dự báo/TTM. Không điều chỉnh bội số nếu chưa có luận cứ định lượng."
+      }
+    ],
+    "comparisons": [
+      {
+        "key": "pb",
+        "label": "P/B",
+        "company_value": 1.2962395810995075,
+        "sample_median": 1.3160497879169544,
+        "premium_pct": -1.5052779157240237,
+        "sample_size": 2,
+        "source_ids": [
+          "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+          "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+          "VAL_KBS_CTG_MBB_20261012_133521_709871",
+          "VAL_KBS_TCB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_CTG_MBB_20261012_133521_709871",
+          "VAL_PROFILE_TCB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_CTG_MBB_20261012_133521_709871",
+          "VAL_YAHOO_TCB_MBB_20261012_133521_709871"
+        ],
+        "interpretation": "Giao dịch thấp hơn trung vị mẫu 1.51%; cần đọc cùng ROE, tăng trưởng, chất lượng lợi nhuận và đòn bẩy. Chênh lệch không tự chứng minh đắt/rẻ."
+      },
+      {
+        "key": "pe",
+        "label": "P/E",
+        "company_value": 6.589690147908773,
+        "sample_median": 7.053387612240689,
+        "premium_pct": -6.5741100563819765,
+        "sample_size": 4,
+        "source_ids": [
+          "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+          "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+          "PEER_ACB_balance_MBB_20261012_133521_709871",
+          "PEER_ACB_income_MBB_20261012_133521_709871",
+          "PEER_VIB_balance_MBB_20261012_133521_709871",
+          "PEER_VIB_income_MBB_20261012_133521_709871",
+          "VAL_KBS_ACB_MBB_20261012_133521_709871",
+          "VAL_KBS_CTG_MBB_20261012_133521_709871",
+          "VAL_KBS_TCB_MBB_20261012_133521_709871",
+          "VAL_KBS_VIB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_ACB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_CTG_MBB_20261012_133521_709871",
+          "VAL_PROFILE_TCB_MBB_20261012_133521_709871",
+          "VAL_PROFILE_VIB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_ACB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_CTG_MBB_20261012_133521_709871",
+          "VAL_YAHOO_TCB_MBB_20261012_133521_709871",
+          "VAL_YAHOO_VIB_MBB_20261012_133521_709871"
+        ],
+        "interpretation": "Giao dịch thấp hơn trung vị mẫu 6.57%; cần đọc cùng ROE, tăng trưởng, chất lượng lợi nhuận và đòn bẩy. Chênh lệch không tự chứng minh đắt/rẻ."
+      }
+    ],
+    "target_price_vnd": 19341.13787711393,
+    "source_ids": [
+      "BANK_CTG_2025-12-31_MBB_20261012_133521_709871",
+      "BANK_TCB_2025-12-31_MBB_20261012_133521_709871",
+      "PEER_ACB_balance_MBB_20261012_133521_709871",
+      "PEER_ACB_income_MBB_20261012_133521_709871",
+      "PEER_VIB_balance_MBB_20261012_133521_709871",
+      "PEER_VIB_income_MBB_20261012_133521_709871",
+      "VAL_KBS_ACB_MBB_20261012_133521_709871",
+      "VAL_KBS_CTG_MBB_20261012_133521_709871",
+      "VAL_KBS_TCB_MBB_20261012_133521_709871",
+      "VAL_KBS_VIB_MBB_20261012_133521_709871",
+      "VAL_PROFILE_ACB_MBB_20261012_133521_709871",
+      "VAL_PROFILE_CTG_MBB_20261012_133521_709871",
+      "VAL_PROFILE_TCB_MBB_20261012_133521_709871",
+      "VAL_PROFILE_VIB_MBB_20261012_133521_709871",
+      "VAL_YAHOO_ACB_MBB_20261012_133521_709871",
+      "VAL_YAHOO_CTG_MBB_20261012_133521_709871",
+      "VAL_YAHOO_TCB_MBB_20261012_133521_709871",
+      "VAL_YAHOO_VIB_MBB_20261012_133521_709871"
+    ],
+    "reason": "Ưu tiên P/B mẫu cho ngân hàng/chứng khoán, P/E mẫu cho doanh nghiệp phi tài chính; phương pháp còn lại dùng đối chiếu. Không lấy trung bình tùy ý hoặc dùng P/E/P/B nhập tay để khuyến nghị.",
+    "methodology": "Ưu tiên P/B mẫu cho ngân hàng/chứng khoán, P/E mẫu cho doanh nghiệp phi tài chính; phương pháp còn lại dùng đối chiếu. Không lấy trung bình tùy ý hoặc dùng P/E/P/B nhập tay để khuyến nghị.",
+    "selected_method": "P/B trung vị mẫu đồng kỳ",
+    "selected_key": "pb",
+    "upside_pct": 1.5282828194957077,
+    "low_vnd": 19341.13787711393,
+    "high_vnd": 20390.4934825845,
+    "selection_reason": "P/B phản ánh hiệu quả sử dụng vốn/tài sản tài chính; P/E mẫu là đối chiếu lợi nhuận. Mẫu có 2 doanh nghiệp đủ dữ liệu; giá trị tham chiếu không đại diện toàn ngành."
+  },
+  "recommendation": {
+    "stance": "THEO DÕI",
+    "reason": "Chênh lệch định giá chính +1.53%. Biên chênh lệch chưa đạt ngưỡng nghiên cứu 15%. Đối chiếu chỉ tiêu đã chọn; không chứng nhận toàn bộ BCTC.",
+    "blockers": [],
+    "upside_pct": 1.5282828194957077
+  },
+  "pdf": {
+    "file": "output/pdf/MBB_report.pdf",
+    "sha256": "84842c1bf5bef3c63e04a9c80ac7e0fe4a2524940b9edab1555a6231c1d94cfd",
+    "page_count": 20,
+    "rendered_pages": [
+      {
+        "page": 1,
+        "file": "submission/evidence/mbb_upgrade/page_01.png"
+      },
+      {
+        "page": 7,
+        "file": "submission/evidence/mbb_upgrade/page_07.png"
+      },
+      {
+        "page": 8,
+        "file": "submission/evidence/mbb_upgrade/page_08.png"
+      },
+      {
+        "page": 15,
+        "file": "submission/evidence/mbb_upgrade/page_15.png"
+      },
+      {
+        "page": 17,
+        "file": "submission/evidence/mbb_upgrade/page_17.png"
+      }
+    ]
+  },
+  "ai": "No live Gemini call. Six verified interim evidence rows available to optional narration.",
+  "limitations": [
+    "First verified public availability 2026-10-12, not confirmed publication date.",
+    "MBB original bank-prepared files hosted by public disclosure archives; CTG/TCB official issuer websites.",
+    "P/E uses annual parent earnings / current share snapshot; not TTM or forecast.",
+    "Four-peer sample is not the entire banking industry; ACB/VIB vendor figures not independently certified.",
+    "NIM, NPL and CAR not verified; no regulatory ratios invented."
+  ],
+  "verification": {
+    "offline_tests_passed": 189,
+    "bank_tests_added": 18,
+    "ui_check": "submission/evidence/mbb_upgrade/ui_check.json",
+    "web_health_8501": "ok"
+  }
+}

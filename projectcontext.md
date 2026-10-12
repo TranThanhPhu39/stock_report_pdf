@@ -91,3 +91,11 @@ Kiểm chứng cuối: 171 kiểm thử offline đạt; AppTest SSI hiển thị
 Cập nhật 12/10/2026: môi trường .venv mới được cài lại theo requirements. PyPI đang cách ly vnstock, nên bỏ gói khỏi cài đặt bắt buộc; giữ adapter tùy chọn và kết nối HTTP Yahoo/KBS/Vietcap, vnfinancialdata. Chi tiết: docs/vnstock_fallback.md.
 
 Kiểm tra lại 12/10/2026 trên .venv mới: cài requirements thành công, pip check không xung đột, 171 kiểm thử đạt. AppTest giao diện đạt; Chrome 1440px/390px không tràn ngang, nút bắt đầu cuộn đúng vị trí. Web chính khởi động tại localhost:8501. Ảnh desktop/mobile được cập nhật; ảnh kết quả SSI giữ từ lượt kiểm tra 11/10 với dữ liệu đã lưu.
+
+## MBB và ngân hàng (12/10/2026)
+
+Bộ đọc `src/data/bank_issuer.py`, cấu hình `config/bank_issuer_sources.json`: MBB hợp nhất 2025 và bán niên 2026; CTG/TCB hợp nhất 2025. PDF gốc phải khớp checksum, ngân hàng, kỳ, phạm vi, đơn vị, thứ tự cột, cân đối và phân bổ LNST. Chín chỉ tiêu năm khớp KBS; metadata KBS sai vẫn bị loại. MBB tải tài liệu ngân hàng từ kho công bố FiinGroup/24HMoney, CTG/TCB từ website ngân hàng; không coi hosting archive là website chính thức MBB. Ngày khả dụng bảo thủ 12/10/2026, chưa xác nhận ngày công bố danh mục và không áp vào truy vấn lịch sử sớm hơn.
+
+Lượt nguồn thật `MBB_20261012_133521_709871`: tài chính 2025/2024/2023/2022, bán niên 30/06/2026; so sánh ngành bốn mã CTG/TCB/ACB/VIB năm 2025. P/B đủ hai mã có vốn mẹ, P/E đủ bốn mã; P/B chính 19.341 VND, chênh +1,53% so giá 19.050 ngày 09/10/2026, khuyến nghị THEO DÕI. Bán niên không ghép vào EPS năm, không nhân đôi dự báo; six-month flows và year-end/opening balances có kỳ riêng trong UI/PDF/Gemini evidence. Chưa có TTM, mẫu P/B bán niên, NIM/NPL/CAR hoặc live Gemini mới. PDF 20 trang và AppTest MBB đạt; minh chứng tại submission/evidence/mbb_upgrade, hướng dẫn docs/mbb_bank_upgrade.md.
+
+Kiểm chứng cuối: 189 kiểm thử offline đạt; AppTest MBB không ngoại lệ, web 8501 trả health OK. Không đưa source_registry.csv hoặc Secrets vào commit.

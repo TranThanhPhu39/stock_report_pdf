@@ -36,9 +36,11 @@ def build_conclusion(financial, market, valuation, quote_check, interim=None):
         basis="giá điều chỉnh theo nguồn, chưa đối chiếu toàn bộ sự kiện quyền" if market.get("statistics_basis")=="provider_adjusted_close" else "đóng cửa nguồn chưa xác minh điều chỉnh quyền"
         risks.append(f"Chuỗi {basis} có mức sụt giảm lớn nhất {market['max_drawdown_pct']:.1f}% trong giai đoạn chọn; không phải dự báo hoặc tổn thất thực nhận. Cần đọc sự kiện cổ tức/chia tách.")
     if interim and interim.get("valid"):
-        fields=interim["fields"];profit=fields["net_profit"];revenue=fields["revenue"]
-        if profit["previous"]>0 and revenue["previous"]>0:
-            opportunities.append(f"BCTC gốc kỳ kết thúc {interim['period_end']}: doanh thu thuần thay đổi {(revenue['value']/revenue['previous']-1)*100:.1f}%, LNST thay đổi {(profit['value']/profit['previous']-1)*100:.1f}% so với cùng kỳ. Cần kiểm tra đóng góp từ thu nhập tài chính và hoạt động cốt lõi.")
+        fields=interim["fields"];profit=fields["net_profit"]
+        key,label = ("net_interest_income", "thu nhập lãi thuần") if financial.get("industry_group")=="bank" else ("revenue", "doanh thu thuần")
+        revenue=fields.get(key)
+        if profit["previous"]>0 and revenue and revenue["previous"]>0:
+            opportunities.append(f"BCTC gốc kỳ kết thúc {interim['period_end']}: {label} thay đổi {(revenue['value']/revenue['previous']-1)*100:.1f}%, LNST thay đổi {(profit['value']/profit['previous']-1)*100:.1f}% so với cùng kỳ. Cần kiểm tra đóng góp từ hoạt động cốt lõi và khoản bất thường; không ngoại suy sáu tháng thành cả năm.")
     latest_verified=latest_price_matches(quote_check,market)
     if not latest_verified:
         risks.append("Giá đóng cửa mới nhất chưa khớp nguồn độc lập đúng ngày; chưa dùng để đối chiếu định giá.")
