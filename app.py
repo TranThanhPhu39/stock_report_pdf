@@ -14,6 +14,7 @@ from src.data.research import company_news_url, parse_company_news
 from src.models import SECTION_LABELS
 from src.pipeline import run_analysis
 from src.reporting.pdf_exporter import generate_report, formatted
+from src.ui.theme import render_theme, workspace_heading, render_guide
 
 ROOT=Path(__file__).resolve().parent
 today=datetime.now(VN_TIME).date()
@@ -160,128 +161,67 @@ def show_valuation_table(rows):
 
 
 st.set_page_config(page_title="StockInsight",layout="wide",initial_sidebar_state="collapsed")
-st.markdown("""
-<style>
-:root { --ink:#173532; --ink-soft:#37544e; --jade:#087e72; --brass:#c7a96b; --paper:#eef4f1; --line:#d9e4df; }
-.stApp { background-color:var(--paper); }
-[data-testid="stHeader"] { background:transparent; }
-.block-container { max-width:1320px; padding-top:1.6rem; padding-bottom:4rem; }
-.masthead { position:relative; overflow:hidden; padding:23px 32px 21px; margin:0 0 26px; color:var(--ink); background:rgba(255,255,255,.64); border:1px solid rgba(255,255,255,.95); border-top:2px solid var(--brass); border-radius:4px; box-shadow:0 14px 38px rgba(34,67,61,.08); backdrop-filter:blur(18px); }
-.masthead:after { content:""; position:absolute; top:0; right:0; width:29%; height:100%; opacity:.12; background:repeating-linear-gradient(135deg,transparent 0 12px,#549a8d 13px 14px); pointer-events:none; }
-.masthead__eyebrow,.masthead__footer { display:flex; justify-content:space-between; align-items:center; gap:14px; position:relative; z-index:1; font-size:12px; color:#58716b; }
-.masthead__eyebrow strong { color:var(--jade); font-weight:650; }
-.masthead__title { position:relative; z-index:1; margin:20px 0 18px; color:var(--ink); font:500 48px/1.08 Georgia,"Times New Roman",serif; }
-.masthead__footer { padding-top:13px; border-top:1px solid rgba(47,91,81,.15); }
-.step-heading { display:flex; align-items:flex-start; gap:14px; margin:10px 0 18px; color:var(--ink); }
-.step-heading__number { padding-top:3px; color:var(--brass); font:600 13px/1.4 "SFMono-Regular",Consolas,monospace; }
-.step-heading__title { font-size:20px; line-height:1.25; font-weight:650; }
-.step-heading__note { margin-top:4px; font-size:12px; color:#657873; }
-.brief-panel { position:relative; overflow:hidden; padding:27px 27px 23px; color:var(--ink); background:rgba(255,255,255,.62); border:1px solid rgba(255,255,255,.96); border-radius:4px; box-shadow:0 16px 42px rgba(34,67,61,.09); backdrop-filter:blur(20px); }
-.brief-kicker { display:flex; align-items:center; gap:9px; color:#58736c; font-size:11px; }
-.brief-pip { width:8px; height:8px; flex:0 0 8px; border-radius:50%; background:#54b7a3; box-shadow:0 0 0 4px rgba(84,183,163,.13); }
-.brief-ticker { margin:24px 0 5px; color:var(--ink); font:500 48px/1 Georgia,"Times New Roman",serif; }
-.brief-company { color:#687d77; font-size:13px; }
-.brief-period { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:23px 0 19px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
-.brief-period span { display:block; color:#71847f; font-size:10px; margin-bottom:5px; }
-.brief-period strong { color:var(--ink-soft); font-size:13px; font-weight:600; }
-.brief-section-label { margin:20px 0 9px; color:#71847f; font-size:10px; }
-.brief-row { display:flex; align-items:center; gap:10px; min-height:37px; border-bottom:1px solid rgba(215,224,220,.7); color:#34504b; font-size:13px; }
-.brief-row__index { width:21px; color:#b69a5c; font:600 11px "SFMono-Regular",Consolas,monospace; }
-.brief-empty { padding:14px 0; color:#71847f; font-size:13px; }
-.brief-count { margin-top:18px; padding-top:14px; border-top:1px solid var(--line); color:#60756f; font-size:11px; }
-.brief-count strong { color:var(--jade); font-size:15px; }
-.news-digest { position:relative; overflow:hidden; margin:0 0 24px; padding:23px 26px; color:var(--ink); background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(232,245,240,.56)); border:1px solid rgba(255,255,255,.94); border-radius:4px; box-shadow:0 16px 38px rgba(34,67,61,.10),inset 0 1px 0 rgba(255,255,255,.95); backdrop-filter:blur(24px) saturate(1.25); }
-.news-digest:before { content:""; position:absolute; top:0; left:26px; right:26px; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent); }
-.news-digest__kicker { margin:0 0 7px; color:var(--jade); font-size:11px; }
-.news-digest__title { margin:0 0 8px; color:var(--ink); font-size:21px; font-weight:650; }
-.news-digest__summary { margin:0 0 13px; color:#526963; font-size:14px; line-height:1.55; }
-.news-digest__item { display:flex; align-items:baseline; gap:12px; padding:9px 0; border-top:1px solid rgba(217,228,223,.74); color:#34504b; font-size:14px; }
-.news-digest__date { flex:0 0 82px; color:#71847f; font-size:12px; }
-.news-digest__item a { color:var(--ink-soft); text-decoration:none; }
-.news-digest__item a:hover { color:var(--jade); text-decoration:underline; }
-.news-digest__note { margin-top:12px; color:#71847f; font-size:11px; }
-.news-digest__group { margin-top:15px; }
-.news-digest__day { display:flex; align-items:center; justify-content:space-between; padding:8px 0; color:var(--jade); font-size:12px; font-weight:650; border-bottom:1px solid rgba(8,126,114,.20); }
-.news-digest__article { padding:11px 0 12px; border-bottom:1px solid rgba(217,228,223,.72); }
-.news-digest__article a { color:var(--ink); font-size:14px; font-weight:600; text-decoration:none; }
-.news-digest__article a:hover { color:var(--jade); text-decoration:underline; }
-.news-digest__excerpt { margin:6px 0 0; color:#526963; font-size:13px; line-height:1.5; }
-.news-digest__source { margin-top:5px; color:#82928e; font-size:10px; }
-[data-testid="stMetric"] { background:rgba(255,255,255,.88); border:1px solid var(--line); border-top:2px solid var(--jade); padding:16px 18px; }
-[data-testid="stMetricLabel"] { color:#536963; }
-[data-testid="stMetricValue"] { color:var(--ink); }
-[data-baseweb="tab-list"] { flex-wrap:wrap; gap:6px; margin:18px 0; }
-[data-baseweb="tab"] { padding:10px 14px; height:auto; border-radius:6px; font-weight:600; }
-[data-baseweb="tab"][aria-selected="true"] { background:#dbeee6; color:#066b60; }
-[data-baseweb="tab-highlight"], [data-baseweb="tab-border"] { display:none; }
-[data-testid="stExpander"] { background:rgba(255,255,255,.65); border-radius:8px; }
-[data-testid="stButton"] button { min-height:42px; }
-@media(max-width:700px) { .block-container{padding:1rem 1rem 3rem}.masthead{padding:20px 19px;margin-bottom:20px}.masthead__eyebrow,.masthead__footer{align-items:flex-start;flex-direction:column;gap:6px}.masthead__title{font-size:42px}.step-heading__title{font-size:18px}.brief-panel{margin-top:10px;padding:23px 20px}.brief-ticker{font-size:42px}.news-digest{padding:19px 17px}.news-digest__item{align-items:flex-start;flex-direction:column;gap:4px}.news-digest__date{flex:auto} }
-</style>
-""",unsafe_allow_html=True)
-st.markdown(f"""
-<header class="masthead">
-    <div class="masthead__eyebrow"><strong>PHÂN TÍCH CỔ PHIẾU VIỆT NAM</strong><span>Dữ liệu cuối ngày · Báo cáo PDF</span></div>
-    <div class="masthead__title">StockInsight</div>
-    <div class="masthead__footer"><span>BÁO CÁO CƠ HỘI ĐẦU TƯ CỔ PHIẾU</span><span>Ngày báo cáo · {today.strftime('%d/%m/%Y')}</span></div>
-</header>
-""",unsafe_allow_html=True)
-request_column,brief_column=st.columns([1.25,.75],gap="large")
-with request_column:
-    st.markdown("<div class='step-heading'><span class='step-heading__number'>01</span><div><div class='step-heading__title'>Cổ phiếu và thời gian</div><div class='step-heading__note'>MÃ GIAO DỊCH · KHOẢNG PHÂN TÍCH</div></div></div>",unsafe_allow_html=True)
-    cols=st.columns(3)
-    ticker=cols[0].text_input("Mã cổ phiếu",value="HPG",help="Nhập mã niêm yết, ví dụ HPG, FPT hoặc VNM.")
-    start=cols[1].date_input("Giá giao dịch từ ngày",value=today-timedelta(days=365),max_value=today-timedelta(days=1),help="Ngày bắt đầu chuỗi giá. Không giới hạn BCTC vào khoảng này; kỳ năm mới nhất đã công bố trước ngày chốt sẽ được dùng.")
-    as_of=cols[2].date_input("Ngày chốt dữ liệu",value=today,max_value=today,help="Chỉ dùng tài liệu và phiên giá đủ điều kiện đến ngày này. BCTC năm và khoảng lịch sử giá có kỳ riêng.")
+render_theme(ROOT,today)
+with st.container(key="analysis_setup"):
+    workspace_heading()
+    request_column,brief_column=st.columns([1.25,.75],gap="large")
+    with request_column:
+        st.markdown("<div class='step-heading'><span class='step-heading__number'>01</span><div><div class='step-heading__title'>Cổ phiếu và thời gian</div><div class='step-heading__note'>MÃ GIAO DỊCH · KHOẢNG PHÂN TÍCH</div></div></div>",unsafe_allow_html=True)
+        cols=st.columns(3)
+        ticker=cols[0].text_input("Mã cổ phiếu",value="HPG",help="Nhập mã niêm yết, ví dụ HPG, FPT hoặc VNM.")
+        start=cols[1].date_input("Giá giao dịch từ ngày",value=today-timedelta(days=365),max_value=today-timedelta(days=1),help="Ngày bắt đầu chuỗi giá. Không giới hạn BCTC vào khoảng này; kỳ năm mới nhất đã công bố trước ngày chốt sẽ được dùng.")
+        as_of=cols[2].date_input("Ngày chốt dữ liệu",value=today,max_value=today,help="Chỉ dùng tài liệu và phiên giá đủ điều kiện đến ngày này. BCTC năm và khoảng lịch sử giá có kỳ riêng.")
 
-    st.markdown("<div class='step-heading' style='margin-top:28px'><span class='step-heading__number'>02</span><div><div class='step-heading__title'>Kiểu báo cáo</div><div class='step-heading__note'>CHỌN MỨC ĐỘ CHI TIẾT VÀ NỘI DUNG XUẤT</div></div></div>",unsafe_allow_html=True)
-    mode=st.radio("Độ chi tiết",["Đầy đủ","Tóm tắt"],horizontal=True,captions=["Nhiều chỉ tiêu và giải thích","Các điểm chính, ngắn gọn"])
-    with st.expander("Tuỳ chỉnh nội dung PDF"):
-        section_cols=st.columns(3)
-        sections=[]
-        for index,(section,label) in enumerate(SECTION_LABELS.items()):
-            if section_cols[index%len(section_cols)].checkbox(label,value=True,key=f"pdf_section_{section}"):
-                sections.append(section)
-    with st.expander("Giả định định giá cá nhân (không bắt buộc)"):
-        st.caption("Chỉ dùng để thử các kịch bản trong phụ lục. Bạn có thể giữ nguyên để dùng định giá chính từ mẫu doanh nghiệp so sánh.")
-        target_pb=st.number_input("P/B cơ sở giả định",min_value=0.1,max_value=20.0,value=1.5,step=0.1,help="Chỉ dùng trong phụ lục độ nhạy; không thay đổi định giá chính hoặc khuyến nghị.")
-        vc=st.columns(3)
-        target_pe=vc[0].number_input("P/E năm giả định",min_value=.1,max_value=100.,value=12.,step=.5)
-        cost_of_equity=vc[1].number_input("Chi phí vốn chủ Ke (%)",min_value=.1,max_value=99.,value=11.5,step=.5)/100
-        terminal_growth=vc[2].number_input("Tăng trưởng dài hạn g (%)",min_value=0.,max_value=20.,value=3.5,step=.5)/100
-        vc=st.columns(3)
-        wacc=vc[0].number_input("WACC cho FCFF (%)",min_value=.1,max_value=99.,value=10.,step=.5)/100
-        forecast_growth=vc[1].number_input("Tăng trưởng FCFF 3 năm (%)",min_value=-50.,max_value=50.,value=7.,step=.5)/100
-        tax_rate=vc[2].number_input("Thuế suất giả định (%)",min_value=0.,max_value=99.,value=20.,step=1.)/100
-        st.caption("Các tỷ lệ trên là giả định do người dùng chọn. DCF chỉ áp cho doanh nghiệp phi tài chính có FCFF và đầu vào đầy đủ. EPS năm quy đổi không phải EPS công bố/TTM.")
-    use_ai=st.checkbox("Gemini hỗ trợ nhận xét từ dữ liệu và nguồn",value=False,help="Cần GEMINI_API_KEY trong Streamlit Secrets hoặc environment. Gửi số liệu và trích xuất bài công khai có giới hạn cho Gemini; nếu thiếu key hoặc lỗi, vẫn tạo báo cáo bằng quy tắc.")
-    submitted=st.button("Phân tích và tạo PDF",type="primary",use_container_width=True,key="run_analysis")
+        st.markdown("<div class='step-heading' style='margin-top:28px'><span class='step-heading__number'>02</span><div><div class='step-heading__title'>Kiểu báo cáo</div><div class='step-heading__note'>CHỌN MỨC ĐỘ CHI TIẾT VÀ NỘI DUNG XUẤT</div></div></div>",unsafe_allow_html=True)
+        mode=st.radio("Độ chi tiết",["Đầy đủ","Tóm tắt"],horizontal=True,captions=["Nhiều chỉ tiêu và giải thích","Các điểm chính, ngắn gọn"])
+        with st.expander("Tuỳ chỉnh nội dung PDF"):
+            section_cols=st.columns(3)
+            sections=[]
+            for index,(section,label) in enumerate(SECTION_LABELS.items()):
+                if section_cols[index%len(section_cols)].checkbox(label,value=True,key=f"pdf_section_{section}"):
+                    sections.append(section)
+        with st.expander("Giả định định giá cá nhân (không bắt buộc)"):
+            st.caption("Chỉ dùng để thử các kịch bản trong phụ lục. Bạn có thể giữ nguyên để dùng định giá chính từ mẫu doanh nghiệp so sánh.")
+            target_pb=st.number_input("P/B cơ sở giả định",min_value=0.1,max_value=20.0,value=1.5,step=0.1,help="Chỉ dùng trong phụ lục độ nhạy; không thay đổi định giá chính hoặc khuyến nghị.")
+            vc=st.columns(3)
+            target_pe=vc[0].number_input("P/E năm giả định",min_value=.1,max_value=100.,value=12.,step=.5)
+            cost_of_equity=vc[1].number_input("Chi phí vốn chủ Ke (%)",min_value=.1,max_value=99.,value=11.5,step=.5)/100
+            terminal_growth=vc[2].number_input("Tăng trưởng dài hạn g (%)",min_value=0.,max_value=20.,value=3.5,step=.5)/100
+            vc=st.columns(3)
+            wacc=vc[0].number_input("WACC cho FCFF (%)",min_value=.1,max_value=99.,value=10.,step=.5)/100
+            forecast_growth=vc[1].number_input("Tăng trưởng FCFF 3 năm (%)",min_value=-50.,max_value=50.,value=7.,step=.5)/100
+            tax_rate=vc[2].number_input("Thuế suất giả định (%)",min_value=0.,max_value=99.,value=20.,step=1.)/100
+            st.caption("Các tỷ lệ trên là giả định do người dùng chọn. DCF chỉ áp cho doanh nghiệp phi tài chính có FCFF và đầu vào đầy đủ. EPS năm quy đổi không phải EPS công bố/TTM.")
+        use_ai=st.checkbox("Gemini hỗ trợ nhận xét từ dữ liệu và nguồn",value=False,help="Cần GEMINI_API_KEY trong Streamlit Secrets hoặc environment. Gửi số liệu và trích xuất bài công khai có giới hạn cho Gemini; nếu thiếu key hoặc lỗi, vẫn tạo báo cáo bằng quy tắc.")
+        submitted=st.button("Phân tích và tạo PDF",type="primary",use_container_width=True,key="run_analysis")
 
-with brief_column:
-    selected_labels=[SECTION_LABELS[section] for section in sections]
-    section_rows="".join(
-        f'<div class="brief-row"><span class="brief-row__index">{index:02d}</span><span>{html.escape(label)}</span></div>'
-        for index,label in enumerate(selected_labels[:5],1)
-    )
-    if len(selected_labels)>5:
-        section_rows+=f'<div class="brief-empty">và {len(selected_labels)-5} mục khác</div>'
-    if not section_rows:
-        section_rows='<div class="brief-empty">Chưa chọn nội dung PDF</div>'
-    mode_label="Đầy đủ" if mode=="Đầy đủ" else "Tóm tắt"
-    st.markdown(f"""
-    <aside class="brief-panel">
-    <div class="brief-kicker"><span class="brief-pip"></span>BÁO CÁO BẠN SẮP TẠO</div>
-      <div class="brief-ticker">{html.escape(ticker.strip().upper() or "—")}</div>
-      <div class="brief-company">Báo cáo cơ hội đầu tư · Việt Nam</div>
-      <div class="brief-period">
-        <div><span>TỪ NGÀY</span><strong>{start.strftime('%d/%m/%Y')}</strong></div>
-        <div><span>NGÀY PHÂN TÍCH</span><strong>{as_of.strftime('%d/%m/%Y')}</strong></div>
-      </div>
-      <div class="brief-section-label">NỘI DUNG ĐƯỢC CHỌN</div>
-      {section_rows}
-      <div class="brief-count"><strong>{len(selected_labels)}</strong> mục · Bản {mode_label}</div>
-    </aside>
-    """,unsafe_allow_html=True)
+    with brief_column:
+        selected_labels=[SECTION_LABELS[section] for section in sections]
+        section_rows="".join(
+            f'<div class="brief-row"><span class="brief-row__index">{index:02d}</span><span>{html.escape(label)}</span></div>'
+            for index,label in enumerate(selected_labels[:5],1)
+        )
+        if len(selected_labels)>5:
+            section_rows+=f'<div class="brief-empty">và {len(selected_labels)-5} mục khác</div>'
+        if not section_rows:
+            section_rows='<div class="brief-empty">Chưa chọn nội dung PDF</div>'
+        mode_label="Đầy đủ" if mode=="Đầy đủ" else "Tóm tắt"
+        st.markdown(f"""
+        <aside class="brief-panel">
+        <div class="brief-kicker"><span class="brief-pip"></span>BÁO CÁO BẠN SẮP TẠO</div>
+          <div class="brief-ticker">{html.escape(ticker.strip().upper() or "—")}</div>
+          <div class="brief-company">Báo cáo cơ hội đầu tư · Việt Nam</div>
+          <div class="brief-period">
+            <div><span>TỪ NGÀY</span><strong>{start.strftime('%d/%m/%Y')}</strong></div>
+            <div><span>NGÀY PHÂN TÍCH</span><strong>{as_of.strftime('%d/%m/%Y')}</strong></div>
+          </div>
+          <div class="brief-section-label">NỘI DUNG ĐƯỢC CHỌN</div>
+          {section_rows}
+          <div class="brief-count"><strong>{len(selected_labels)}</strong> mục · Bản {mode_label}</div>
+        </aside>
+        """,unsafe_allow_html=True)
+
+render_guide()
 
 current_signature=(ticker.strip().upper(),start.isoformat(),as_of.isoformat(),mode,tuple(sections),target_pb,target_pe,cost_of_equity,terminal_growth,wacc,forecast_growth,tax_rate,use_ai)
 if submitted:
@@ -310,6 +250,7 @@ if result and st.session_state.get("analysis_input_signature") != current_signat
     st.session_state.pop("analysis_result",None)
     st.session_state.pop("report_path",None)
     result=None
+st.markdown('<div id="research"></div>',unsafe_allow_html=True)
 if result:
     request=result["request"];acquisition=result["acquisition"]
     st.subheader(f"Kết quả {request['ticker']}")
@@ -319,7 +260,7 @@ if result:
         st.download_button("Tải báo cáo phân tích PDF",path.read_bytes(),file_name=path.name,mime="application/pdf",type="primary")
     recommendation=result.get("recommendation",{})
     primary=result.get("valuation",{}).get("primary",{})
-    with st.container(border=True):
+    with st.container(key="recommendation_summary"):
         st.subheader(recommendation.get("stance","Kết quả phân tích"))
         st.write(recommendation.get("reason","Xem các mục bên dưới để đánh giá dữ liệu và cơ hội đầu tư."))
         summary_cols=st.columns(3)
@@ -565,9 +506,12 @@ if result:
         for i,report in enumerate(acquisition["financial_documents"]):
             st.download_button("Tải PDF gốc: "+report["title"],(ROOT/report["file"]).read_bytes(),file_name=Path(report["file"]).name,mime="application/pdf",key=f"raw_pdf_{i}")
 else:
-    st.info("Nhập mã cổ phiếu và bấm Phân tích và tạo PDF. Hệ thống tự lấy dữ liệu, bạn không cần chuẩn bị CSV.")
+    st.markdown('<div id="latest-news"></div>',unsafe_allow_html=True)
     try:
         preview_news=fetch_news_preview(ticker.strip().upper(),as_of)
         show_news(preview_news,key=f"news_preview_expanded_{ticker.strip().upper()}_{as_of.isoformat()}",title=f"Tin mới về {ticker.strip().upper()}")
     except Exception:
         st.warning("Chưa kết nối được nguồn tin của mã này. Có thể thử lại sau hoặc tiếp tục phân tích với các nguồn dữ liệu khác.")
+
+
+st.markdown('<footer class="page-footer"><span>StockInsight · Góc nhìn đầu tư từ dữ liệu</span><span>Dữ liệu cuối ngày · Nguồn được ghi trong báo cáo</span></footer>',unsafe_allow_html=True)

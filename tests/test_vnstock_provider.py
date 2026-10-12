@@ -1,6 +1,6 @@
 """SDK unit contract, fallback execution and independent upstream selection."""
 from contextlib import ExitStack
-from datetime import date
+from datetime import date, datetime
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 import pandas as pd
 
 from src.data.acquisition import acquire
-from src.data.providers import DataSourceError, price_source_family
+from src.data.providers import DataSourceError, VN_TIME, price_source_family
 from src.data.research import collect_research
 from src.data.vnstock_provider import fetch_vnstock_kbs_prices, fetch_vnstock_vci_prices, load_quote, normalize_history
 
@@ -34,6 +34,12 @@ def response(source="KBS"):
 
 
 class VnstockProviderTests(unittest.TestCase):
+    def setUp(self):
+        # The fixture's latest completed day must not change with the host date.
+        clock = patch("src.data.providers.datetime", wraps=datetime)
+        clock.start().now.return_value = datetime(2026, 10, 11, 10, tzinfo=VN_TIME)
+        self.addCleanup(clock.stop)
+
     def test_unit_conversion_volume_and_completed_cutoff(self):
         frame=history();frame.loc[0,"time"]="2026-10-08T18:00:00Z"
         rows=normalize_history(frame,"SHS","KBS",START,date(2026,10,10))

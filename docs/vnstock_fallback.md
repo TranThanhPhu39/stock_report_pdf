@@ -1,6 +1,8 @@
 # Kết nối vnstock bổ sung (11/10/2026)
 
-Theo yêu cầu người dùng, bổ sung thư viện vnstock vào luồng tự lấy giá cuối ngày. Máy hiện dùng bản `vnstock==4.0.8`; tên `vnstock3` là dòng cũ đã hợp nhất sang vnstock. Cố định phiên bản trong requirements để đơn vị và schema không thay đổi âm thầm.
+Theo yêu cầu người dùng, bổ sung adapter vnstock vào luồng tự lấy giá cuối ngày. Hợp đồng dữ liệu của adapter đã kiểm thử với `vnstock==4.0.8`; tên `vnstock3` là dòng cũ đã hợp nhất sang vnstock.
+
+**Cập nhật cài đặt 12/10/2026:** [PyPI đang cách ly vnstock](https://pypi.org/project/vnstock/4.0.8/) trong khi kiểm tra bảo mật, khiến pip không tìm thấy phiên bản để cài. Gói này được bỏ khỏi requirements bắt buộc để môi trường mới cài được. Không cài qua bản mirror hoặc GitHub để vượt trạng thái cách ly. Adapter vẫn giữ để bảo toàn hợp đồng dữ liệu; khi thiếu SDK, nó báo lỗi nguồn có kiểm soát. Luồng Yahoo/KBS HTTP/Vietcap HTTP và vnfinancialdata không phụ thuộc vào vnstock. Các kết quả SDK bên dưới là bằng chứng của lượt kiểm thử trước đó, không phải chứng nhận SDK đang có trong môi trường mới.
 
 ## Luồng lấy và đối chiếu
 

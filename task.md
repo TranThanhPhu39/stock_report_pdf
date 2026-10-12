@@ -132,3 +132,16 @@ Minh chứng: submission/exchange_report_acceptance.json; phương pháp và gi�
 Chi tiết và minh chứng: docs/ssi_report_upgrade.md; submission/evidence/ssi_report_upgrade.json.
 
 Kiểm chứng cuối: 171 kiểm thử offline đạt; AppTest SSI hiển thị lỗi HTTP 503, giữ nút tải PDF và không ngoại lệ (API/PDF được giả lập trong AppTest). PDF SSI 17 trang và hồi quy SHS/VNM/REE đã kiểm tra ở đợt trước; PDF được giữ nguyên vì chưa có nhận xét AI thật.
+
+## Giao diện theo mẫu Pinterest
+
+- [x] Truy cập pin và xem ảnh mẫu Credix; phân tích bố cục, màu, chữ và khung dashboard.
+- [x] Nền trời xanh/mây tự tạo, tiêu đề giữa trang, CTA cuộn tới phần nhập mã, khung bo tròn và thẻ xanh tím nhạt; assets lưu trong dự án.
+- [x] Bố cục cho điện thoại, trạng thái focus bàn phím và chế độ giảm chuyển động.
+- [x] Hồi quy AppTest SSI: không ngoại lệ, tin 3 → 8 → 3, tin doanh nghiệp 12 bài, lọc biểu đồ; một lượt pipeline.
+
+Chi tiết và minh chứng: docs/pinterest_ui_design.md; submission/evidence/pinterest_ui_upgrade.json.
+
+Cập nhật 12/10/2026: môi trường .venv mới được cài lại theo requirements. PyPI đang cách ly vnstock, nên bỏ gói khỏi cài đặt bắt buộc; giữ adapter tùy chọn và kết nối HTTP Yahoo/KBS/Vietcap, vnfinancialdata. Chi tiết: docs/vnstock_fallback.md.
+
+Kiểm tra lại 12/10/2026 trên .venv mới: cài requirements thành công, pip check không xung đột, 171 kiểm thử đạt. AppTest giao diện đạt; Chrome 1440px/390px không tràn ngang, nút bắt đầu cuộn đúng vị trí. Web chính khởi động tại localhost:8501. Ảnh desktop/mobile được cập nhật; ảnh kết quả SSI giữ từ lượt kiểm tra 11/10 với dữ liệu đã lưu.

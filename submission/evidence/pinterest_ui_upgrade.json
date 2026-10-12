@@ -1,0 +1,101 @@
+{
+  "recorded_at": "2026-10-12T10:08:25.949074+07:00",
+  "reference": "https://www.pinterest.com/pin/54958057951233737/",
+  "reference_review": "Pin poster image inspected; full video not reviewed",
+  "web_health": "ok",
+  "browser": "Existing Chrome in a separate headless profile",
+  "desktop": {
+    "viewport_width": 1440,
+    "viewport_height": 1100,
+    "document_width": 1440,
+    "horizontal_overflow": false
+  },
+  "mobile": {
+    "viewport_width": 390,
+    "viewport_height": 844,
+    "document_width": 390,
+    "horizontal_overflow": false
+  },
+  "start_analysis_anchor": {
+    "hash": "#workspace",
+    "target_top_px": 25.484375
+  },
+  "ssi_result_browser": {
+    "saved_run_id": "SSI_20261011_222135_393293",
+    "preview_only_server_port": 8502,
+    "saved_result_seeded": true,
+    "pipeline_and_pdf_export_mocked": true,
+    "no_exception": true,
+    "metric_text_visible": true,
+    "vega_chart_rendered": true,
+    "mobile_horizontal_overflow": false
+  },
+  "app_test": {
+    "macro": {
+      "articles_available": 8,
+      "preview": 3,
+      "show_all_and_collapse": true
+    },
+    "industry": {
+      "articles_available": 8,
+      "preview": 3,
+      "show_all_and_collapse": true
+    },
+    "no_exception": true,
+    "no_json_ui": true,
+    "analysis_calls": 1,
+    "company_news_count": 12,
+    "chart_filter_ok": true,
+    "grouped_industry_channels": true,
+    "run_id": "SSI_20261011_222135_393293"
+  },
+  "screenshots": {
+    "desktop": {
+      "file": "submission/evidence/pinterest_ui/desktop.png",
+      "sha256": "49aeb9223dfcf50b61255139cf139ed90dab44f9375ba1b415f125e38d8c0ff5",
+      "visually_reviewed": true,
+      "captured_local_date": "2026-10-12"
+    },
+    "mobile": {
+      "file": "submission/evidence/pinterest_ui/mobile.png",
+      "sha256": "b9ac16e8155bceb0d92c07420dddb68177144f1bb6b78c11805fd1f03b6f1544",
+      "visually_reviewed": true,
+      "captured_local_date": "2026-10-12"
+    },
+    "ssi_result": {
+      "file": "submission/evidence/pinterest_ui/ssi_result.png",
+      "sha256": "6f9c73258f58f22c9eeadca58c63a6b113d96f51c690301f2264fbbe25ce23aa",
+      "visually_reviewed": true,
+      "captured_local_date": "2026-10-11"
+    },
+    "ssi_market": {
+      "file": "submission/evidence/pinterest_ui/ssi_market.png",
+      "sha256": "8fa7377f12aa55adb5e350ac56edd12313abd370855362ae0c9db0be873b3a32",
+      "visually_reviewed": true,
+      "captured_local_date": "2026-10-11"
+    },
+    "ssi_mobile_result": {
+      "file": "submission/evidence/pinterest_ui/ssi_mobile_result.png",
+      "sha256": "09ac6e645ae123e426dc88e1b25d60d7a68486ac6857b1902bbbdb3470f2d67d",
+      "visually_reviewed": true,
+      "captured_local_date": "2026-10-11"
+    }
+  },
+  "analysis_engine_changed": false,
+  "pdf_contents_changed": false,
+  "new_gemini_calls": 0,
+  "environment": {
+    "python": "3.12.10",
+    "requirements_install_succeeded": true,
+    "pip_check": "No broken requirements found.",
+    "vnstock": "Not installed: package quarantined on PyPI; excluded from mandatory requirements",
+    "vnfinancialdata": "0.1.2"
+  },
+  "unit_tests": {
+    "command": ".venv/Scripts/python.exe -m unittest discover -s tests -q",
+    "tests_run": 171,
+    "status": "OK",
+    "clock_fixture_fixed": true
+  },
+  "app_test_checked_at": "2026-10-12T10:08:25.949074+07:00"
+}

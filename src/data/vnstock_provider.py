@@ -26,7 +26,7 @@ def load_quote(source="KBS"):
     try:
         installed = version("vnstock")
         if installed != VNSTOCK_VERSION:
-            raise DataSourceError(f"vnstock {installed} has no verified unit contract; install vnstock=={VNSTOCK_VERSION}")
+            raise DataSourceError(f"vnstock {installed} has no verified unit contract; expected {VNSTOCK_VERSION}")
         # Direct component preserves VCI symbol/source metadata; the unified
         # Quote adapter drops these custom DataFrame attributes when slicing.
         if source == "KBS":
@@ -35,7 +35,7 @@ def load_quote(source="KBS"):
             from vnstock.explorer.vci.quote import Quote
         return Quote
     except ImportError as exc:
-        raise DataSourceError("vnstock unavailable; install requirements.txt") from exc
+        raise DataSourceError("Optional vnstock adapter unavailable; direct Yahoo/KBS/Vietcap connectors remain available") from exc
 
 
 def normalize_history(frame, ticker: str, source: str, start: date, cutoff: date) -> list[dict]:
