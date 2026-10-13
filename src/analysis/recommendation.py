@@ -68,7 +68,7 @@ def build_recommendation(result):
     elif year<asof.year-1:blockers.append(f"Tài chính mới nhất {year}, cần bổ sung kỳ {asof.year-1} hoặc mới hơn.")
     if result["quality"]["financial_check"].get("status")=="mismatch":blockers.append("Tài chính sai lệch với tài liệu đối chiếu.")
     if market and (asof-date.fromisoformat(market["latest_date"])).days>7:blockers.append("Giá cuối chuỗi cũ hơn 7 ngày; kiểm tra thanh khoản/tình trạng giao dịch.")
-    if not number(target,True):blockers.append("Chưa có phương pháp chính có bội số mẫu đồng kỳ hoặc SOTP đã xác minh. "+primary.get('reason','')+" Không dùng giả định nhập tay thay thế.")
+    if not number(target,True):blockers.append((primary.get('reason') or "Chưa có phương pháp chính có bội số mẫu đồng kỳ hoặc SOTP đã xác minh.")+" Không dùng giả định nhập tay thay thế.")
     if not number(price,True):blockers.append("Giá đóng cửa dùng để tính chênh lệch không dương hoặc không hữu hạn.")
     weak_profit=number(val("net_profit")) and val("net_profit")<=0
     recent_profit=interim.get('fields',{}).get('parent_profit',{}) if interim and interim.get('valid') else {}

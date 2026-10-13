@@ -37,6 +37,7 @@ from src.analysis.trailing import trailing_from_interim
 from src.analysis.comparison import compare_results
 from src.analysis.decision import decision_summary
 from src.data.ssi_interim import collect_ssi_interim
+from src.data.tch_issuer import collect_tch_issuer
 
 
 def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5,
@@ -76,14 +77,16 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     reference=collect_reference(ticker,as_of,financial,company,root,acquisition["run_id"])
     research["sources"].extend(reference["sources"])
     research["warnings"].extend(reference["warnings"])
-    issuer=collect_bank_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker in BANK_NAMES else collect_ssi_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=="SSI" else collect_shs_issuer(ticker,as_of,reference,root,acquisition["run_id"])
+    issuer=collect_bank_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker in BANK_NAMES else collect_ssi_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=="SSI" else collect_tch_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=='TCH' else collect_shs_issuer(ticker,as_of,reference,root,acquisition["run_id"])
     research["sources"].extend(issuer["sources"])
     research["warnings"].extend(issuer["warnings"])
     research["errors"].extend(issuer["errors"])
     if issuer["available"]:
         replaced={r["year"] for r in issuer["records"]}
         financial=analyze_financials([r for r in research["financial_records"] if r["year"] not in replaced]+issuer["records"])
-        company["name"]=BANK_NAMES[ticker] if ticker in BANK_NAMES else "Công ty Cổ phần Chứng khoán SSI" if ticker=="SSI" else "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội"
+        company["name"]=issuer.get('name') or (BANK_NAMES[ticker] if ticker in BANK_NAMES else "Công ty Cổ phần Chứng khoán SSI" if ticker=="SSI" else "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội")
+        if ticker=='TCH':
+            acquisition['financial_documents'].append(dict(title='TCH: BCTC hợp nhất kiểm toán niên độ 01/04/2025–31/03/2026',file=issuer['file']))
         if issuer.get("interim"):
             interim=issuer["interim"]
         if ticker in BANK_NAMES:

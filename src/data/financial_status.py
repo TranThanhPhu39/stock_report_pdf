@@ -15,7 +15,9 @@ def financial_status(result):
              if (data:=result.get("valuation",{}).get(key)) and not data.get("available")]
     messages=[]
     if year is None:messages.append("Chưa có kỳ BCTC đủ metadata và kiểm tra để sử dụng trong phân tích chính.")
-    else:messages.append(f"BCTC dùng trong phân tích chính: năm {year}, phạm vi {dict(consolidated='hợp nhất',separate='riêng lẻ',parent='công ty mẹ').get(periods[0]['scope'],periods[0]['scope'])}.")
+    else:messages.append(f"BCTC dùng trong phân tích chính: năm {year}, kết thúc {periods[0].get('period_end','chưa xác định')}, phạm vi {dict(consolidated='hợp nhất',separate='riêng lẻ',parent='công ty mẹ').get(periods[0]['scope'],periods[0]['scope'])}.")
+    if result['request'].get('ticker')=='TCH' and periods:
+        messages.append('TCH có niên độ 01/04–31/03. Không ghép mẫu ngành kết thúc 31/12 với kỳ 31/03; thiếu mẫu đồng kỳ có thể vẫn chặn định giá chính. Bộ ghép TTM bán niên 01/01–30/06 hiện chưa áp dụng cho niên độ này.')
     quarterly=result.get('quarterly',{})
     if quarterly.get('records'):messages.append(f"Có kết quả kinh doanh riêng quý từ Vietcap đến {quarterly['records'][0]['period_end']}; phạm vi từng quý chưa được nguồn khai báo, chưa thay tài chính định giá năm.")
     if result['request'].get('ticker')=='SSI' and not result.get('interim',{}):messages.append('SSI: BCTC năm chính đã xác minh; dữ liệu quý Vietcap là nguồn bổ sung, PDF bán niên chưa đủ điều kiện dùng trong kết quả này. Năm 2025 không có nghĩa là báo cáo mới nhất doanh nghiệp đã công bố trong 2026.')

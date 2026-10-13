@@ -15,10 +15,14 @@ def parse_quarters(payload, ticker, as_of, source_id, industry_group):
     data=payload.get('data',{})
     if not isinstance(data,dict) or not isinstance(data.get('quarters'),list):
         raise DataSourceError('Vietcap không có danh sách quý đúng cấu trúc.')
-    records={}
+    records={};organ_codes=set()
     for row in data['quarters']:
-        if row.get('ticker')!=ticker or row.get('organCode')!=ticker:
+        if row.get('ticker')!=ticker or not isinstance(row.get('organCode'),str) or not row['organCode']:
             raise DataSourceError('Vietcap trả sai mã doanh nghiệp.')
+        # organCode is an internal identifier (e.g. HHSF for ticker TCH).
+        organ_codes.add(row['organCode'])
+        if len(organ_codes)>1:
+            raise DataSourceError('Vietcap có mã định danh doanh nghiệp không nhất quán.')
         year=row.get('yearReport');quarter=row.get('lengthReport')
         if isinstance(year,bool) or not isinstance(year,int) or isinstance(quarter,bool) or quarter not in (1,2,3,4):
             raise DataSourceError('Vietcap có kỳ quý không hợp lệ.')
@@ -93,7 +97,7 @@ def collect_quarterly(ticker,as_of,financial,root,run_id):
         primary_year=max((p['year'] for p in financial.get('periods',[])),default=None)
         for annual in payload.get('data',{}).get('years',[]):
             if annual.get('yearReport')!=primary_year:continue
-            if annual.get('ticker')!=ticker or annual.get('organCode')!=ticker:continue
+            if annual.get('ticker')!=ticker:continue
             if annual.get('publicDate','9999')[:10]>as_of.isoformat() or annual.get('updateDate','9999')[:10]>as_of.isoformat():continue
             primary=next((p for p in financial.get('periods',[]) if p['year']==annual.get('yearReport') and p.get('period_end')==f"{p['year']}-12-31"),None)
             if not primary:continue

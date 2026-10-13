@@ -5,6 +5,10 @@ from src.analysis.valuation import number
 
 def trailing_from_interim(financial,interim,as_of):
     out=dict(available=False,fields={},reason='Thiếu năm và bán niên đã kiểm tra cùng kỳ/phạm vi.')
+    periods=financial.get('periods',[])
+    if periods and all(not p.get('period_end','').endswith('-12-31') for p in periods):
+        out['reason']='Đã có BCTC năm theo niên độ riêng; chưa có bộ ghép cập nhật lũy kế/cùng kỳ đã xác minh cho niên độ này.'
+        return out
     if not interim or not interim.get('valid') or interim.get('period_type')!='half_year':return out
     try:
         end=date.fromisoformat(interim['period_end'])

@@ -6,6 +6,8 @@
 
 Cập nhật 13/10/2026: xem [dữ liệu quý/TTM, tóm tắt quyết định và so sánh mã tự chọn](docs/research_workflow_upgrade.md).
 
+TCH: bổ sung BCTC kiểm toán hợp nhất năm tài chính 2025 (01/04/2025–31/03/2026) từ bản chép đã kiểm tra, chỉ dùng với PDF chính thức khớp SHA256; sửa kiểm tra định danh quý Vietcap. Chưa hỗ trợ TTM niên độ riêng hoặc mọi PDF TCH mới. Xem [nguyên nhân, kiểm chứng và giới hạn TCH](docs/tch_fiscal_year_fix.md).
+
 Python 3.11+; máy kiểm thử dùng Python 3.12.10. Chạy trong thư mục dự án:
 
 ```powershell

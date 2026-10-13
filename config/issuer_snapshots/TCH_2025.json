@@ -1,0 +1,33 @@
+{
+  "ticker": "TCH",
+  "name": "Công ty Cổ phần Đầu tư Dịch vụ Tài chính Hoàng Huy",
+  "year": 2025,
+  "period_begin": "2025-04-01",
+  "period_end": "2026-03-31",
+  "published_at": "2026-06-26",
+  "scope": "consolidated",
+  "unit": "VND",
+  "disclosure_url": "https://www.hoanghuy.vn/bao-cao-tai-chinh/tch-bao-cao-tai-chinh-nam-2025-da-kiem-toan-giai-doan-01042025-31032026/",
+  "url": "https://www.hoanghuy.vn/images/uploadfiles/20260625%20-%20tch%20-%20bao%20cao%20tai%20chinh%202025%20hop%20nhat.pdf",
+  "sha256": "95dfa0d407102dc1d253edef5ef1fa0efc56fa3eb265a2907dd63eef4390903d",
+  "review_method": "Manual transcription verified against rendered issuer PDF on 2026-10-13. Only use with the exact SHA256; values are source observations, not valuation assumptions. Prior column is the comparative in this PDF.",
+  "fields": {
+    "assets": {"kind":"balance", "page":8, "row":"270", "value":21840874772623, "previous":15331759635013},
+    "liabilities": {"kind":"balance", "page":9, "row":"300", "value":7475518496782, "previous":1882806997158},
+    "equity": {"kind":"balance", "page":9, "row":"400", "value":14365356275841, "previous":13448952637855},
+    "non_controlling_equity": {"kind":"balance", "page":9, "row":"429", "value":2869385387203, "previous":3699693778300},
+    "cash": {"kind":"balance", "page":7, "row":"110", "value":1691253431725, "previous":1268134021383},
+    "current_assets": {"kind":"balance", "page":7, "row":"100", "value":19405606286948, "previous":13260750350181},
+    "current_liabilities": {"kind":"balance", "page":9, "row":"310", "value":7382867751463, "previous":1488037105820},
+    "short_debt": {"kind":"balance", "page":9, "row":"320", "value":0, "previous":1050000000},
+    "long_debt": {"kind":"balance", "page":9, "row":"338", "value":0, "previous":303367282646},
+    "revenue": {"kind":"income", "page":10, "row":"10", "value":1447394456840, "previous":4666987450641},
+    "gross_profit": {"kind":"income", "page":10, "row":"20", "value":348447097400, "previous":1796735858257},
+    "pretax_profit": {"kind":"income", "page":10, "row":"50", "value":352971034551, "previous":1422385455629},
+    "net_profit": {"kind":"income", "page":10, "row":"60", "value":259196467437, "previous":1121497661342},
+    "parent_profit": {"kind":"income", "page":10, "row":"61", "value":211060969763, "previous":854994167663},
+    "non_controlling_profit": {"kind":"income", "page":10, "row":"62", "value":48135497674, "previous":266503493679},
+    "cfo": {"kind":"cashflow", "page":11, "row":"20", "value":2029979951421, "previous":1467691975783},
+    "capex_cash": {"kind":"cashflow", "page":11, "row":"21", "value":-210637501230, "previous":-26580946653}
+  }
+}
