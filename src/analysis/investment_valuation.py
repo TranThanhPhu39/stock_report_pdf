@@ -6,7 +6,10 @@ def investment_valuation(financial, market, valuation, benchmark, sotp=None):
     out=dict(available=False,methods=[],comparisons=[],target_price_vnd=None,source_ids=[],
              reason="Chưa có bội số mẫu đủ dữ liệu đồng kỳ hoặc SOTP hợp lệ để định giá chính.",
              methodology="Ưu tiên P/B mẫu cho ngân hàng/chứng khoán, P/E mẫu cho doanh nghiệp phi tài chính; phương pháp còn lại dùng đối chiếu. Không lấy trung bình tùy ý hoặc dùng P/E/P/B nhập tay để khuyến nghị.")
-    if not valuation.get("shares") or not market or not financial.get("periods"):return out
+    if not number(valuation.get("shares"),True) or not market or not financial.get("periods"):return out
+    if not number(market.get("latest_close_vnd"),True):
+        out["reason"]="Giá đóng cửa không dương hoặc không hữu hạn; không tính định giá chính."
+        return out
     latest=financial["periods"][0]
     same_basis=benchmark.get("period_end")==latest["period_end"] and benchmark.get("scope")==latest["scope"] and benchmark.get("price_date")==market["latest_date"]
     if not same_basis:

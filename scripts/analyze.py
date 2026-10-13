@@ -27,11 +27,12 @@ def main():
     parser.add_argument("--forecast-growth",type=float,default=.07)
     parser.add_argument("--tax-rate",type=float,default=.20)
     parser.add_argument("--use-ai",action="store_true")
+    parser.add_argument("--compare",nargs="+",default=[],help="Tối đa 4 mã so sánh với mã chính")
     parser.add_argument("--output",type=Path)
     args=parser.parse_args()
     result=run_analysis(args.ticker,args.start,args.as_of,mode=args.mode,sections=args.sections,target_pb=args.target_pb,
                         target_pe=args.target_pe,cost_of_equity=args.cost_of_equity,wacc=args.wacc,terminal_growth=args.terminal_growth,
-                        forecast_growth=args.forecast_growth,tax_rate=args.tax_rate,use_ai=args.use_ai)
+                        forecast_growth=args.forecast_growth,tax_rate=args.tax_rate,use_ai=args.use_ai,comparison_tickers=args.compare)
     if not result["market"] and not result["financial"]["metrics"]:
         print("Không lấy được dữ liệu phân tích:",result["errors"]);return 1
     path=generate_report(result,args.output)

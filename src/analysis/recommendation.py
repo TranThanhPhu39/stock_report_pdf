@@ -69,13 +69,22 @@ def build_recommendation(result):
     if result["quality"]["financial_check"].get("status")=="mismatch":blockers.append("Tài chính sai lệch với tài liệu đối chiếu.")
     if market and (asof-date.fromisoformat(market["latest_date"])).days>7:blockers.append("Giá cuối chuỗi cũ hơn 7 ngày; kiểm tra thanh khoản/tình trạng giao dịch.")
     if not number(target,True):blockers.append("Chưa có phương pháp chính có bội số mẫu đồng kỳ hoặc SOTP đã xác minh. "+primary.get('reason','')+" Không dùng giả định nhập tay thay thế.")
+    if not number(price,True):blockers.append("Giá đóng cửa dùng để tính chênh lệch không dương hoặc không hữu hạn.")
     weak_profit=number(val("net_profit")) and val("net_profit")<=0
+    recent_profit=interim.get('fields',{}).get('parent_profit',{}) if interim and interim.get('valid') else {}
+    recent_profit_weak=(number(recent_profit.get('value')) and number(recent_profit.get('previous'),True)
+                        and bool(periods) and interim.get('period_end','')>periods[0].get('period_end','')
+                        and recent_profit['value']<recent_profit['previous'])
     weak_cash=financial.get("industry_group")=="nonfinancial" and number(val("cfo")) and val("cfo")<=0
     cash_confirmed=financial.get("industry_group")!="nonfinancial" or number(val("cfo"),True)
-    finance_verified=result["quality"]["financial_check"].get("status")=="matched_selected_fields"
+    financial_check=result["quality"]["financial_check"]
+    current_checks=[c for c in financial_check.get("checks",[])
+                    if str(c.get("period")) in {str(year),periods[0].get("period_end")} ] if periods else []
+    finance_verified=(financial_check.get("status")=="matched_selected_fields"
+                      and bool(current_checks) and all(c.get("match") is True for c in current_checks))
     realized_growth=val("realized_profit_growth")
     profit_quality_weak=financial.get("industry_group")=="securities" and number(realized_growth) and realized_growth<0
-    independent_note="Đối chiếu chỉ tiêu đã chọn; không chứng nhận toàn bộ BCTC." if finance_verified else "Tài chính chưa đối chiếu độc lập; mức tin cậy thấp."
+    independent_note=f"Đối chiếu chỉ tiêu đã chọn của năm {year}; không chứng nhận toàn bộ BCTC." if finance_verified else "Tài chính kỳ đang dùng chưa có đối chiếu độc lập khớp các chỉ tiêu đã chọn; mức tin cậy thấp."
     stance="THEO DÕI";reason="Chưa có biên chênh lệch và chất lượng đầu vào đủ mạnh để đề xuất tích lũy."
     if blockers:
         stance="CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ";reason=" ".join(blockers)
@@ -85,6 +94,8 @@ def build_recommendation(result):
         if weak_cash:risk_reasons.append(f"CFO {year} không dương ({val('cfo')/1e9:,.2f} tỷ VND).")
         if upside<=-15:risk_reasons.append(f"Giá trị tham chiếu chính thấp hơn giá đóng cửa {abs(upside):.2f}%.")
         stance="ƯU TIÊN QUẢN TRỊ RỦI RO";reason=" ".join(risk_reasons)+" Cần xác minh sự phục hồi hoặc cập nhật giả định trước khi tăng tỷ trọng."
+    elif recent_profit_weak:
+        reason=f"LNST mẹ bán niên kết thúc {interim['period_end']} giảm {(1-recent_profit['value']/recent_profit['previous'])*100:.2f}% so với cùng kỳ. Định giá năm chưa phản ánh đầy đủ cập nhật này; cần xác minh nguyên nhân và cập nhật kỳ mới trước khi tích lũy."
     elif profit_quality_weak:
         share=val("unrealized_profit_share")
         reason=f"LNST {year} tăng {growth:.2f}% nhưng LNTT đã thực hiện giảm {abs(realized_growth):.2f}%. " if number(growth) else f"LNTT đã thực hiện {year} giảm {abs(realized_growth):.2f}%. "

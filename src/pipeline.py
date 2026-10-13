@@ -32,10 +32,15 @@ from src.data.market_context import collect_market_context
 from src.data.sotp_provider import collect_sotp
 from src.analysis.investment_valuation import investment_valuation
 from src.analysis.research_narrative import research_narrative
+from src.data.quarterly import collect_quarterly
+from src.analysis.trailing import trailing_from_interim
+from src.analysis.comparison import compare_results
+from src.analysis.decision import decision_summary
+from src.data.ssi_interim import collect_ssi_interim
 
 
 def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5,
-                 target_pe=12.0,cost_of_equity=.115,terminal_growth=.035,forecast_growth=.07,wacc=.10,tax_rate=.20,use_ai=False,ai_key=None,ai_model=None) -> dict:
+                 target_pe=12.0,cost_of_equity=.115,terminal_growth=.035,forecast_growth=.07,wacc=.10,tax_rate=.20,use_ai=False,ai_key=None,ai_model=None,comparison_tickers=None) -> dict:
     ticker = ticker.strip().upper()
     if not re.fullmatch(r"[A-Z][A-Z0-9]{1,9}", ticker):
         raise ValueError("Mã cổ phiếu không hợp lệ.")
@@ -44,7 +49,7 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     root = root or Path(__file__).resolve().parents[1]
     request = AnalysisRequest(ticker, start, as_of, mode=mode, target_pb=target_pb,target_pe=target_pe,cost_of_equity=cost_of_equity,
                               terminal_growth=terminal_growth,forecast_growth=forecast_growth,wacc=wacc,tax_rate=tax_rate,use_ai=use_ai,
-                              **({"sections":sections} if sections is not None else {}))
+                              comparison_tickers=comparison_tickers or [],**({"sections":sections} if sections is not None else {}))
     # No pre-existing CSV and no manual fetch step required. This calls the network providers.
     acquisition = acquire(ticker, start, as_of, root)
     rows = []
@@ -95,6 +100,19 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     from src.analysis.bank_metrics import attach_bank_metrics
     financial=attach_bank_metrics(financial,issuer.get('bank_ratios') if financial_check['status']!='mismatch' else None,
                                   interim if financial_check['status']!='mismatch' else None,as_of)
+    quarterly=collect_quarterly(ticker,as_of,financial,root,acquisition['run_id'])
+    research['sources'].extend(quarterly['sources'])
+    research['warnings'].extend(quarterly['warnings'])
+    research['warnings'].extend('Dữ liệu quý: '+e['message'] for e in quarterly['errors'])
+    if ticker=='SSI' and financial_check['status']!='mismatch':
+        reviewed=collect_ssi_interim(as_of,financial,quarterly,root,acquisition['run_id'])
+        research['sources'].extend(reviewed['sources'])
+        research['warnings'].extend('Bán niên SSI: '+e['message'] for e in reviewed['errors'])
+        if reviewed['available']:
+            interim=reviewed['interim']
+            acquisition['financial_documents'].append(dict(title=f"SSI: BCTC hợp nhất bán niên {interim['period_end']} đã đối chiếu",file=interim['file']))
+    if financial.get('industry_group')!='bank' and not financial.get('ttm',{}).get('available'):
+        financial['ttm']=trailing_from_interim(financial,interim if financial_check['status']!='mismatch' else None,as_of)
     vnf=collect_vnfinancialdata(ticker,as_of,company,financial,root,acquisition["run_id"])
     research["sources"].extend(vnf["sources"])
     # A supplementary dataset failure does not discard valid primary statements.
@@ -132,13 +150,25 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     result = {"request": request.to_dict(),
               "acquisition": acquisition, "market": market, "price_rows": rows,
               "company":company,"financial":financial,"interim":interim,"valuation":valuation,"conclusion":conclusion,"news":research["news"],"macro":context["macro"],"industry":context["industry"],
-              "reference":reference,"vnfinancialdata":vnf,"issuer_financials":issuer,"context_news":context_news,"market_context":market_context,"research_narrative":narrative,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
+              "reference":reference,"vnfinancialdata":vnf,"issuer_financials":issuer,"quarterly":quarterly,"context_news":context_news,"market_context":market_context,"research_narrative":narrative,"quality":{"price_check":research["quote_check"],"financial_check":financial_check,"warnings":acquisition.get("warnings",[])+research["warnings"]+financial["errors"]},
               "errors":acquisition["errors"]+research["errors"],"financial_metrics_status":"analyzed" if financial["metrics"] else "unavailable",
               "sources":research["sources"],"status":"partial" if acquisition["errors"] or research["errors"] or (acquisition["prices"] and acquisition["prices"].get("coverage",{}).get("start_gap_days",0)>7) or research["quote_check"]["status"]!="matched" or not financial["metrics"] or not context["macro"].get("available") or not context["industry"].get("comparisons") or (financial["periods"] and financial["periods"][0]["year"]<as_of.year-1) else "analyzed"}
     import json
     existing_sources = root / "outputs/runs" / acquisition["run_id"] / "sources.json"
     result["sources"] = json.loads(existing_sources.read_text(encoding="utf-8")) + research["sources"]
     result["recommendation"]=build_recommendation(result)
+    result['decision_summary']=decision_summary(result)
+    compared=[];comparison_errors=[]
+    for symbol in request.comparison_tickers:
+        try:
+            child=run_analysis(symbol,start,as_of,root,mode=mode,sections=sections,
+                               target_pb=target_pb,target_pe=target_pe,cost_of_equity=cost_of_equity,
+                               terminal_growth=terminal_growth,forecast_growth=forecast_growth,wacc=wacc,tax_rate=tax_rate)
+            compared.append(child)
+            result['sources'].extend(child['sources'])
+        except (ValueError,OSError,RuntimeError) as exc:
+            comparison_errors.append(dict(ticker=symbol,message=str(exc)))
+    result['comparison']=compare_results([result]+compared,comparison_errors) if request.comparison_tickers else {'available':False,'rows':[],'errors':[]}
     from src.data.financial_status import financial_status
     result["financial_data_status"]=financial_status(result)
     result["ai_commentary"]=generate_commentary(result,key=ai_key,model=ai_model)

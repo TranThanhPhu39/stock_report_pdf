@@ -16,9 +16,11 @@ def financial_status(result):
     messages=[]
     if year is None:messages.append("Chưa có kỳ BCTC đủ metadata và kiểm tra để sử dụng trong phân tích chính.")
     else:messages.append(f"BCTC dùng trong phân tích chính: năm {year}, phạm vi {dict(consolidated='hợp nhất',separate='riêng lẻ',parent='công ty mẹ').get(periods[0]['scope'],periods[0]['scope'])}.")
-    if result['request'].get('ticker')=='SSI':messages.append('SSI: bộ đọc hiện xác minh BCTC năm; chưa tích hợp BCTC quý/bán niên hoặc lợi nhuận TTM. Năm 2025 không có nghĩa là báo cáo mới nhất doanh nghiệp đã công bố trong 2026.')
+    quarterly=result.get('quarterly',{})
+    if quarterly.get('records'):messages.append(f"Có kết quả kinh doanh riêng quý từ Vietcap đến {quarterly['records'][0]['period_end']}; phạm vi từng quý chưa được nguồn khai báo, chưa thay tài chính định giá năm.")
+    if result['request'].get('ticker')=='SSI' and not result.get('interim',{}):messages.append('SSI: BCTC năm chính đã xác minh; dữ liệu quý Vietcap là nguồn bổ sung, PDF bán niên chưa đủ điều kiện dùng trong kết quả này. Năm 2025 không có nghĩa là báo cáo mới nhất doanh nghiệp đã công bố trong 2026.')
     interim = result.get('interim')
-    if interim and interim.get('valid') and interim.get('ticker'):
+    if interim and interim.get('valid'):
         messages.append(f"Có cập nhật BCTC hợp nhất bán niên kết thúc {interim['period_end']}. Định giá P/E/P/B mẫu đồng kỳ vẫn dùng năm {year}.")
         ttm=financial.get('ttm',{})
         messages.append(f"Đã ghép lợi nhuận TTM {ttm['period_begin']} đến {ttm['period_end']}; P/E TTM là tham khảo riêng, chưa có mẫu TTM đồng kỳ." if ttm.get('available') else 'TTM: '+ttm.get('reason','Chưa có bộ số liệu đủ điều kiện.'))

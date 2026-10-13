@@ -22,6 +22,8 @@ def price_response():
 
 class AutomaticPipelineTests(unittest.TestCase):
     def setUp(self):
+        quarterly=patch('src.pipeline.collect_quarterly',return_value={'available':False,'records':[], 'sources':[], 'warnings':[], 'errors':[], 'ttm':{'available':False}})
+        quarterly.start();self.addCleanup(quarterly.stop)
         fallback=patch("src.data.acquisition.fetch_kbs_prices",side_effect=DataSourceError("Fixture fallback offline"))
         fallback.start();self.addCleanup(fallback.stop)
         vci=patch("src.data.acquisition.fetch_vietcap_prices",side_effect=DataSourceError("Fixture Vietcap offline"))
@@ -61,6 +63,10 @@ class AutomaticPipelineTests(unittest.TestCase):
         with patch("src.pipeline.acquire") as fetch:
             with self.assertRaises(ValueError):
                 run_analysis("../HPG", date(2025, 10, 9), date(2026, 10, 9))
+            fetch.assert_not_called()
+        with patch('src.pipeline.acquire') as fetch:
+            with self.assertRaises(ValueError):
+                run_analysis('HPG',date(2025,10,9),date(2026,10,9),comparison_tickers=['AAA','BBB','CCC','DDD','EEE'])
             fetch.assert_not_called()
 
     def test_repeated_requests_refresh_prices_and_reuse_checked_pdf(self):

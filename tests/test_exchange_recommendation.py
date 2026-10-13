@@ -67,6 +67,7 @@ class RecommendationTests(unittest.TestCase):
         r=result(['overview','financial','valuation','risks']);r['financial']=financial();r['market']=market()
         r['valuation']=value();r['quality']['price_check']=compare_prices([{'date':'2026-10-08','close':20000}],{'data_day':[{'t':'2026-10-08','c':20000}]},NOW)
         r['quality']['financial_check']['status']='matched_selected_fields'
+        r['quality']['financial_check']['checks']=[dict(metric='net_profit',period='2025',match=True)]
         next(m for m in r['financial']['metrics'] if m['key']=='net_profit_growth')['value']=20
         r['valuation']['primary']={'available':True,'selected_method':'P/B mẫu','source_ids':['fixture'], 'upside_pct':35,'selection_reason':'Fixture đồng kỳ','methodology':'Mẫu dữ liệu kiểm thử','comparisons':[]}
         r['valuation']['primary']['methods']=[{'method':'P/B','target_price_vnd':26000,'weight_pct':50,'contribution_vnd':13000},{'method':'P/E','target_price_vnd':28000,'weight_pct':50,'contribution_vnd':14000}]
@@ -82,6 +83,33 @@ class RecommendationTests(unittest.TestCase):
             if kind=='unverified':r['quality']['financial_check']['status']='not_independently_checked'
             else:next(m for m in r['financial']['metrics'] if m['key']=='cfo')['value']=None
             self.assertEqual(build_recommendation(r)['stance'],'THEO DÕI')
+
+    def test_latest_interim_decline_prevents_buy_based_on_old_annual_growth(self):
+        r=self.fixture();r['interim']=dict(valid=True,period_end='2026-06-30',fields={'parent_profit':{'value':5,'previous':10}})
+        recommendation=build_recommendation(r)
+        self.assertEqual(recommendation['stance'],'THEO DÕI');self.assertIn('bán niên',recommendation['reason'])
+
+    def test_older_interim_cannot_override_more_recent_annual(self):
+        r=self.fixture();r['interim']=dict(valid=True,period_end='2025-06-30',fields={'parent_profit':{'value':5,'previous':10}})
+        self.assertIn('TÍCH LŨY',build_recommendation(r)['stance'])
+
+    def test_prior_year_or_empty_checks_do_not_verify_current_financials(self):
+        for checks in [[], [dict(metric='net_profit',period='2024',match=True)],
+                       [dict(metric='net_profit',period='2025',match=False)]]:
+            r=self.fixture();r['quality']['financial_check']['checks']=checks
+            recommendation=build_recommendation(r)
+            self.assertEqual(recommendation['stance'],'THEO DÕI')
+            self.assertEqual(recommendation['confidence'],'Thấp')
+
+    def test_invalid_primary_target_blocks_instead_of_crashing(self):
+        for target in [None,0,float('nan'),float('inf')]:
+            r=self.fixture();r['valuation']['primary']['target_price_vnd']=target
+            self.assertEqual(build_recommendation(r)['stance'],'CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ')
+
+    def test_invalid_market_price_blocks_instead_of_crashing(self):
+        for price in [None,0,float('nan'),float('inf')]:
+            r=self.fixture();r['market']['latest_close_vnd']=price
+            self.assertEqual(build_recommendation(r)['stance'],'CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ')
     def test_missing_latest_stale_financials_or_single_method_blocks(self):
         for kind in ['price','financial','method','stale_price']:
             r=self.fixture()

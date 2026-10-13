@@ -36,6 +36,13 @@ def snapshot():
 
 
 class PrimaryValuationTests(unittest.TestCase):
+    def test_invalid_prices_or_share_counts_do_not_create_primary_valuation(self):
+        for invalid in [None,0,-1,True,float('nan'),float('inf')]:
+            m=market();m['latest_close_vnd']=invalid
+            self.assertFalse(investment_valuation(financial(),m,value(),benchmark())['available'])
+            v=value();v['shares']=invalid
+            self.assertFalse(investment_valuation(financial(),market(),v,benchmark())['available'])
+
     def test_manual_multiples_and_weights_cannot_change_primary_valuation(self):
         outputs=[]
         for pb,pe in [(1,5),(10,90)]:

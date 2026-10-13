@@ -18,14 +18,26 @@ def analyze_financials(records: list[dict]) -> dict:
     by_year, errors = {}, []
     for record in records:
         year = record["year"]
-        grouped = by_year.setdefault(year, {"year": year, "fields": {}, "scopes": set(), "business_type": record["business_type"],"period_ends":set(),"business_types":set()})
+        grouped = by_year.setdefault(year, {"year": year, "fields": {}, "scopes": set(), "business_type": record["business_type"],"period_ends":set(),"business_types":set(),"conflicting_fields":set()})
         grouped["scopes"].add(record["scope"])
         grouped["period_ends"].add(record.get("period_end",f"{year}-12-31"))
         grouped["business_types"].add(record["business_type"])
-        grouped["fields"].update(record["fields"])
+        for key,field in record["fields"].items():
+            existing=grouped["fields"].get(key)
+            if existing is not None:
+                if existing.get("value") is None:
+                    grouped["fields"][key]=field
+                elif field.get("value") is not None and (existing["value"]!=field["value"] or existing.get("unit")!=field.get("unit")):
+                    grouped["conflicting_fields"].add(key)
+            else:
+                grouped["fields"][key]=field
     periods = []
     for year in sorted(by_year, reverse=True):
         period = by_year[year]
+        conflicting_fields=period.pop("conflicting_fields")
+        if conflicting_fields:
+            errors.append(f"{year}: giá trị chỉ tiêu mâu thuẫn ({', '.join(sorted(conflicting_fields))}); chặn kỳ tài chính")
+            continue
         if len(period["period_ends"])!=1 or len(period["business_types"])!=1:
             errors.append(f"{year}: ngày cuối kỳ hoặc nhóm ngành không nhất quán; chặn kỳ tài chính")
             continue

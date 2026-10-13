@@ -27,6 +27,30 @@ def period(year,profit,equity,scope="consolidated"):
     return {"year":year,"business_type":1,"scope":scope,"fields":{k:{"value":v,"source_id":"fixture","period":str(year)} for k,v in values.items()}}
 
 class FinancialGuardTests(unittest.TestCase):
+    def test_invalid_begin_month_cannot_pass_twelve_month_check(self):
+        p=payload();p['Head'][0].update(PeriodBegin='202500',PeriodEnd='202511')
+        with self.assertRaises(DataSourceError):
+            parse_annual_financials(p,'income',date(2026,10,9),'test')
+
+    def test_conflicting_source_rows_cannot_silently_overwrite_revenue(self):
+        p=payload();duplicate=deepcopy(p['Content']['income'][0]);duplicate['Value1']=999
+        p['Content']['income'].append(duplicate)
+        with self.assertRaises(DataSourceError):
+            parse_annual_financials(p,'income',date(2026,10,9),'test')
+
+    def test_conflicting_statements_block_year_in_both_orders(self):
+        a=period(2025,10,100);b=deepcopy(a);b['fields']['net_profit']['value']=999
+        for records in [[a,b],[b,a]]:
+            f=analyze_financials(records)
+            self.assertFalse(f['periods']);self.assertTrue(f['errors'])
+
+    def test_duplicate_or_missing_field_preserves_known_value_in_both_orders(self):
+        a=period(2025,10,100);b=deepcopy(a);b['fields']['net_profit']['value']=None
+        for records in [[a,a],[a,b],[b,a]]:
+            f=analyze_financials(records)
+            profit=next(m for m in f['metrics'] if m['key']=='net_profit')
+            self.assertEqual(profit['value'],10)
+
     def test_unit_conversion_does_not_multiply_eps(self):
         r=parse_annual_financials(payload(),"income",date(2026,10,9),"test")
         self.assertEqual(r[0]["fields"]["revenue"]["value"],10000000)

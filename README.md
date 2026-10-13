@@ -4,6 +4,8 @@
 
 ## Chạy ứng dụng
 
+Cập nhật 13/10/2026: xem [dữ liệu quý/TTM, tóm tắt quyết định và so sánh mã tự chọn](docs/research_workflow_upgrade.md).
+
 Python 3.11+; máy kiểm thử dùng Python 3.12.10. Chạy trong thư mục dự án:
 
 ```powershell
@@ -93,7 +95,7 @@ Cập nhật SHS tiếp theo: **112 kiểm thử đạt**; tự đọc bảng ki
 
 ## Cập nhật báo cáo SSI (11/10/2026)
 
-SSI tự đọc BCTC hợp nhất kiểm toán 2025 từ PDF chính thức công bố 27/03/2026; qua 12 đối chiếu giá trị với KBS, cân đối tài sản và lợi nhuận thực hiện/chưa thực hiện. Kỳ KBS sai metadata 24 tháng vẫn bị loại. TVS trong mẫu ngành có bộ đọc PDF kiểm toán tương tự; lần kiểm chứng SSI dùng hai mẫu VDS/TVS cùng kỳ 2025, đủ P/E và P/B. Mẫu nhỏ không đại diện toàn ngành; giá trị năm quy đổi theo số CP snapshot, chưa phải TTM/dự phóng. SSI chưa tích hợp BCTC quý/bán niên 2026.
+SSI tự đọc BCTC hợp nhất kiểm toán 2025 từ PDF chính thức công bố 27/03/2026; qua 12 đối chiếu giá trị với KBS, cân đối tài sản và lợi nhuận thực hiện/chưa thực hiện. Kỳ KBS sai metadata 24 tháng vẫn bị loại. TVS trong mẫu ngành có bộ đọc PDF kiểm toán tương tự; lần kiểm chứng SSI dùng hai mẫu VDS/TVS cùng kỳ 2025, đủ P/E và P/B. Mẫu nhỏ không đại diện toàn ngành; giá trị năm quy đổi theo số CP snapshot, chưa phải TTM/dự phóng. Từ đợt 13/10/2026, SSI có dữ liệu quý Vietcap và bộ đọc PDF hợp nhất soát xét bán niên để ghép TTM khi các đối chiếu đạt.
 
 Khoảng ngày đầu trang là lịch sử giá; ngày chốt giới hạn tài liệu được công bố. Web có nến OHLC, khối lượng, MA20/50 khi lịch sử đủ điều kiện và bộ lọc biểu đồ. Tin vĩ mô/ngành lấy tối đa 8 bài phù hợp mỗi phạm vi trong 30 ngày, gộp một ô mỗi mục; mặc định 3 bài với nút mở toàn bộ. Những mã không vào mẫu có lý do riêng: lỗi kỳ, khác phạm vi, thiếu chỉ tiêu hoặc tải nguồn thất bại.
 

@@ -51,8 +51,9 @@ def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: st
         if not end.isdigit() or not begin.isdigit() or len(end)!=6 or len(begin)!=6:
             raise DataSourceError("Metadata ngày đầu/cuối kỳ không hợp lệ")
         end_year,end_month=int(end[:4]),int(end[4:])
-        if not 1<=end_month<=12:
-            raise DataSourceError("Tháng cuối kỳ không hợp lệ")
+        begin_month=int(begin[4:])
+        if not 1<=end_month<=12 or not 1<=begin_month<=12:
+            raise DataSourceError("Tháng đầu/cuối kỳ không hợp lệ")
         period_end=date(end_year,end_month,calendar.monthrange(end_year,end_month)[1]).isoformat()
         months=(end_year-int(begin[:4]))*12+end_month-int(begin[4:])+1
         if months!=12 or date.fromisoformat(period_end)>min(as_of,date.fromisoformat(published[:10])):
@@ -80,6 +81,8 @@ def parse_annual_financials(payload: dict, kind: str, as_of: date, source_id: st
                           "period": str(year), "published_at": published[:10], "statement_scope": scope}
             raw_fields.append(provenance)
             if key:
+                if key in fields and fields[key]["value"]!=normalized:
+                    raise DataSourceError(f"Chỉ tiêu {key} có các dòng giá trị mâu thuẫn trong kỳ {year}; không tự ghi đè.")
                 fields[key] = provenance
         parsed.append({"year": year, "period_end": period_end, "period_begin": begin, "published_at": published[:10],
                        "scope": scope, "business_type": head.get("BusinessType"), "audit": head.get("AuditedStatus"),

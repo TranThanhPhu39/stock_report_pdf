@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 import html
 import json
+import re
 import pandas as pd
 import streamlit as st
 from src.analysis.news import build_news_digest
@@ -15,6 +16,8 @@ from src.models import SECTION_LABELS
 from src.pipeline import run_analysis
 from src.reporting.pdf_exporter import generate_report, formatted
 from src.ui.theme import render_theme, workspace_heading, render_guide
+from src.analysis.decision import decision_summary
+from src.analysis.comparison import comparison_table
 
 ROOT=Path(__file__).resolve().parent
 today=datetime.now(VN_TIME).date()
@@ -192,6 +195,11 @@ with st.container(key="analysis_setup"):
             forecast_growth=vc[1].number_input("Tăng trưởng FCFF 3 năm (%)",min_value=-50.,max_value=50.,value=7.,step=.5)/100
             tax_rate=vc[2].number_input("Thuế suất giả định (%)",min_value=0.,max_value=99.,value=20.,step=1.)/100
             st.caption("Các tỷ lệ trên là giả định do người dùng chọn. DCF chỉ áp cho doanh nghiệp phi tài chính có FCFF và đầu vào đầy đủ. EPS năm quy đổi không phải EPS công bố/TTM.")
+        with st.expander("So sánh với các mã bạn chọn (tuỳ chọn)"):
+            comparison_input=st.text_input("Mã so sánh",value="",placeholder="Ví dụ: FPT, VNM, SSI",key="comparison_tickers_input",
+                                           help="Nhập tối đa 4 mã ngoài mã chính, cách nhau bằng dấu phẩy hoặc khoảng trắng. Bảng so sánh nằm trong mục Ngành và PDF khi chọn Phân tích ngành.")
+            comparison_tickers=[s for s in re.split(r"[,;\s]+",comparison_input.strip().upper()) if s]
+            st.caption("Tổng 2-5 mã. Mỗi mã được lấy dữ liệu mới nên thời gian tạo báo cáo sẽ lâu hơn. So sánh đồng kỳ; các chỉ tiêu khác cơ sở được ghi rõ hoặc ẩn.")
         use_ai=st.checkbox("Gemini hỗ trợ nhận xét từ dữ liệu và nguồn",value=False,help="Cần GEMINI_API_KEY trong Streamlit Secrets hoặc environment. Gửi số liệu và trích xuất bài công khai có giới hạn cho Gemini; nếu thiếu key hoặc lỗi, vẫn tạo báo cáo bằng quy tắc.")
         submitted=st.button("Phân tích và tạo PDF",type="primary",use_container_width=True,key="run_analysis")
 
@@ -223,7 +231,7 @@ with st.container(key="analysis_setup"):
 
 render_guide()
 
-current_signature=(ticker.strip().upper(),start.isoformat(),as_of.isoformat(),mode,tuple(sections),target_pb,target_pe,cost_of_equity,terminal_growth,wacc,forecast_growth,tax_rate,use_ai)
+current_signature=(ticker.strip().upper(),start.isoformat(),as_of.isoformat(),mode,tuple(sections),target_pb,target_pe,cost_of_equity,terminal_growth,wacc,forecast_growth,tax_rate,use_ai,tuple(comparison_tickers))
 if submitted:
     st.session_state.pop("analysis_result",None)
     st.session_state.pop("report_path",None)
@@ -235,7 +243,7 @@ if submitted:
         try:
             with st.spinner("Đang lấy dữ liệu, đối chiếu nguồn, phân tích và tạo PDF… Lần đầu đọc PDF scan có thể mất vài phút."):
                 key=resolve_key(secrets=st.secrets) if use_ai else None
-                result=run_analysis(ticker,start,as_of,mode="full" if mode=="Đầy đủ" else "summary",sections=sections,target_pb=target_pb,target_pe=target_pe,cost_of_equity=cost_of_equity,terminal_growth=terminal_growth,wacc=wacc,forecast_growth=forecast_growth,tax_rate=tax_rate,use_ai=use_ai,ai_key=key)
+                result=run_analysis(ticker,start,as_of,mode="full" if mode=="Đầy đủ" else "summary",sections=sections,target_pb=target_pb,target_pe=target_pe,cost_of_equity=cost_of_equity,terminal_growth=terminal_growth,wacc=wacc,forecast_growth=forecast_growth,tax_rate=tax_rate,use_ai=use_ai,ai_key=key,comparison_tickers=comparison_tickers)
                 if not result["market"] and not result["financial"]["metrics"]:
                     st.error("Không lấy được dữ liệu hợp lệ. Kiểm tra mã cổ phiếu hoặc thử lại khi nguồn truy cập được.")
                     for error in result["errors"]:st.warning(error["message"])
@@ -267,7 +275,24 @@ if result:
         summary_cols[0].metric("Giá đóng cửa",formatted(result.get("market",{}).get("latest_close_vnd") if result.get("market") else None,"VND/share"))
         summary_cols[1].metric("Giá tham chiếu định giá",formatted(primary.get("target_price_vnd") if primary.get("available") else None,"VND/share"))
         summary_cols[2].metric("Chênh lệch so với giá",formatted(primary.get("upside_pct") if primary.get("available") else None,"%"))
-        st.caption("Giá tham chiếu phụ thuộc phương pháp và dữ liệu đủ điều kiện; chênh lệch giá không đồng nghĩa với khuyến nghị mua.")
+        decision=result.get('decision_summary') or decision_summary(result)
+        st.write("**Cơ sở quyết định:** "+decision['method'])
+        st.caption(f"Tài chính định giá: {decision['annual_basis']} · Tin cậy: {decision['confidence']} · Mẫu phương pháp chính: {decision['sample_size'] if decision['sample_size'] is not None else 'Không áp dụng/chưa có'}")
+        st.caption("TTM đã xác minh: "+decision['ttm_basis']+(" · Quý nguồn mới nhất: "+decision['latest_quarter'] if decision['latest_quarter'] else ""))
+        if decision['low_vnd'] is not None:
+            st.write("**Khoảng giá các phương pháp:** "+formatted(decision['low_vnd'],'VND/share')+" đến "+formatted(decision['high_vnd'],'VND/share')+" · Phân tán "+formatted(decision['spread_pct'],'%'))
+        st.caption(decision['selection_reason'])
+        detail_cols=st.columns(2)
+        with detail_cols[0]:
+            st.write('**Điều kiện còn thiếu / cần cập nhật**')
+            if decision['blockers']:
+                for blocker in decision['blockers']:st.write('• '+blocker)
+            else:st.caption('Không có điều kiện chặn theo quy tắc hiện tại; kiểm tra BCTC và sự kiện mới trước khi sử dụng.')
+        with detail_cols[1]:
+            st.write('**Rủi ro cần đọc trước**')
+            for risk in decision['risks']:st.write('• '+risk)
+            if not decision['risks']:st.caption('Xem mục Cơ hội và rủi ro để đọc đầy đủ.')
+        st.caption(decision['note'])
     ai=result.get("ai_commentary",{})
     if request.get("use_ai") and not ai.get("available"):
         st.info(ai.get("reason","Gemini chưa có nhận xét hợp lệ; báo cáo vẫn dùng phân tích từ dữ liệu."))
@@ -278,7 +303,7 @@ if result:
             with st.expander("Nhận xét AI chưa được sử dụng"):
                 for reason in dict.fromkeys(row["reason"] for row in ai["rejected"]):st.write(reason)
     issues=result.get("errors",[])
-    warnings=acquisition.get("warnings",[])
+    warnings=list(dict.fromkeys(acquisition.get("warnings",[])+result.get("quality",{}).get("warnings",[])))
     if issues or warnings:
         with st.expander(f"Tình trạng thu thập dữ liệu · {len(issues)+len(warnings)} lưu ý"):
             st.caption("Một nguồn không truy cập được có thể đã được thay bằng nguồn dự phòng. Xem điều kiện sử dụng dữ liệu trong từng mục phân tích.")
@@ -337,11 +362,46 @@ if result:
                 show_industry_sample(industry)
             st.caption("Trung vị là giá trị ở giữa các doanh nghiệp trong mẫu; không phải bình quân của toàn bộ ngành.")
         else:st.warning("Nguồn chưa xác nhận phân ngành của mã này; không tự gán ngành.")
+        comparison=result.get('comparison',{})
+        if comparison.get('rows') or request.get('comparison_tickers'):
+            st.subheader('So sánh mã tự chọn')
+            st.caption(comparison.get('note',''))
+            if comparison.get('period_end'):
+                st.caption(f"Kỳ năm chung: {comparison['period_end']} · Ngày giá đối chiếu: {comparison.get('price_date') or 'Chưa có'}")
+            else:st.warning('Chưa có kỳ/phạm vi chung; số tài chính và bội số khác cơ sở được ẩn.')
+            compare_frame=pd.DataFrame(comparison_table(comparison))
+            if not compare_frame.empty:
+                st.dataframe(compare_frame,hide_index=True,width='stretch')
+                st.download_button('Tải bảng so sánh CSV',compare_frame.to_csv(index=False).encode('utf-8-sig'),file_name=f"{request['ticker']}_comparison.csv",mime='text/csv')
+            for error in comparison.get('errors',[]):st.warning(error['ticker']+': '+readable_reason(error['message']))
         show_ai_section(result,"industry")
         show_research_notes(result,"industry")
     with tabs[3]:
         diagnostics=result.get("financial_data_status",{})
-        st.caption("Khoảng ngày trên đầu trang dành cho lịch sử giá. Phần này dùng BCTC năm mới nhất đủ điều kiện đến ngày chốt, cùng năm trước để tính tăng trưởng; không phải số liệu TTM.")
+        st.caption("Khoảng ngày trên đầu trang dành cho lịch sử giá. BCTC năm, cập nhật quý và TTM được trình bày riêng với kỳ và nguồn tương ứng.")
+        quarterly=result.get('quarterly',{})
+        with st.expander('Cập nhật kết quả kinh doanh quý và TTM',expanded=True):
+            st.caption(quarterly.get('reason','Chưa có dữ liệu quý trong kết quả này.'))
+            qrecords=quarterly.get('records',[])
+            if qrecords:
+                qrows=[]
+                for q in qrecords[:8]:
+                    previous=next((p for p in qrecords if p['year']==q['year']-1 and p['quarter']==q['quarter']),None)
+                    profit=q['fields'].get('net_profit',{}).get('value');prior=previous['fields'].get('net_profit',{}).get('value') if previous else None
+                    qrows.append({'Quý':f"{q['year']}-Q{q['quarter']}",'Kỳ':q['period_begin']+' → '+q['period_end'],
+                                  'Doanh thu / Thu nhập lãi thuần':formatted(q['fields'].get('net_interest_income' if result['financial'].get('industry_group')=='bank' else 'revenue',{}).get('value'),'VND'),
+                                  'LNST':formatted(profit,'VND'),'LNST mẹ':formatted(q['fields'].get('parent_profit',{}).get('value'),'VND'),
+                                  'LNST YoY (%)':formatted((profit/prior-1)*100 if profit is not None and prior is not None and prior>0 and profit>=0 else None),
+                                  'Công bố':q['published_at'],'Cập nhật nguồn':q['updated_at']})
+                st.dataframe(pd.DataFrame(qrows),hide_index=True,width='stretch')
+                st.caption('Số riêng quý theo Vietcap; phạm vi từng quý chưa được nguồn khai báo. CFO quý không cộng vì chưa xác nhận cơ sở riêng quý/lũy kế. Số liệu quý này chưa thay định giá chính.')
+            observed=quarterly.get('ttm',{})
+            if observed.get('available'):
+                st.write(f"**Quan sát TTM từ bốn quý: {observed['period_begin']} đến {observed['period_end']}**")
+                st.dataframe(pd.DataFrame([{'Chỉ tiêu':{'net_profit':'LNST','parent_profit':'LNST mẹ','revenue':'Doanh thu','net_interest_income':'Thu nhập lãi thuần'}.get(k,k),'Tổng bốn quý':formatted(f['value'],'VND')} for k,f in observed['fields'].items()]),hide_index=True,width='stretch')
+                st.caption(observed['note'])
+            else:st.info(observed.get('reason','Chưa đủ bốn quý liên tiếp hoặc đối chiếu đơn vị.'))
+            for error in quarterly.get('errors',[]):st.caption(readable_reason(error['message']))
         for message in diagnostics.get("messages",[]):st.caption(message)
         if result["financial"]["metrics"]:
             st.caption(f"Báo cáo năm {result['financial']['metrics'][0]['period']}; không phải số liệu TTM.")
@@ -359,7 +419,7 @@ if result:
             st.write(f"**Lợi nhuận TTM: {ttm['period_begin']} đến {ttm['period_end']}**")
             st.dataframe(pd.DataFrame([{'Chỉ tiêu':label,'Năm trước':formatted(f['annual_value'],'VND'),
                 '+ Bán niên hiện tại':formatted(f['current_ytd'],'VND'),'− Bán niên cùng kỳ':formatted(f['prior_ytd'],'VND'),
-                '= TTM':formatted(f['value'],'VND')} for key,label in [('parent_profit','LNST cổ đông mẹ'),('net_profit','LNST hợp nhất'),('net_interest_income','Thu nhập lãi thuần')] if (f:=ttm['fields'].get(key))]),hide_index=True,width='stretch')
+                '= TTM':formatted(f['value'],'VND')} for key,label in [('parent_profit','LNST cổ đông mẹ'),('net_profit','LNST hợp nhất'),('net_interest_income','Thu nhập lãi thuần'),('revenue','Doanh thu'),('cfo','Dòng tiền kinh doanh')] if (f:=ttm['fields'].get(key))]),hide_index=True,width='stretch')
             st.caption(ttm['note'])
         interim=result.get("interim")
         if interim and interim["valid"]:

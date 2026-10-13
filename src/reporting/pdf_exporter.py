@@ -7,6 +7,7 @@ from xml.sax.saxutils import escape, quoteattr
 from src.models import SECTION_LABELS
 from src.reporting.charts import market_chart, research_chart
 from src.analysis.price_quality import latest_price_matches
+from src.analysis.decision import decision_summary
 
 ROOT=Path(__file__).resolve().parents[2]
 try:
@@ -43,7 +44,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     styles.add(ParagraphStyle(name="EvidenceHeadingVN",parent=styles["HeadingVN"],fontSize=11,leading=15,spaceBefore=8,spaceAfter=5))
     styles.add(ParagraphStyle(name="TitleVN",parent=styles["HeadingVN"],fontSize=22,leading=28,spaceBefore=0))
     story=[];left_panels={};left_cards={};current_section="overview"
-    full_width={"methods","sources","valuation_appendix"};right_width=112*mm;left_width=56*mm
+    full_width={"methods","sources","valuation_appendix","comparison"};right_width=112*mm;left_width=56*mm
     def p(value,small=False,source=False):
         safe=str(value).translate(str.maketrans({"—":"-","–":"-","‑":"-","−":"-"}))
         return Paragraph(escape(safe).replace("\n","<br/>"),styles["SourceVN" if source else "MethodVN" if small and current_section=="methods" else "SmallVN" if small else "BodyVN"])
@@ -175,6 +176,17 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             if recommendation.get("target_price_vnd"):
                 text(f"Định giá chính: {recommendation['target_price_vnd']:,.0f} VND/CP; chênh lệch "+formatted(recommendation.get("upside_pct"),"%")+". Không phải lợi suất dự báo.",True)
             citations(recommendation["source_ids"])
+        decision=result.get('decision_summary') or decision_summary(result)
+        heading('Cơ sở quyết định và điều kiện còn thiếu')
+        text(decision['method'])
+        text(f"Tài chính định giá: {decision['annual_basis']}; mẫu phương pháp chính: {decision['sample_size'] if decision['sample_size'] is not None else 'không áp dụng/chưa có'}.",True)
+        text('TTM đã xác minh: '+decision['ttm_basis'],True)
+        if decision['latest_quarter']:text('Quý nguồn mới nhất: '+decision['latest_quarter']+'; dữ liệu quý bổ sung được trình bày riêng.',True)
+        if decision['low_vnd'] is not None:text('Khoảng giá các phương pháp: '+formatted(decision['low_vnd'],'VND/share')+' đến '+formatted(decision['high_vnd'],'VND/share')+'. Phân tán: '+formatted(decision['spread_pct'],'%'),True)
+        text(decision['selection_reason'],True)
+        for item in decision['blockers']:text('Cần bổ sung: '+item,True)
+        for item in decision['risks']:text('Rủi ro: '+item,True)
+        text(decision['note'],True)
 
         text(f"Sàn: {result['company'].get('exchange') or 'chưa có'} · Website: {result['company'].get('website') or 'chưa có'}")
         business=result["company"].get("business") or "Nguồn chưa cung cấp mô tả doanh nghiệp."
@@ -226,6 +238,19 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             citations([r["source_id"] for r in industry.get("sources",[])]+[d["indicator"]["source_id"] for d in industry.get("drivers",[])])
             ai_notes("industry")
             narrative_notes("industry")
+    comparison=result.get('comparison',{})
+    if 'industry' in selected and (comparison.get('rows') or comparison.get('errors')):
+        start_section('comparison','So sánh mã tự chọn')
+        text(comparison.get('note',''),True)
+        text(f"Kỳ năm chung: {comparison.get('period_end') or 'chưa có'}; ngày giá: {comparison.get('price_date') or 'chưa có'}.",True)
+        crows=comparison.get('rows',[])
+        table(['Mã / nhóm','Kỳ năm','LNST (tỷ)','YoY (%)','ROE (%)'],[[r['ticker']+' / '+r['industry'],r['period_end'] or 'Chưa đồng kỳ',formatted(r['net_profit_vnd']/1e9 if r['net_profit_vnd'] is not None else None),formatted(r['profit_growth_pct']),formatted(r['roe_pct'])] for r in crows],[48*mm,32*mm,32*mm,31*mm,31*mm])
+        table(['Mã','Giá (VND)','P/E năm','P/B','P/E TTM'],[[r['ticker'],formatted(r['price_vnd']),formatted(r['pe_annual']),formatted(r['pb']),formatted(r['pe_ttm'])] for r in crows])
+        for row in crows:
+            if row['industry']=='Phi tài chính':text(row['ticker']+': CFO/LNST '+formatted(row['cash_conversion'])+' lần; nợ vay/vốn '+formatted(row['debt_equity'])+' lần.',True)
+            for note in row['notes']:text(row['ticker']+': '+note,True)
+        for error in comparison.get('errors',[]):text(error['ticker']+': '+error['message'],True)
+        citations(comparison.get('source_ids',[]))
     if "market" in selected:
         start_section("market",SECTION_LABELS["market"]);market=result.get("market")
         if market:
@@ -248,6 +273,19 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
     if "financial" in selected:
         start_section("financial",SECTION_LABELS["financial"]);metrics=result["financial"]["metrics"]
         for message in result.get("financial_data_status",{}).get("messages",[]):text(message,True)
+        quarterly=result.get('quarterly',{})
+        if quarterly.get('records'):
+            heading('Kết quả kinh doanh quý - nguồn bổ sung')
+            text(quarterly.get('reason',''),True)
+            table(['Quý / công bố','Doanh thu hoặc lãi thuần (tỷ)','LNST (tỷ)','LNST mẹ (tỷ)'],[[f"{q['year']}-Q{q['quarter']} / {q['published_at']}"]+[formatted(q['fields'].get(k,{}).get('value'),'VND').replace(' tỷ VND','') for k in ['net_interest_income' if result['financial'].get('industry_group')=='bank' else 'revenue','net_profit','parent_profit']] for q in quarterly['records'][:(8 if full else 4)]])
+            text('Số riêng quý của Vietcap; phạm vi từng quý chưa được nguồn khai báo. CFO chưa cộng do cơ sở riêng quý/lũy kế chưa xác nhận. Ngày cập nhật và đầu vào chi tiết nằm trong hồ sơ phân tích.',True)
+            observed=quarterly.get('ttm',{})
+            if observed.get('available'):
+                text(f"Quan sát TTM bốn quý: {observed['period_begin']} đến {observed['period_end']}.")
+                for k,label in [('net_profit','LNST'),('parent_profit','LNST mẹ')]:
+                    if k in observed['fields']:text(label+': '+formatted(observed['fields'][k]['value'],'VND'),True)
+                text(observed['note'],True)
+            citations([s['source_id'] for s in quarterly.get('sources',[])])
         if metrics:
             caption=p(f"Báo cáo năm {metrics[0]['period']}; tăng trưởng so với năm trước cùng phạm vi. Tiền quy đổi: tỷ VND.")
             caption.keepWithNext=True
@@ -288,10 +326,12 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             text(interim["note"],True)
         ttm=result['financial'].get('ttm',{})
         if ttm.get('available'):
+            ttm_start=len(story)
             heading(f"Lợi nhuận TTM: {ttm['period_begin']} đến {ttm['period_end']}")
-            table(['Chỉ tiêu (tỷ VND)','Năm trước','+ Bán niên','− Cùng kỳ','= TTM'],[[label]+[formatted(f[k]/1e9) for k in ['annual_value','current_ytd','prior_ytd','value']] for key,label in [('parent_profit','LNST cổ đông mẹ'),('net_profit','LNST hợp nhất'),('net_interest_income','Thu nhập lãi thuần')] if (f:=ttm['fields'].get(key))])
+            table(['Chỉ tiêu (tỷ VND)','Năm trước','+ Bán niên','− Cùng kỳ','= TTM'],[[label]+[formatted(f[k]/1e9) for k in ['annual_value','current_ytd','prior_ytd','value']] for key,label in [('parent_profit','LNST cổ đông mẹ'),('net_profit','LNST hợp nhất'),('net_interest_income','Thu nhập lãi thuần'),('revenue','Doanh thu'),('cfo','Dòng tiền kinh doanh')] if (f:=ttm['fields'].get(key))])
             text(ttm['note'],True)
             citations([i['source_id'] for f in ttm['fields'].values() for i in f['inputs']])
+            story[ttm_start:]=[KeepTogether(story[ttm_start:])]
         if full:
             names={m['key']:m['label'] for m in metrics}
             names.update(revenue='Doanh thu hoạt động' if result['financial'].get('industry_group')=='securities' else 'Doanh thu thuần',net_profit='LNST',assets='Tài sản',equity='Vốn chủ',liabilities='Nợ phải trả',
@@ -545,7 +585,7 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             canvas.restoreState()
         return draw_page
     templates=[]
-    for section in ["overview"]+[k for k in request["sections"] if k!="overview"]+(["valuation_appendix"] if full and "valuation" in selected else [])+["methods","sources"]:
+    for section in ["overview"]+[k for k in request["sections"] if k!="overview"]+(['comparison'] if 'industry' in selected and (comparison.get('rows') or comparison.get('errors')) else [])+(["valuation_appendix"] if full and "valuation" in selected else [])+["methods","sources"]:
         width=174*mm if section in full_width else right_width
         x=18*mm if section in full_width else 80*mm
         frame=Frame(x,23*mm,width,256*mm,leftPadding=0,rightPadding=0,topPadding=0,bottomPadding=0,id=section)

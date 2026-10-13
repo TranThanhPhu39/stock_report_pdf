@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field, asdict
 from datetime import date
 import math
+import re
 
 SECTION_LABELS = {"overview": "Tổng quan", "macro": "Tổng quan vĩ mô", "industry": "Phân tích ngành", "market": "Giá và giao dịch", "financial": "Tài chính",
                   "reference": "Dữ liệu và báo cáo bổ sung", "valuation": "Định giá và so sánh", "news": "Tin tức", "risks": "Cơ hội và rủi ro"}
@@ -22,8 +23,17 @@ class AnalysisRequest:
     wacc: float = .10
     tax_rate: float = .20
     use_ai: bool = False
+    comparison_tickers: list[str] = field(default_factory=list)
 
     def __post_init__(self):
+        normalized=[]
+        for ticker in self.comparison_tickers:
+            symbol=ticker.strip().upper()
+            if not re.fullmatch(r'[A-Z][A-Z0-9]{1,9}',symbol):
+                raise ValueError('Mã so sánh không hợp lệ.')
+            if symbol!=self.ticker and symbol not in normalized:normalized.append(symbol)
+        if len(normalized)>4:raise ValueError('Chọn tối đa 4 mã so sánh ngoài mã chính (tổng 2-5 mã).')
+        self.comparison_tickers=normalized
         if self.mode not in {"summary", "full"}:
             raise ValueError("Chế độ báo cáo không hợp lệ.")
         if not self.sections or set(self.sections) - set(SECTION_LABELS):
