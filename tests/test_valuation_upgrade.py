@@ -131,6 +131,20 @@ class PeerValuationTests(unittest.TestCase):
 
 
 class AiRegressionTests(unittest.TestCase):
+    def test_nonbank_ttm_does_not_require_bank_interest_income(self):
+        r=result()
+        inputs=[{'source_id':'fixture'}]
+        fields={key:dict(value=value,inputs=inputs) for key,value in
+                [('parent_profit',20e9),('net_profit',21e9),('revenue',80e9),('cfo',15e9)]}
+        r['financial']['ttm']=dict(available=True,period_begin='2025-07-01',
+                                  period_end='2026-06-30',fields=fields,note='Verified TTM')
+        b=evidence_bundle(r)
+        ttm=[e for e in b['evidence'] if e['label'].endswith('TTM')]
+        self.assertEqual(len(ttm),4)
+        self.assertEqual({e['value'] for e in ttm},{20e9,21e9,80e9,15e9})
+        self.assertFalse(any(e['label']=='Thu nhập lãi thuần TTM' for e in ttm))
+        out=generate_commentary(r,key='fake',caller=lambda *args:self.valid(r))
+        self.assertTrue(out['available'])
     def valid(self,r):
         b=evidence_bundle(r);m=next(e for e in b["evidence"] if e["kind"]=="macro");f=next(e for e in b["evidence"] if e["kind"]=="company");i=next(e for e in b["evidence"] if e["kind"]=="industry")
         def item(ids):return {"text":"Cần kiểm tra tác động tới chi phí vốn và dự phòng.","evidence_ids":ids,"source_ids":["fixture"]}
