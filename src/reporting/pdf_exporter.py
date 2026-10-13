@@ -439,6 +439,15 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
             table(["Phương pháp","Bội số","Giá / CP","Chênh giá"],[[m["method"],formatted(m.get("multiple"),"x"),formatted(m["target_price_vnd"],"VND/share"),formatted(m.get("difference_pct"),"%")] for m in primary["methods"]])
             panel("valuation","Chỉ hiển thị các phương pháp định giá chính có đầu vào từ mẫu đồng kỳ. Giá tham chiếu không phải cam kết lợi suất.")
         else:text(primary.get("reason","Chưa đủ dữ liệu định giá chính có nguồn."))
+        near_pb=val.get('near_period_pb',{})
+        if near_pb.get('available'):
+            heading('P/B tham khảo cho niên độ riêng')
+            text(near_pb['reason'],True)
+            text(near_pb['selection'],True)
+            table(['Mã','Ngày vốn mẹ','Lệch ngày','P/B'],[[p['ticker'],p['equity_period'],str(p['period_gap_days']),formatted(p['pb'],'x')] for p in near_pb['peers']])
+            text(f"BVPS mẹ {formatted(near_pb['book_value_per_share'],'VND/share')} × P/B trung vị {formatted(near_pb['median_pb'],'x')} = {formatted(near_pb['reference_price_vnd'],'VND/share')}; chênh tham khảo {formatted(near_pb['difference_pct'],'%')}. Giá cùng ngày {near_pb['price_date']}.")
+            text('Chưa đánh giá lại dự án/đất, pháp lý hoặc khả năng thu tiền. Khác biệt hiệu quả vốn/cơ cấu tài sản có thể lớn. Không đưa giá này vào định giá chính, P/E, TTM hoặc khuyến nghị.',True)
+            citations([s['source_id'] for s in near_pb['sources']])
         peers=benchmark.get("peers",[])
         if peers:
             heading("Doanh nghiệp so sánh")

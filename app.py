@@ -268,20 +268,24 @@ if result:
         st.download_button("Tải báo cáo phân tích PDF",path.read_bytes(),file_name=path.name,mime="application/pdf",type="primary")
     recommendation=result.get("recommendation",{})
     primary=result.get("valuation",{}).get("primary",{})
+    near_pb=result.get('valuation',{}).get('near_period_pb',{})
     with st.container(key="recommendation_summary"):
         st.subheader(recommendation.get("stance","Kết quả phân tích"))
         st.write(recommendation.get("reason","Xem các mục bên dưới để đánh giá dữ liệu và cơ hội đầu tư."))
         summary_cols=st.columns(3)
         summary_cols[0].metric("Giá đóng cửa",formatted(result.get("market",{}).get("latest_close_vnd") if result.get("market") else None,"VND/share"))
-        summary_cols[1].metric("Giá tham chiếu định giá",formatted(primary.get("target_price_vnd") if primary.get("available") else None,"VND/share"))
-        summary_cols[2].metric("Chênh lệch so với giá",formatted(primary.get("upside_pct") if primary.get("available") else None,"%"))
+        use_near=not primary.get('available') and near_pb.get('available')
+        summary_cols[1].metric("Giá tham khảo P/B gần kỳ" if use_near else "Giá tham chiếu định giá",formatted(near_pb.get('reference_price_vnd') if use_near else primary.get("target_price_vnd") if primary.get("available") else None,"VND/share"))
+        summary_cols[2].metric("Chênh lệch tham khảo" if use_near else "Chênh lệch so với giá",formatted(near_pb.get('difference_pct') if use_near else primary.get("upside_pct") if primary.get("available") else None,"%"))
+        if use_near:
+            st.caption(f"Mẫu P/B gần kỳ: {near_pb['pb_sample_size']} mã; số dư vốn mẹ trước {near_pb['anchor_period_end']} tối đa 90 ngày, giá cùng ngày {near_pb['price_date']}. Đây là tham khảo nghiên cứu, chưa phải định giá chính hoặc giá mục tiêu. Xem bảng nguồn trong tab Định giá.")
         decision=result.get('decision_summary') or decision_summary(result)
         st.write("**Cơ sở quyết định:** "+decision['method'])
         st.caption(f"Tài chính định giá: {decision['annual_basis']} · Tin cậy: {decision['confidence']} · Mẫu phương pháp chính: {decision['sample_size'] if decision['sample_size'] is not None else 'Không áp dụng/chưa có'}")
         st.caption("TTM đã xác minh: "+decision['ttm_basis']+(" · Quý nguồn mới nhất: "+decision['latest_quarter'] if decision['latest_quarter'] else ""))
         if decision['low_vnd'] is not None:
             st.write("**Khoảng giá các phương pháp:** "+formatted(decision['low_vnd'],'VND/share')+" đến "+formatted(decision['high_vnd'],'VND/share')+" · Phân tán "+formatted(decision['spread_pct'],'%'))
-        st.caption(decision['selection_reason'])
+        if decision['selection_reason'] not in recommendation.get('reason',''):st.caption(decision['selection_reason'])
         detail_cols=st.columns(2)
         with detail_cols[0]:
             st.write('**Điều kiện còn thiếu / cần cập nhật**')
@@ -471,6 +475,16 @@ if result:
             if not reference.get("available"):st.info("Chưa có dữ liệu bổ sung đủ điều kiện theo phiên bản nguồn/ngày phân tích/sàn.")
     with tabs[4]:
         val=result["valuation"];primary=val.get("primary",{});benchmark=val.get("benchmark",{})
+        near_pb=val.get('near_period_pb',{})
+        if near_pb.get('available'):
+            st.write('**P/B tham khảo cho niên độ riêng**')
+            st.caption(near_pb['reason'])
+            st.caption(near_pb['selection'])
+            st.dataframe(pd.DataFrame([{'Mã':p['ticker'],'Ngày số dư vốn mẹ':p['equity_period'],
+                'Lệch kỳ (ngày)':p['period_gap_days'],'Ngày giá':p['price_date'],
+                'P/B (lần)':p['pb']} for p in near_pb['peers']]),hide_index=True,width='stretch')
+            st.write(f"BVPS cổ đông mẹ {formatted(near_pb['book_value_per_share'],'VND/share')} × trung vị P/B {formatted(near_pb['median_pb'],'lần')} = {formatted(near_pb['reference_price_vnd'],'VND/share')}.")
+            st.caption('Vốn sổ sách chưa đánh giá lại giá trị dự án/đất, tiến độ pháp lý và khả năng thu tiền. Mẫu có thể khác cơ cấu tài sản, đòn bẩy và hiệu quả vốn; chênh lệch không tự chứng minh cổ phiếu rẻ hoặc đắt. Không dùng mẫu này để tính P/E, TTM hoặc đổi khuyến nghị.')
         st.write(f"**Bội số của {request['ticker']} từ dữ liệu đã xác minh**")
         multiples=st.columns(3)
         multiples[0].metric("P/E lợi nhuận mẹ năm",formatted(val.get("pe",{}).get("reference_pe"),"lần"))

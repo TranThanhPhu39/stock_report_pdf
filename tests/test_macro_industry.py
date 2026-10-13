@@ -51,6 +51,15 @@ class MacroTests(unittest.TestCase):
         self.assertTrue(parse_world_bank(p,'lending_annual',date(2026,10,9),'WB')[0]['stale'])
 
 class IndustryTests(unittest.TestCase):
+    def test_failed_older_sample_does_not_replace_latest_basis(self):
+        target=analyze_financials([period(2025,30,100),period(2024,20,80)])
+        group={'code':'1757','level':4,'name':'Thép','symbols':['AAA','BBB'],'url':'test'}
+        universe={'groups':[group],'retrieved_at':'2026-10-09T10:00:00+07:00','complete':True,'taxonomy':'Vietcap ICB','retrieval_mode':'test'}
+        with TemporaryDirectory() as folder,patch('src.data.industry.collect_universe',return_value=universe),patch('src.data.industry.download',return_value=b'{}'),patch('src.data.industry.parse_annual_financials',return_value=[self.normalized_period(2024)]):
+            result=collect_industry('AAA',date(2026,10,9),target,Path(folder),'fixture')
+        self.assertEqual(result['period_end'],'2025-12-31')
+        self.assertFalse(result['peers'])
+        self.assertFalse(any('dùng kỳ chung' in w for w in result['warnings']))
     @staticmethod
     def normalized_period(year,profit=10,equity=100,scope="consolidated"):
         return {**period(year,profit,equity,scope),"period_end":f"{year}-12-31"}

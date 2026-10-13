@@ -177,6 +177,20 @@ def collect_industry(ticker,as_of,financial,root,run_id,max_peers=4):
     if group["code"]!=result["code"]:
         result["warnings"].append(f"Không đủ mẫu cùng kỳ trong {result['subsector_name']}; mở rộng mẫu lên ICB cấp {group.get('level')}: {group['name']}. So sánh nhóm rộng hơn, không coi là các đối thủ có sản phẩm giống nhau.")
         result.update({"name":group["name"],"code":group["code"],"level":group.get("level"),"members":group["symbols"]})
+    if len(candidates)<2:
+        # A failed older-year attempt is not a real common-period sample.
+        # Keep the main company's latest basis instead of presenting a stale
+        # sample date that makes the valuation failure look like a year mix.
+        target=financial['periods'][0]
+        candidates=[]
+        result['excluded']=[]
+        for symbol in group['symbols']:
+            if symbol==ticker:continue
+            data=balance_cache[symbol]
+            if isinstance(data,str):result['excluded'].append(dict(ticker=symbol,reason=data,reason_code='source_unavailable'))
+            else:
+                records,_,issues=data
+                result['excluded'].append(dict(ticker=symbol,**exclusion_detail(analyze_financials(records),target,issues)))
     result.update(period_end=target["period_end"],scope=target["scope"])
     if target["period_end"]!=financial["periods"][0]["period_end"]:
         result["warnings"].append(f"Mẫu ngành dùng kỳ chung {target['year']} do chưa đủ hai peer ở kỳ mới nhất. So sánh mã phân tích và peer đều tại {target['period_end']}; không ghép chỉ tiêu khác năm.")

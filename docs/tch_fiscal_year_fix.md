@@ -25,3 +25,19 @@ Streamlit AppTest với kết quả lưu chạy không exception, có tám tab v
 Phân tích vẫn ở trạng thái `partial`: chưa đủ mẫu ngành đúng kỳ và nguồn độc lập để định giá chính. Nhãn “CHƯA ĐỦ CƠ SỞ KHUYẾN NGHỊ” vì vậy vẫn có thể đúng. TTM niên độ 01/04–31/03 chưa có bộ đọc lũy kế đã xác minh. Bản chép chỉ hỗ trợ đúng phiên bản PDF/niên độ đã nêu, không tự đọc mọi báo cáo TCH mới; thay đổi file cần kiểm tra và cập nhật bản chép có nguồn.
 
 Nguồn: [công bố kiểm toán TCH năm 2025](https://www.hoanghuy.vn/bao-cao-tai-chinh/tch-bao-cao-tai-chinh-nam-2025-da-kiem-toan-giai-doan-01042025-31032026/), [PDF hợp nhất](https://www.hoanghuy.vn/images/uploadfiles/20260625%20-%20tch%20-%20bao%20cao%20tai%20chinh%202025%20hop%20nhat.pdf).
+
+## Bổ sung P/B tham khảo gần kỳ
+
+Lượt `TCH_20261013_155155_291761` kiểm tra phần định giá còn thiếu:
+
+- Sửa lỗi kỳ mẫu: khi thử năm cũ vẫn không đủ hai peer, không hiển thị năm cũ như một mẫu chung đã chọn. Định giá chính vẫn yêu cầu đúng kỳ, phạm vi và ngày giá.
+- Sửa lấy giá peer: Yahoo trả thành công nhưng thiếu đúng ngày yêu cầu cũng phải thử Vietcap, không chỉ chuyển nguồn khi HTTP lỗi. Giá vẫn phải khớp KBS trong dung sai hiện có.
+- Thêm `src/data/near_period_pb.py`: chỉ dành cho doanh nghiệp phi tài chính có niên độ riêng khi chưa có định giá chính. Chọn tối đa bốn mã cùng nhóm nguồn, lớn nhất theo tài sản trong các snapshot của chính lượt chạy. Yêu cầu vốn cổ đông mẹ dương, cùng phạm vi/loại báo cáo, cân đối tài sản/nợ/vốn, số dư trước ngày cuối kỳ mã phân tích không quá **90 ngày**, giá cùng ngày và CP cùng ngày chốt. Ngưỡng 90 ngày là chính sách tham khảo của ứng dụng, không phải chuẩn kế toán hay bảo đảm khả năng so sánh.
+- Không tạo P/E từ mẫu lệch kỳ, không ghép lợi nhuận/TTM khác niên độ, không đưa giá tham khảo vào `valuation.primary`, khuyến nghị hoặc điều kiện tích lũy. Không thay mẫu ngành đồng kỳ hiện có.
+- Giao diện có nhãn riêng **Giá tham khảo P/B gần kỳ** và **Chênh lệch tham khảo** khi đủ mẫu. Tab Định giá/PDF liệt kê từng mã, ngày vốn mẹ, độ lệch và P/B. Không gọi giá này là giá mục tiêu hoặc RNAV. Vốn sổ sách chưa đánh giá lại dự án/đất, pháp lý, dòng tiền; cơ cấu tài sản và hiệu quả vốn giữa các mã có thể khác nhiều.
+
+Lượt thật có VHM, KSF, DXG và SIP: số dư 31/12/2025, lệch TCH 90 ngày, giá 12/10/2026. Trung vị P/B **2,2583294517** × BVPS mẹ TCH cho tham khảo **25.875,97 VND/CP**. Đây chỉ là kết quả công thức của mẫu này; chênh lệch lớn không tự chứng minh TCH bị định giá thấp. Định giá chính vẫn thiếu cơ sở, mức tin cậy vẫn thấp.
+
+AppTest xác nhận nhãn tham khảo hiển thị, bốn peer và tám tab, không exception. PDF kiểm tra chín trang, phần bảng tham khảo đã render và kiểm tra trực quan. **244 kiểm thử cuối đều đạt**, gồm hồi quy giới hạn ngày/phạm vi/NCI, giá dự phòng, kỳ mẫu thất bại và cách ly giá tham khảo khỏi định giá chính.
+
+Tham khảo về phương pháp và giới hạn bội số: [CFA Institute — Market-Based Valuation](https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/market-based-valuation-price-enterprise-value-multiples). Chính sách ngày/nguồn cụ thể ở trên là thiết kế của ứng dụng.

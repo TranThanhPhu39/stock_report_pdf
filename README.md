@@ -8,6 +8,8 @@ Cập nhật 13/10/2026: xem [dữ liệu quý/TTM, tóm tắt quyết định v
 
 TCH: bổ sung BCTC kiểm toán hợp nhất năm tài chính 2025 (01/04/2025–31/03/2026) từ bản chép đã kiểm tra, chỉ dùng với PDF chính thức khớp SHA256; sửa kiểm tra định danh quý Vietcap. Chưa hỗ trợ TTM niên độ riêng hoặc mọi PDF TCH mới. Xem [nguyên nhân, kiểm chứng và giới hạn TCH](docs/tch_fiscal_year_fix.md).
 
+Doanh nghiệp phi tài chính có niên độ riêng còn thiếu định giá chính có thêm P/B **tham khảo gần kỳ** nếu đủ mẫu: số dư vốn mẹ trước kỳ mã phân tích tối đa 90 ngày, cùng phạm vi, giá và CP cùng ngày chốt. Bảng ghi rõ ngày từng mã; không tính P/E lệch kỳ hoặc đưa giá tham khảo vào khuyến nghị/giá mục tiêu.
+
 Python 3.11+; máy kiểm thử dùng Python 3.12.10. Chạy trong thư mục dự án:
 
 ```powershell

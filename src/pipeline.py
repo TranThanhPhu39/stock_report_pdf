@@ -38,6 +38,7 @@ from src.analysis.comparison import compare_results
 from src.analysis.decision import decision_summary
 from src.data.ssi_interim import collect_ssi_interim
 from src.data.tch_issuer import collect_tch_issuer
+from src.data.near_period_pb import collect_near_period_pb
 
 
 def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5,
@@ -130,6 +131,9 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     valuation["sotp"]=sotp
     valuation["benchmark"]=benchmark
     valuation["primary"]=investment_valuation(financial,market,valuation,benchmark,sotp)
+    near_pb=collect_near_period_pb(ticker,as_of,financial,context['industry'],valuation,market,research['quote_check'],root,acquisition['run_id']) if not valuation['primary']['available'] else {'available':False,'sources':[]}
+    valuation['near_period_pb']=near_pb
+    research['sources'].extend(near_pb['sources'])
     research["sources"].extend(sotp["sources"])
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=2) as pool:
