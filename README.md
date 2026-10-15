@@ -10,6 +10,8 @@ TCH: bổ sung BCTC kiểm toán hợp nhất năm tài chính 2025 (01/04/2025�
 
 Doanh nghiệp phi tài chính có niên độ riêng còn thiếu định giá chính có thêm P/B **tham khảo gần kỳ** nếu đủ mẫu: số dư vốn mẹ trước kỳ mã phân tích tối đa 90 ngày, cùng phạm vi, giá và CP cùng ngày chốt. Bảng ghi rõ ngày từng mã; không tính P/E lệch kỳ hoặc đưa giá tham khảo vào khuyến nghị/giá mục tiêu.
 
+P/B định giá chính đã hỗ trợ **kỳ bảng cân đối chung**: dùng số dư vốn thực tế cùng ngày/phạm vi của mã phân tích và tối thiểu hai mã khác, kể cả BCTC quý. TCH có số dư hợp nhất 31/12/2025 từ PDF chính thức khớp SHA256; không đổi kỳ BCTC năm 31/03/2026, không coi lợi nhuận 9 tháng là lợi nhuận năm/TTM. DCF toàn doanh nghiệp vẫn là kịch bản độ nhạy và không bắt buộc chia theo dự án; thông báo nêu rõ đầu vào còn thiếu.
+
 Python 3.11+; máy kiểm thử dùng Python 3.12.10. Chạy trong thư mục dự án:
 
 ```powershell

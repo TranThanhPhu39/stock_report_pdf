@@ -39,6 +39,8 @@ from src.analysis.decision import decision_summary
 from src.data.ssi_interim import collect_ssi_interim
 from src.data.tch_issuer import collect_tch_issuer
 from src.data.near_period_pb import collect_near_period_pb
+from src.data.common_period_pb import collect_common_period_pb
+from src.data.reviewed_issuer import collect_reviewed_issuer, SUPPORTED as REVIEWED_ISSUERS
 
 
 def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None, *, mode="full", sections=None, target_pb=1.5,
@@ -78,7 +80,7 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     reference=collect_reference(ticker,as_of,financial,company,root,acquisition["run_id"])
     research["sources"].extend(reference["sources"])
     research["warnings"].extend(reference["warnings"])
-    issuer=collect_bank_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker in BANK_NAMES else collect_ssi_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=="SSI" else collect_tch_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=='TCH' else collect_shs_issuer(ticker,as_of,reference,root,acquisition["run_id"])
+    issuer=collect_bank_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker in BANK_NAMES else collect_ssi_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=="SSI" else collect_tch_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker=='TCH' else collect_reviewed_issuer(ticker,as_of,root,acquisition["run_id"]) if ticker in REVIEWED_ISSUERS else collect_shs_issuer(ticker,as_of,reference,root,acquisition["run_id"])
     research["sources"].extend(issuer["sources"])
     research["warnings"].extend(issuer["warnings"])
     research["errors"].extend(issuer["errors"])
@@ -88,6 +90,8 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
         company["name"]=issuer.get('name') or (BANK_NAMES[ticker] if ticker in BANK_NAMES else "Công ty Cổ phần Chứng khoán SSI" if ticker=="SSI" else "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội")
         if ticker=='TCH':
             acquisition['financial_documents'].append(dict(title='TCH: BCTC hợp nhất kiểm toán niên độ 01/04/2025–31/03/2026',file=issuer['file']))
+        if ticker in REVIEWED_ISSUERS:
+            acquisition['financial_documents'].append(dict(title=f"{ticker}: BCTC hợp nhất kiểm toán {issuer['year']} từ PDF chính thức",file=issuer['file']))
         if issuer.get("interim"):
             interim=issuer["interim"]
         if ticker in BANK_NAMES:
@@ -131,6 +135,11 @@ def run_analysis(ticker: str, start: date, as_of: date, root: Path | None = None
     valuation["sotp"]=sotp
     valuation["benchmark"]=benchmark
     valuation["primary"]=investment_valuation(financial,market,valuation,benchmark,sotp)
+    common_pb=collect_common_period_pb(ticker,as_of,financial,issuer.get('balance_snapshots',[]),context['industry'],valuation,market,research['quote_check'],root,acquisition['run_id']) if not valuation['primary']['available'] else {'available':False,'sources':[]}
+    valuation['common_period_pb']=common_pb
+    research['sources'].extend(common_pb['sources'])
+    if common_pb['available']:
+        valuation['primary']=investment_valuation(financial,market,valuation,benchmark,sotp,common_pb=common_pb)
     near_pb=collect_near_period_pb(ticker,as_of,financial,context['industry'],valuation,market,research['quote_check'],root,acquisition['run_id']) if not valuation['primary']['available'] else {'available':False,'sources':[]}
     valuation['near_period_pb']=near_pb
     research['sources'].extend(near_pb['sources'])

@@ -12,6 +12,24 @@ from src.data.reference_miner import cached_file
 from src.data.shs_issuer import folded
 
 
+def balance_snapshot_record(snapshot,content,as_of,source_id):
+    from src.data.common_period_pb import valid_balance
+    if snapshot.get('ticker')!='TCH' or snapshot.get('scope')!='consolidated' or snapshot.get('unit')!='VND' or snapshot.get('basis')!='interim_balance':
+        raise DataSourceError('Snapshot số dư TCH sai danh tính/phạm vi/đơn vị.')
+    if not content.startswith(b'%PDF-') or hashlib.sha256(content).hexdigest()!=snapshot['sha256']:
+        raise DataSourceError('PDF quý TCH khác bản đã kiểm tra.')
+    end=date.fromisoformat(snapshot['period_end']);published=date.fromisoformat(snapshot['published_at'])
+    if end!=date(2025,12,31) or published!=date(2026,1,29) or published>as_of:
+        raise DataSourceError('Snapshot quý TCH sai kỳ hoặc chưa công bố.')
+    fields={k:dict(value=f['value'],unit='VND',source_id=source_id,page=f['page'],source_field='PDF row '+f['row'],
+                   period=end.isoformat(),published_at=published.isoformat(),statement_scope='consolidated',
+                   extraction_method='checksum_bound_reviewed_transcription') for k,f in snapshot['fields'].items()}
+    p=dict(year=2025,period_end=end.isoformat(),published_at=published.isoformat(),scope='consolidated',business_type=1,
+           basis='interim_balance',audit='CKT',fields=fields)
+    if not valid_balance(p,'consolidated',1):raise DataSourceError('Số dư quý TCH không qua kiểm tra vốn/bảng cân đối.')
+    return p
+
+
 def snapshot_records(snapshot,content,as_of,source_id):
     if snapshot['ticker']!='TCH' or snapshot['scope']!='consolidated' or snapshot['unit']!='VND':
         raise DataSourceError('Snapshot TCH sai doanh nghiệp/phạm vi/đơn vị.')
@@ -48,7 +66,7 @@ def snapshot_records(snapshot,content,as_of,source_id):
 
 
 def collect_tch_issuer(ticker,as_of,root,run_id):
-    out=dict(available=False,records=[],checks=[],sources=[],warnings=[],errors=[])
+    out=dict(available=False,records=[],balance_snapshots=[],checks=[],sources=[],warnings=[],errors=[])
     if ticker!='TCH':return out
     try:
         snapshot=json.loads((root/'config/issuer_snapshots/TCH_2025.json').read_text(encoding='utf-8'))
@@ -76,4 +94,17 @@ def collect_tch_issuer(ticker,as_of,root,run_id):
         if as_of>=date(2027,4,1):out['warnings'].append('Nguồn TCH đã xác minh hiện dừng ở niên độ kết thúc 31/03/2026; cần kiểm tra BCTC mới trước khi sử dụng.')
     except (DataSourceError,OSError,ValueError,KeyError,TypeError) as exc:
         out['errors'].append(dict(stage='tch_issuer',message=str(exc)))
+    # Keep interim balances separate from annual financial metrics/TTM.
+    try:
+        snapshot=json.loads((root/'config/issuer_snapshots/TCH_2025_Q3_balance.json').read_text(encoding='utf-8'))
+        if date.fromisoformat(snapshot['published_at'])<=as_of:
+            path=root/'data/raw/documents/TCH_2025_Q3_consolidated.pdf'
+            content,meta=cached_file(snapshot['url'],path,snapshot['published_at'],max_size=40_000_000)
+            sid='TCH_Q3_BALANCE_2025_'+run_id
+            out['balance_snapshots']=[balance_snapshot_record(snapshot,content,as_of,sid)]
+            out['sources'].append(dict(source_id=sid,url_or_file=snapshot['url'],retrieved_at=meta['retrieved_at'],
+                                       page_or_table='PDF pages 5–6, rows 270/300/400/429; 31/12/2025 column',
+                                       notes='Visually reviewed transcription, exact PDF SHA256 '+snapshot['sha256']+'; unaudited interim balance only, not annual earnings or TTM.'))
+    except (DataSourceError,OSError,ValueError,KeyError,TypeError) as exc:
+        out['warnings'].append('Số dư quý TCH chưa dùng được: '+str(exc))
     return out

@@ -503,6 +503,11 @@ if result:
             st.metric("Giá tham chiếu chính",formatted(primary["target_price_vnd"],"VND/share"),formatted(primary["upside_pct"],"%"))
             st.write(primary["selected_method"]+". "+primary["selection_reason"])
             st.caption(primary["methodology"])
+            if val.get('common_period_pb',{}).get('available'):
+                common=val['common_period_pb'];benchmark=common['benchmark']
+                st.caption(f"Kỳ bảng cân đối dùng định giá: {common['period']['period_end']} · {common['period']['scope']}. BCTC mới nhất dùng phân tích: {result['financial']['periods'][0]['period_end']}. Không dùng lợi nhuận lũy kế của báo cáo quý làm P/E năm.")
+                for method in primary['methods']:
+                    if method.get('period_end'):st.caption(method['basis'])
             st.dataframe(pd.DataFrame([{ "Chỉ tiêu":c["label"],"Hiện tại (x)":c["company_value"],"Trung vị mẫu (x)":c["sample_median"],"Cao/thấp hơn mẫu (%)":c["premium_pct"],"Số mẫu":c["sample_size"]} for c in primary["comparisons"]]),hide_index=True,width="stretch")
             for c in primary["comparisons"]:st.write(c["label"]+": "+c["interpretation"])
             st.dataframe(pd.DataFrame([{"Phương pháp":m["method"],"Bội số (x)":m.get("multiple"),"Giá / CP (VND)":m["target_price_vnd"],"Chênh với giá (%)":m.get("difference_pct"),"Số mẫu":m.get("sample_size")} for m in primary["methods"]]),hide_index=True,width="stretch")
@@ -516,7 +521,7 @@ if result:
         if peers:
             st.write("**Các doanh nghiệp so sánh**")
             st.dataframe(pd.DataFrame([{ "Mã":r["ticker"],"P/E năm (x)":r["pe"],"P/B (x)":r["pb"],"ROE (%)":r["roe"],"LNST YoY (%)":r.get("profit_growth"),"Nợ vay/vốn":r.get("debt_equity")} for r in peers]),hide_index=True,width="stretch")
-            st.caption(f"Kỳ {benchmark.get('period_end')}; giá {benchmark.get('price_date')}. P/E theo lợi nhuận mẹ năm/CP snapshot; không phải TTM hay dự phóng. Mẫu không đại diện toàn ngành.")
+            st.caption(benchmark.get('explanation') or f"Kỳ {benchmark.get('period_end')}; giá {benchmark.get('price_date')}. P/E theo lợi nhuận mẹ năm/CP snapshot; không phải TTM hay dự phóng. Mẫu không đại diện toàn ngành.")
         sotp=val.get("sotp",{})
         with st.expander("SOTP: định giá từng mảng",expanded=bool(sotp.get("available"))):
             st.write(sotp.get("reason","Chưa có dữ liệu từng mảng có nguồn."))

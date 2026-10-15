@@ -105,7 +105,9 @@ def analyze_valuation(financial, market, company, quote_check, as_of, target_pb=
     required=["cfo","capex_cash","interest_paid","cash","short_debt","long_debt","non_controlling_equity"]
     missing=[k for k in required if not number(get(k))]
     if financial.get("industry_group")!="nonfinancial":val["dcf"]["reason"]="Không áp DCF CFO/FCFF của doanh nghiệp sản xuất cho ngân hàng/chứng khoán; cần mô hình vốn hoặc cổ tức riêng."
-    elif missing:val["dcf"]["reason"]="Thiếu FCFF/bridge: "+", ".join(missing)+"; không thay CFO thiếu bằng 85% lợi nhuận."
+    elif missing:
+        labels={'cfo':'dòng tiền kinh doanh','capex_cash':'tiền chi đầu tư tài sản cố định','interest_paid':'lãi vay đã trả','cash':'tiền và tương đương tiền','short_debt':'nợ vay ngắn hạn','long_debt':'nợ vay dài hạn','non_controlling_equity':'vốn cổ đông không kiểm soát'}
+        val["dcf"]["reason"]="Thiếu đầu vào DCF: "+", ".join(labels[k] for k in missing)+". Chưa xác định được từ nguồn đã kiểm tra; không tự thay bằng 0."
     elif get("capex_cash")>0 or get("interest_paid")>0:val["dcf"]["reason"]="CAPEX/lãi đã trả sai dấu dòng chi."
     elif wacc<=perpetual_growth:val["dcf"]["reason"]="DCF yêu cầu WACC > tăng trưởng dài hạn."
     else:

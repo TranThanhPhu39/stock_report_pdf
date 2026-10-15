@@ -41,3 +41,21 @@ Lượt thật có VHM, KSF, DXG và SIP: số dư 31/12/2025, lệch TCH 90 ng�
 AppTest xác nhận nhãn tham khảo hiển thị, bốn peer và tám tab, không exception. PDF kiểm tra chín trang, phần bảng tham khảo đã render và kiểm tra trực quan. **244 kiểm thử cuối đều đạt**, gồm hồi quy giới hạn ngày/phạm vi/NCI, giá dự phòng, kỳ mẫu thất bại và cách ly giá tham khảo khỏi định giá chính.
 
 Tham khảo về phương pháp và giới hạn bội số: [CFA Institute — Market-Based Valuation](https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/market-based-valuation-price-enterprise-value-multiples). Chính sách ngày/nguồn cụ thể ở trên là thiết kế của ứng dụng.
+
+## P/B cùng ngày bảng cân đối, cập nhật 13/10/2026
+
+Luồng mới `src/data/common_period_pb.py` tìm kỳ bảng cân đối chung trước khi dùng tham khảo lệch kỳ. Giữ nguyên BCTC năm mới nhất và TTM; chỉ dùng vốn tại ngày chung để tính BVPS/P/B. Kỳ lùi không quá 90 ngày so với BCTC năm mới nhất và không cũ hơn 365 ngày tại ngày phân tích. Đây là chính sách ứng dụng. Mẫu gồm tối đa bốn mã khác cùng nhóm nguồn, lớn nhất theo tài sản trong kỳ đủ điều kiện; tối thiểu hai P/B có giá đóng cửa cùng ngày đối chiếu và CP snapshot. Chỉ đọc snapshot peer của chính lượt chạy, không dùng run cũ. P/B số dư cùng ngày không yêu cầu kỳ tích lũy lợi nhuận của các doanh nghiệp giống nhau.
+
+TCH dùng [PDF hợp nhất quý III năm tài chính 2025](https://www.hoanghuy.vn/images/uploadfiles/20260129%20-%20tch%20-%20bao%20cao%20tai%20chinh%20quy%20iii%20nam%20tai%20chinh%202025%20hop%20nhat.pdf), công bố 29/01/2026, SHA256 `577d9379e02fd5b250e5d41bbb8d4b7e64ef2c022a56c6f061a8e90503de853f`. Trang PDF 5–6, cột 31/12/2025:
+
+- Tài sản: 21.120.690.828.321 VND; nợ phải trả: 6.850.160.011.726 VND.
+- Vốn chủ sở hữu: 14.270.530.816.595 VND; NCI: 2.838.570.954.495 VND.
+- Vốn cổ đông mẹ: 11.431.959.862.100 VND.
+
+Bản chép đã kiểm tra trực quan lưu ở `config/issuer_snapshots/TCH_2025_Q3_balance.json`, chỉ chấp nhận PDF đúng checksum. Báo cáo giữa niên độ chưa kiểm toán; bản chép không phải đối chiếu nguồn độc lập. KBS quý vẫn bị loại nếu metadata/cột mơ hồ: không sửa ngày hoặc dùng thứ tự cột thay ID. Hiện adapter số dư quý chính thức này chỉ hỗ trợ đúng tài liệu TCH nêu trên; mã khác cần có bộ số dư có nguồn được hỗ trợ hoặc kỳ năm chung đủ điều kiện.
+
+Luồng P/B cùng ngày không tính P/E từ lợi nhuận quý, 9 tháng hay năm khác niên độ. Mẫu P/B vẫn có thể khác mô hình kinh doanh, cơ cấu tài sản và đòn bẩy, không phải RNAV. CP snapshot hiện tại chia vốn kỳ cũ là giả định được công bố; cần kiểm tra thay đổi vốn sau kỳ báo cáo.
+
+Lượt chạy đầy đủ `TCH_20261013_163324_434761` thử 31/03/2026 không có mẫu, chọn 31/12/2025 với VHM/KSF/DXG/SIP, giá đối chiếu 12/10/2026. Trung vị P/B 2,2583294517 cho giá tham chiếu **25.731,89 VND/CP**, dựa trên vốn TCH đúng 31/12/2025. Kết luận **THEO DÕI**, tin cậy thấp; một phương pháp chưa đủ điều kiện tích lũy. Giao diện và PDF ghi riêng kỳ định giá 31/12/2025 và BCTC năm phân tích 31/03/2026. AppTest tám tab không exception; PDF kiểm tra 10 trang đã render và kiểm tra trực quan. Bộ kiểm thử có 251 ca, gồm checksum/publication, bảng cân đối/NCI/đơn vị, kỳ/phạm vi/ngày giá, mẫu dưới hai mã và không tạo P/E trong chế độ số dư.
+
+DCF toàn doanh nghiệp không cần chia dự án và không cần mẫu P/E/P/B. Mô hình hiện tại là FCFF ba năm với WACC/tăng trưởng giả định nên chỉ dùng độ nhạy. TCH hiện thiếu **lãi vay đã trả** trong đầu vào được kiểm tra; thông báo đã dùng tên tiếng Việt và không tự thay giá trị thiếu bằng 0. Muốn DCF làm định giá chính phải có dự báo dòng tiền, chi phí vốn và cầu nối giá trị vốn có cơ sở. Chia theo dự án là lựa chọn dự báo cho doanh nghiệp dự án, không phải điều kiện bắt buộc của DCF.

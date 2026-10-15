@@ -59,7 +59,7 @@ def build_recommendation(result):
     ids=sorted({i["source_id"] for i in valuation.get("inputs",[]) if i.get("source_id")} | set(primary.get("source_ids",[])))
     if number(upside) and upside>=15:
         thesis("Định giá chính và biên chênh lệch",f"{primary.get('selected_method','Phương pháp chính')}: {target:,.0f} VND/CP, chênh {upside:+.2f}% so với giá {price:,.0f} ngày {market['latest_date']}.",
-               f"Đầu vào tài chính năm {year}, cần cập nhật kỳ mới. Có khoảng chênh lệch để nghiên cứu nếu các giả định lợi nhuận, vốn và chi phí vốn giữ được. Không phải lợi suất dự báo.",
+               f"Kỳ định giá {primary.get('period_end') or periods[0]['period_end']}, BCTC năm phân tích {periods[0]['period_end']}; cần cập nhật kỳ mới. Có khoảng chênh lệch để nghiên cứu nếu các giả định lợi nhuận, vốn và chi phí vốn giữ được. Không phải lợi suất dự báo.",
                "Xác minh BCTC mới và kiểm tra lại bội số/chi phí vốn trước khi hành động.",
                "Giá trị cập nhật không còn chênh ít nhất 15%, hoặc đầu vào/giả định không còn phù hợp.",ids,market["latest_date"])
     blockers=[]

@@ -1,0 +1,16 @@
+{
+  "ticker": "TCH",
+  "scope": "consolidated",
+  "unit": "VND",
+  "basis": "interim_balance",
+  "period_end": "2025-12-31",
+  "published_at": "2026-01-29",
+  "sha256": "577d9379e02fd5b250e5d41bbb8d4b7e64ef2c022a56c6f061a8e90503de853f",
+  "url": "https://www.hoanghuy.vn/images/uploadfiles/20260129%20-%20tch%20-%20bao%20cao%20tai%20chinh%20quy%20iii%20nam%20tai%20chinh%202025%20hop%20nhat.pdf",
+  "fields": {
+    "assets": {"value": 21120690828321, "page": 5, "row": "270"},
+    "liabilities": {"value": 6850160011726, "page": 6, "row": "300"},
+    "equity": {"value": 14270530816595, "page": 6, "row": "400"},
+    "non_controlling_equity": {"value": 2838570954495, "page": 6, "row": "429"}
+  }
+}

@@ -434,6 +434,12 @@ def generate_report(result: dict, path: Path | None=None) -> Path:
         if primary.get("available"):
             text(f"Phương pháp chính: {primary['selected_method']}. Giá tham chiếu {primary['target_price_vnd']:,.0f} VND/CP; chênh {primary['upside_pct']:+.2f}% so với đóng cửa.")
             text(primary["selection_reason"]);text(primary["methodology"],True)
+            common=val.get('common_period_pb',{})
+            if common.get('available'):
+                benchmark=common['benchmark']
+                text(f"Bảng cân đối dùng P/B: {common['period']['period_end']} / {common['period']['scope']}; BCTC mới nhất dùng phân tích: {result['financial']['periods'][0]['period_end']}.",True)
+                for method in primary['methods']:
+                    if method.get('period_end'):text(method['basis'],True)
             table(["Chỉ tiêu","Hiện tại","Trung vị","Chênh bội số","n"],[[c["label"],formatted(c["company_value"],"x"),formatted(c["sample_median"],"x"),formatted(c["premium_pct"],"%"),str(c["sample_size"])] for c in primary["comparisons"]])
             for c in primary["comparisons"]:text(c["label"]+": "+c["interpretation"],True)
             table(["Phương pháp","Bội số","Giá / CP","Chênh giá"],[[m["method"],formatted(m.get("multiple"),"x"),formatted(m["target_price_vnd"],"VND/share"),formatted(m.get("difference_pct"),"%")] for m in primary["methods"]])

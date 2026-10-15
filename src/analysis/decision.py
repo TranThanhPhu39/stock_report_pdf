@@ -18,11 +18,11 @@ def decision_summary(result):
     prices=[m['target_price_vnd'] for m in methods if number(m.get('target_price_vnd'),True)]
     return dict(method=primary.get('selected_method') or 'Chưa có phương pháp đủ dữ liệu',
                 selection_reason=primary.get('selection_reason') or primary.get('reason',''),
-                annual_basis=f"{p.get('period_end','Chưa có')} / {SCOPE_NAMES.get(p.get('scope'),'Chưa xác định')}",
+                annual_basis=f"{primary.get('period_end') or p.get('period_end','Chưa có')} / {SCOPE_NAMES.get(primary.get('scope') or p.get('scope'),'Chưa xác định')}",
                 ttm_basis=f"{ttm['period_begin']} đến {ttm['period_end']} / {SCOPE_NAMES.get(ttm.get('scope'),'Chưa xác định')}" if ttm.get('available') else 'Chưa có TTM đã xác minh',
                 latest_quarter=quarterly.get('records',[{}])[0].get('period_end') if quarterly.get('records') else None,
                 sample_size=selected.get('sample_size') if selected else None,
                 low_vnd=min(prices) if prices else None,high_vnd=max(prices) if prices else None,
                 spread_pct=rec.get('model_spread_pct'),confidence=rec.get('confidence','Thấp'),
                 blockers=list(dict.fromkeys(b for b in blockers if b)),risks=risks,
-                conditions=rec.get('conditions',[]),note='Khoảng giá là min-max các phương pháp đủ điều kiện, không phải khoảng xác suất. Giá định giá chính vẫn dùng cơ sở năm/mẫu đồng kỳ; P/E TTM tham khảo riêng.')
+                conditions=rec.get('conditions',[]),note='Khoảng giá là min-max các phương pháp đủ điều kiện, không phải khoảng xác suất. P/B có thể dùng số dư bảng cân đối quý cùng ngày; P/E dùng lợi nhuận năm đồng kỳ, TTM tham khảo riêng.')

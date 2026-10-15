@@ -10,7 +10,9 @@ from src.data.research import KBS_BASE
 
 
 def collect_valuation_peers(industry, as_of, price_date, root, run_id, *, period_policy='exact'):
+    if period_policy not in {'exact','exact_balance','prior_balance_90_days'}:raise ValueError('Unknown peer period policy')
     near=period_policy=='prior_balance_90_days'
+    balance_only=near or period_policy=='exact_balance'
     result={"available":False,"peers":[],"excluded":[],"sources":[],"median_pb":None,
             "median_pe":None,"pb_sample_size":0,"pe_sample_size":0,"pe_available":False,
             "sector_name":industry.get("name"),"period_end":industry.get("period_end"),"scope":industry.get("scope"),"reason":"Chưa đủ hai P/B đồng kỳ có giá đối chiếu và số CP snapshot."}
@@ -53,7 +55,7 @@ def collect_valuation_peers(industry, as_of, price_date, root, run_id, *, period
         metrics={m["key"]:m["value"] for m in peer["financial"]["metrics"]}
         return {"ticker":ticker,"price_date":price_date,"shares_snapshot":as_of.isoformat(),"equity_period":period["period_end"],
                 "pb":quotes[0]/(capital/shares) if number(capital,True) else None,
-                "pe":quotes[0]/(profit/shares) if not near and number(profit,True) else None,
+                "pe":quotes[0]/(profit/shares) if not balance_only and number(profit,True) else None,
                 "period_gap_days":gap,
                 "roe":metrics.get("roe"),"profit_growth":metrics.get("net_profit_growth"),"debt_equity":metrics.get("debt_equity"),
                 "pe_basis":"LNST cổ đông mẹ năm / CP snapshot; không phải TTM hoặc dự phóng",
@@ -75,6 +77,8 @@ def collect_valuation_peers(industry, as_of, price_date, root, run_id, *, period
     if len(values)>=2:
         result.update(available=True,reason="",median_pb=statistics.median(values),sample_size=len(values),price_date=price_date,
                       explanation=f"Trung vị {len(values)} mã khác trong mẫu {industry.get('name')}, giá {price_date}; vốn năm quy đổi trên CP snapshot. Không phải chỉ số P/B toàn ngành.")
+    if period_policy=='exact_balance':
+        result.update(period_policy=period_policy,explanation=f"P/B từ số dư vốn cổ đông mẹ cùng ngày {industry.get('period_end')}, cùng phạm vi; giá {price_date}, CP snapshot {as_of}. Không sử dụng lợi nhuận quý/lũy kế để tính P/E.")
     if near:
         result.update(period_policy=period_policy,usable_in_primary=False,
                       explanation='P/B tham khảo từ số dư vốn mẹ trước ngày cuối kỳ mã phân tích tối đa 90 ngày; giá cùng ngày, CP snapshot cùng ngày chốt. Không phải mẫu đồng kỳ, giá mục tiêu, RNAV hay khuyến nghị. Không dùng P/E từ các năm lệch kỳ.')
